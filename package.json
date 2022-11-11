@@ -1,0 +1,23 @@
+{
+  "name": "hololounge-vr",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "node ./server/index.js ./client/build ./client/build",
+    "start:dev": "nodemon ./server/index.js ./client/build ./client/public",
+    "build": "cd client && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jdboris/hololounge-vr.git"
+  },
+  "author": "Joseph Boris",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/jdboris/hololounge-vr/issues"
+  },
+  "homepage": "https://github.com/jdboris/hololounge-vr#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
