@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "start": "node ./server/index.js ./client/build ./client/build",
-    "start:dev": "nodemon ./server/index.js ./client/build ./client/public",
+    "start:server": "cd ./server && npm run start ../client/build ../client/public",
+    "start:client": "cd ./client && npm run start",
     "build": "cd client && npm run build"
   },
   "repository": {
@@ -16,8 +17,5 @@
   "bugs": {
     "url": "https://github.com/jdboris/hololounge-vr/issues"
   },
-  "homepage": "https://github.com/jdboris/hololounge-vr#readme",
-  "devDependencies": {
-    "nodemon": "^2.0.20"
-  }
+  "homepage": "https://github.com/jdboris/hololounge-vr#readme"
 }
