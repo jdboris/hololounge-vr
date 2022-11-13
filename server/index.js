@@ -36,4 +36,8 @@ const port = process.env.PORT || 5000;
 app.listen(port);
 
 console.log("Listening on port " + port);
-console.log(`Serving client app from '${CLIENT_APP_PATH}'`);
+if (NODE_ENV !== "development") {
+  console.log(`Serving client app from '${CLIENT_APP_PATH}'`);
+} else {
+  console.log("Run client app separately...");
+}
