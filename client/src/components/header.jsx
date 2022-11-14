@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import theme from "@jdboris/css-themes/space-station";
-import { FaBars } from "react-icons/fa";
+import { FaBars, FaUser } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
+import { MdLanguage } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
 
 function Header() {
@@ -46,56 +47,54 @@ function Header() {
             e.target.closest("header").scrollTo({ top: 0 });
           }}
         ></div>
+        <ul
+          onFocus={(e) => {
+            e.target.closest("header").scrollTo({ top: 0 });
+            if (
+              e.target.getBoundingClientRect().top + 5 >=
+              e.target.closest("header").getBoundingClientRect().bottom
+            ) {
+              setIsMenuOpen(true);
+            }
+          }}
+        >
+          <li>
+            <Link to="/account">{isMenuOpen && <FaUser />} Account</Link>
+          </li>
+          <li>
+            <button className={theme.altButton}>
+              <MdLanguage /> {isMenuOpen && "Language"}
+            </button>
+          </li>
+          {!isLoading &&
+            (currentUser ? (
+              <>
+                {currentUser && currentUser.isAuthor && (
+                  <li>
+                    <Link to="/article/new">New Article</Link>
+                  </li>
+                )}
 
-        {!isLoading &&
-          (currentUser ? (
-            <ul
-              onFocus={(e) => {
-                e.target.closest("header").scrollTo({ top: 0 });
-                if (
-                  e.target.getBoundingClientRect().top + 5 >=
-                  e.target.closest("header").getBoundingClientRect().bottom
-                ) {
-                  setIsMenuOpen(true);
-                }
-              }}
-            >
-              {currentUser && currentUser.isAuthor && (
                 <li>
-                  <Link to="/article/new">New Article</Link>
+                  <Link to={`/user/${currentUser.id}`}>Profile</Link>
                 </li>
-              )}
 
-              <li>
-                <Link to={`/user/${currentUser.id}`}>Profile</Link>
-              </li>
+                {currentUser && currentUser.isAdmin && (
+                  <li>
+                    <Link to="/settings">Settings</Link>
+                  </li>
+                )}
 
-              {currentUser && currentUser.isAdmin && (
                 <li>
-                  <Link to="/settings">Settings</Link>
+                  <button onClick={logout}>Logout</button>
                 </li>
-              )}
-
-              <li>
-                <button onClick={logout}>Logout</button>
-              </li>
-            </ul>
-          ) : (
-            <ul>
-              <li>
-                <Link to="/settings">Settings</Link>
-              </li>
-              <li>
-                <Link to="/settings">Settings</Link>
-              </li>
-              <li>
-                <Link to="/settings">Settings</Link>
-              </li>
+              </>
+            ) : (
               <li>
                 <button onClick={login}>Login</button>
               </li>
-            </ul>
-          ))}
+            ))}
+        </ul>
 
         <button
           className={theme.altButton}
