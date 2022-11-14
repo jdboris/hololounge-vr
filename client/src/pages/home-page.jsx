@@ -8,8 +8,8 @@ function HomePage() {
         className={theme.landingPage}
         style={{ backgroundImage: `url('landing-page.jpeg')` }}
       >
-        <strong>HoloLounge</strong>
-        <small>Relax, hang out, have fun.</small>
+        <strong>Casual VR Fun</strong>
+        <small>Try something new. Stay a while.</small>
 
         <button
           onClick={(e) => {
