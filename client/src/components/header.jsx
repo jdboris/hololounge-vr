@@ -91,7 +91,9 @@ function Header() {
               </>
             ) : (
               <li>
-                <button onClick={login}>Login</button>
+                <Link className={theme.button} to="/login">
+                  Login
+                </Link>
               </li>
             ))}
         </ul>

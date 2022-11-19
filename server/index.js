@@ -1,12 +1,15 @@
 import express from "express";
 import path from "path";
 import * as dotenv from "dotenv";
-import db from "./db/db.js";
-
-dotenv.config();
+import authRouter from "./api/auth.js";
+import { HttpError } from "./utils.js";
+import bodyParser from "body-parser";
 
 const app = express();
 
+app.use(bodyParser.json());
+
+dotenv.config();
 const { CLIENT_APP_PATH, NODE_ENV, PORT } = process.env;
 
 if (!CLIENT_APP_PATH) {
@@ -21,8 +24,8 @@ if (NODE_ENV !== "development") {
   app.use(express.static(CLIENT_APP_PATH));
 }
 
-// TODO:
-// API routes here...
+// API Routes
+app.use("/api/auth", authRouter);
 
 // Default to React app
 app.get("*", (req, res) => {
@@ -34,6 +37,28 @@ app.get("*", (req, res) => {
   res.sendFile(`${path.resolve(process.cwd(), CLIENT_APP_PATH)}/index.html`);
 });
 
+// Error handler
+app.use((err, req, res, next) => {
+  if (!(err instanceof HttpError)) {
+    console.error(err);
+    res.send(
+      500,
+      // Generic error message.
+      JSON.stringify({
+        ...err,
+        message: "Something went wrong. Try again later.",
+      })
+    );
+    return;
+  }
+
+  res.send(
+    err.status,
+    // Manually copy the message property to include it in the JSON string
+    JSON.stringify({ ...err, message: err.message })
+  );
+});
+
 const port = PORT || 5000;
 app.listen(port);
 
@@ -42,5 +67,5 @@ console.log("Listening on port " + port);
 if (NODE_ENV !== "development") {
   console.log(`Serving client app from '${CLIENT_APP_PATH}'`);
 } else {
-  console.log("Run client app separately...");
+  console.log("NOTE: Run client app separately...");
 }

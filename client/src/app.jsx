@@ -3,20 +3,26 @@ import theme from "@jdboris/css-themes/space-station";
 import Footer from "./components/footer";
 import Header from "./components/header";
 import HomePage from "./pages/home-page";
+import LoginPage from "./pages/login-page";
+import { AuthProvider } from "./contexts/auth";
 
 function App() {
   return (
-    <div className={theme.root}>
-      <BrowserRouter>
-        <Header></Header>
+    <BrowserRouter>
+      <AuthProvider>
+        <div className={theme.root}>
+          <Header></Header>
 
-        <Routes>
-          <Route path="/" element={<HomePage />}></Route>
-        </Routes>
+          <Routes>
+            <Route path="/login" element={<LoginPage />}></Route>
 
-        <Footer></Footer>
-      </BrowserRouter>
-    </div>
+            <Route path="/" element={<HomePage />}></Route>
+          </Routes>
+
+          <Footer></Footer>
+        </div>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 
