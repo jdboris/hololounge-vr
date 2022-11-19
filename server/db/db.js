@@ -1,25 +1,38 @@
-import mongoose from "mongoose";
 import * as dotenv from "dotenv";
+import { Sequelize } from "sequelize";
+import mysql from "mysql2/promise";
 
 dotenv.config();
 
-const { MONGODB_URI } = process.env;
+const { DATABASE_NAME, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST } =
+  process.env;
 
-if (!MONGODB_URI) {
-  console.error(
-    `Error: Expected MONGODB_URI environment variable to be URI to MongoDB database, received: ${MONGODB_URI}.`
-  );
-  process.exit(1);
-}
+const connection = await mysql.createConnection({
+  host: DATABASE_HOST,
+  user: DATABASE_USERNAME,
+  password: DATABASE_PASSWORD,
+});
 
-mongoose.connect(
-  MONGODB_URI,
-  () => {
-    console.log(`Connected to MongoDB database at ${MONGODB_URI}`);
-  },
-  (e) => {
-    console.error(e);
+await connection.query(`CREATE DATABASE IF NOT EXISTS ${DATABASE_NAME}`);
+
+connection.end();
+
+const sequelize = new Sequelize(
+  DATABASE_NAME,
+  DATABASE_USERNAME,
+  DATABASE_PASSWORD,
+  {
+    host: DATABASE_HOST,
+    dialect: "mysql",
   }
 );
+try {
+  await sequelize.authenticate();
+  console.log(
+    `Connected to MySQL database '${DATABASE_NAME}' through host '${DATABASE_HOST}'.`
+  );
+} catch (error) {
+  console.error("Unable to connect to MySQL database: ", error);
+}
 
-export default mongoose;
+export default sequelize;
