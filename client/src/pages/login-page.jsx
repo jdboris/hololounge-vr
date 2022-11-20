@@ -1,14 +1,15 @@
-import theme from "@jdboris/css-themes/space-station";
-import { useContext } from "react";
-import { useEffect } from "react";
+import theme from "@jdboris/css-themes/space-station/theme.module.scss";
 import GoogleLoginButton from "../components/google-login-button";
-import { AuthContext, useAuth } from "../contexts/auth";
+import UserForm from "../components/user-form";
+import { useAuth } from "../contexts/auth";
 
 function LoginPage() {
-  const { authenticate } = useAuth();
+  const { signup, login, authenticate } = useAuth();
 
   return (
     <main>
+      <UserForm mode="login" signup={signup} login={login} />
+      <span className={theme.sideLines}>OR</span>
       <GoogleLoginButton
         onSuccess={(jwt) => {
           authenticate(jwt, "google");
