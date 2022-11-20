@@ -12,16 +12,27 @@ function load(url) {
   });
 }
 
-function GoogleLoginButton({ onSuccess }) {
+function AppleLoginButton({ onSuccess }) {
   const divRef = useRef();
 
   useEffect(() => {
     (async () => {
-      await load("https://accounts.google.com/gsi/client");
-      const { google } = window;
+      await load(
+        "https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"
+      );
+      const { AppleID } = window;
+
+      AppleID.auth.init({
+        clientId: process.env.REACT_APP_APPLE_OAUTH_CLIENT_ID,
+        scope: "[SCOPES]",
+        redirectURI: location.origin,
+        state: "[STATE]",
+        nonce: "[NONCE]",
+        usePopup: true,
+      });
 
       google.accounts.id.initialize({
-        client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
+        client_id: process.env.REACT_APP_APPLE_OAUTH_CLIENT_ID,
         callback: (response) => {
           onSuccess(response.credential);
         },
@@ -35,7 +46,14 @@ function GoogleLoginButton({ onSuccess }) {
     })();
   }, []);
 
-  return <div ref={divRef}></div>;
+  return (
+    <div
+      ref={divRef}
+      data-color="black"
+      data-border="true"
+      data-type="sign in"
+    ></div>
+  );
 }
 
-export default GoogleLoginButton;
+export default AppleLoginButton;
