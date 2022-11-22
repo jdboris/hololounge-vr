@@ -2,13 +2,30 @@ import theme from "@jdboris/css-themes/space-station/theme.module.scss";
 import { useState } from "react";
 import { FaRegEnvelope } from "react-icons/fa";
 import { MdPassword } from "react-icons/md";
+import { AiOutlineExclamationCircle } from "react-icons/ai";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-function UserForm({ mode: defaultMode, user: defaultUser, signup, login }) {
+function UserForm({
+  mode: defaultMode,
+  user: defaultUser,
+  signup,
+  login,
+  error,
+  setError,
+}) {
   const [mode, setMode] = useState(defaultMode);
   const [user, setUser] = useState({ ...defaultUser });
   const [repeatPassword, setRepeatPassword] = useState("");
-  const navigate = useNavigate();
+
+  function errorDetail(detail) {
+    setError({
+      ...error,
+      details: {
+        ...error?.details,
+        ...detail,
+      },
+    });
+  }
 
   return (
     <form
@@ -32,6 +49,12 @@ function UserForm({ mode: defaultMode, user: defaultUser, signup, login }) {
         {mode === "login" && "Login"} {mode === "signup" && "Signup"}
       </div>
       <label>
+        {error?.details?.email && (
+          <div className={theme.error}>
+            <AiOutlineExclamationCircle /> {error.details.email}
+          </div>
+        )}
+
         <FaRegEnvelope />
         <input
           type="email"
@@ -45,6 +68,12 @@ function UserForm({ mode: defaultMode, user: defaultUser, signup, login }) {
         />
       </label>
       <label>
+        {error?.details?.password && (
+          <div className={theme.error}>
+            <AiOutlineExclamationCircle /> {error.details.password}
+          </div>
+        )}
+
         <MdPassword />
         <input
           type="password"
@@ -53,29 +82,59 @@ function UserForm({ mode: defaultMode, user: defaultUser, signup, login }) {
           autoComplete="password"
           value={user.password || ""}
           onChange={(e) =>
-            setUser((old) => ({ ...old, password: e.target.value }))
+            setUser((old) => ({ ...old, password: e.target.value })) ||
+            errorDetail({ password: null, repeatPassword: null })
+          }
+          onBlur={(e) =>
+            e.target.value != repeatPassword &&
+            errorDetail({ repeatPassword: "Passwords must match." })
           }
         />
       </label>
       {mode === "signup" && (
         <label>
+          {error?.details?.repeatPassword && (
+            <div className={theme.error}>
+              <AiOutlineExclamationCircle /> {error.details.repeatPassword}
+            </div>
+          )}
+
           <MdPassword />
           <input
             type="password"
             name="repeatPassword"
             placeholder="Password (repeat)"
             value={repeatPassword}
-            onChange={(e) => setRepeatPassword(e.target.value)}
+            onChange={(e) =>
+              setRepeatPassword(e.target.value) ||
+              errorDetail({ repeatPassword: null })
+            }
+            onBlur={(e) =>
+              e.target.value != user.password &&
+              errorDetail({ repeatPassword: "Passwords must match." })
+            }
           />
         </label>
       )}
       {mode === "login" && (
-        <Link to={"/signup"} style={{ marginLeft: "1em", marginRight: "auto" }}>
+        <Link
+          to={"/signup"}
+          style={{ marginLeft: "1em", marginRight: "auto" }}
+          onClick={() => {
+            setError(null);
+          }}
+        >
           Signup
         </Link>
       )}
       {mode === "signup" && (
-        <Link to={"/login"} style={{ marginLeft: "1em", marginRight: "auto" }}>
+        <Link
+          to={"/login"}
+          style={{ marginLeft: "1em", marginRight: "auto" }}
+          onClick={() => {
+            setError(null);
+          }}
+        >
           Login
         </Link>
       )}

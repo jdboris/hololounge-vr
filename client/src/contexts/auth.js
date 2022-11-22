@@ -3,22 +3,22 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [errors, setErrors] = useState([]);
+  const [error, setError] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
 
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (errors && errors.length) console.error(errors);
-  }, [errors]);
+  // useEffect(() => {
+  //   if (error) console.error(error);
+  // }, [error]);
 
-  async function login(username, password) {
+  async function login({ email, password }) {
     if (isLoading) return;
 
     try {
       setIsLoading(true);
     } catch (error) {
-      setErrors([error]);
+      setError(error);
     } finally {
       setIsLoading(false);
     }
@@ -30,26 +30,58 @@ export function AuthProvider({ children }) {
     try {
       setIsLoading(true);
 
-      localStorage.setItem("authToken", jwt);
       const response = await fetch(`/api/auth`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${jwt}`,
           "Content-Type": "application/json",
         },
+        credentials: "same-origin",
         body: JSON.stringify({ strategy }),
       });
 
-      const data = await response.json();
+      const { error, user } = await response.json();
 
       if (!response.ok) {
-        throw data.error;
+        throw error;
       }
 
-      setCurrentUser(data.user);
+      setCurrentUser(user);
       return true;
     } catch (error) {
-      setErrors([error]);
+      setError(error);
+    } finally {
+      setIsLoading(false);
+    }
+
+    return false;
+  }
+
+  async function signup({ email, password }) {
+    if (isLoading) return;
+
+    try {
+      setIsLoading(true);
+
+      const response = await fetch(`/api/auth/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "same-origin",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const { error, user } = await response.json();
+
+      if (!response.ok) {
+        throw error;
+      }
+
+      setCurrentUser(user);
+      return true;
+    } catch (error) {
+      setError(error);
     } finally {
       setIsLoading(false);
     }
@@ -63,7 +95,7 @@ export function AuthProvider({ children }) {
     try {
       setIsLoading(true);
     } catch (error) {
-      setErrors([error]);
+      setError(error);
     } finally {
       setIsLoading(false);
     }
@@ -73,11 +105,13 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider
       value={{
         currentUser,
+        signup,
         login,
         authenticate,
         logout,
         isLoading,
-        errors,
+        error,
+        setError,
       }}
     >
       {children}
@@ -88,12 +122,14 @@ export function AuthProvider({ children }) {
 /**
  * @typedef AuthContextValue
  * @property {Object | null} currentUser
+ * @property {({ email: string, password: string }) => Promise<boolean | undefined>} signup
  * @property {(username: any, password: any) => Promise<void>} login
  * @property {(jwt: any, strategy: string) => Promise<boolean | undefined>} authenticate
  * Send the given `jwt` to the backend for authetication. Saves the token in local storage and sets the `currentUser` state.
  * @property {() => Promise<void>} logout
  * @property {boolean} isLoading
- * @property {never[]} errors
+ * @property {never[]} error
+ * @property {React.Dispatch<React.SetStateAction<null>>} setError
  */
 
 /**

@@ -9,11 +9,11 @@ const User = sequelize.define("users", {
   strategyId: {
     type: DataTypes.STRING,
     unique: true,
-    allowNull: false,
   },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: true,
   },
   passwordHash: {
     type: DataTypes.STRING,

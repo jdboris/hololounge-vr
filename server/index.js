@@ -4,10 +4,12 @@ import * as dotenv from "dotenv";
 import authRouter from "./api/auth.js";
 import { HttpError } from "./utils.js";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 app.use(bodyParser.json());
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
 dotenv.config();
 const { CLIENT_APP_PATH, NODE_ENV, PORT } = process.env;
@@ -41,28 +43,26 @@ app.get("*", (req, res) => {
 app.use((err, req, res, next) => {
   if (!(err instanceof HttpError)) {
     console.error(err);
-    res.send(
-      500,
+    res.status(500).json(
       // Generic error message.
-      JSON.stringify({
+      {
         ...err,
         message: "Something went wrong. Try again later.",
-      })
+      }
     );
     return;
   }
 
-  res.send(
-    err.status,
+  res.status(err.status).json(
     // Manually copy the message property to include it in the JSON string
-    JSON.stringify({ ...err, message: err.message })
+    { error: { ...err, message: err.message } }
   );
 });
 
 const port = PORT || 5000;
-app.listen(port);
-
-console.log("Listening on port " + port);
+app.listen(port, () => {
+  console.log("Listening on port " + port);
+});
 
 if (NODE_ENV !== "development") {
   console.log(`Serving client app from '${CLIENT_APP_PATH}'`);
