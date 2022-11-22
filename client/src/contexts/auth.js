@@ -17,11 +17,31 @@ export function AuthProvider({ children }) {
 
     try {
       setIsLoading(true);
+
+      const response = await fetch(`/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "same-origin",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const { error, user } = await response.json();
+
+      if (!response.ok) {
+        throw error;
+      }
+
+      setCurrentUser(user);
+      return true;
     } catch (error) {
       setError(error);
     } finally {
       setIsLoading(false);
     }
+
+    return false;
   }
 
   async function authenticate(jwt, strategy) {

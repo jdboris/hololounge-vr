@@ -71,14 +71,6 @@ authRouter.post("/signup", async (req, res) => {
   const { email, password } = req.body;
   const details = {};
 
-  if (!email) {
-    details.email = "Please enter an email address.";
-  }
-
-  if (!password) {
-    details.password = "Please enter a password.";
-  }
-
   if (password.length < 8) {
     details.password = "Invalid password (8+ characters required).";
   }
@@ -115,6 +107,52 @@ authRouter.post("/signup", async (req, res) => {
 
   res.json({
     message: "Signup successful!",
+  });
+});
+
+authRouter.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  const details = {};
+
+  if (!email) {
+    details.email = "Please enter an email address.";
+  }
+
+  if (!password) {
+    details.password = "Please enter a password.";
+  }
+
+  if (Object.keys(details).length) {
+    throw new HttpError("", 400, details);
+  }
+
+  const user = await User.findOne({ where: { email }, plain: true });
+
+  if (!user) {
+    details.email = "No account found with that email.";
+  }
+
+  if (Object.keys(details).length) {
+    throw new HttpError("", 400, details);
+  }
+
+  if (!(await bcrypt.compare(password, user.passwordHash))) {
+    throw new HttpError("Invalid email/password", 400);
+  }
+
+  res.cookie(
+    "authToken",
+    jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "30 days" }),
+    {
+      httpOnly: true,
+      secure: NODE_ENV !== "development",
+      sameSite: "strict",
+      signed: true,
+    }
+  );
+
+  res.json({
+    message: "Login successful!",
   });
 });
 

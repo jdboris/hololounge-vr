@@ -4,7 +4,7 @@ import UserForm from "../components/user-form";
 import { useAuth } from "../contexts/auth";
 
 function LoginPage() {
-  const { signup, login, authenticate, error, setError } = useAuth();
+  const { signup, login, authenticate, error, setError, isLoading } = useAuth();
 
   return (
     <main>
@@ -14,6 +14,7 @@ function LoginPage() {
         login={login}
         error={error}
         setError={setError}
+        isLoading={isLoading}
       />
       <span className={theme.sideLines}>OR</span>
       <GoogleLoginButton
