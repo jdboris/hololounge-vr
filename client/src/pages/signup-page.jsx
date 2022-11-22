@@ -33,6 +33,7 @@ function SignupPage() {
       <GoogleLoginButton
         onSuccess={(jwt) => {
           authenticate(jwt, "google");
+          setError(null);
         }}
       />
     </main>

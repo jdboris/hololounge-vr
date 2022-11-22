@@ -39,6 +39,7 @@ authRouter.post("/", async (req, res) => {
       },
       defaults: {
         strategyId: sub,
+        strategy: "google",
         email,
         givenName: given_name,
         familyName: family_name,
@@ -135,6 +136,14 @@ authRouter.post("/login", async (req, res) => {
 
   if (Object.keys(details).length) {
     throw new HttpError("", 400, details);
+  }
+
+  if (user.strategy === "google") {
+    throw new HttpError(
+      "That email has already been used to sign in with Google. Sign in with Google to continue.",
+      400,
+      details
+    );
   }
 
   if (!(await bcrypt.compare(password, user.passwordHash))) {

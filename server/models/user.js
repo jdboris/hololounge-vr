@@ -10,6 +10,10 @@ const User = sequelize.define("users", {
     type: DataTypes.STRING,
     unique: "strategyId",
   },
+  strategy: {
+    type: DataTypes.STRING,
+    values: ["google"],
+  },
   email: {
     type: DataTypes.STRING,
     allowNull: false,

@@ -41,6 +41,7 @@ function LoginPage() {
       <GoogleLoginButton
         onSuccess={(jwt) => {
           authenticate(jwt, "google");
+          setError(null);
         }}
       />
     </main>
