@@ -174,4 +174,9 @@ authRouter.get("/current-user", async (req, res) => {
   });
 });
 
+authRouter.get("/logout", async (req, res) => {
+  res.clearCookie("authToken");
+  res.json({});
+});
+
 export default authRouter;

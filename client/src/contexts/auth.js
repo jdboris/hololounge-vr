@@ -19,14 +19,9 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function getCurrentUser() {
-    if (isLoading) return;
-
     try {
-      setIsLoading(true);
-
       const response = await fetch(`/api/auth/current-user`, {
         method: "GET",
-
         credentials: "same-origin",
       });
 
@@ -39,8 +34,6 @@ export function AuthProvider({ children }) {
       return user;
     } catch (error) {
       setError(error);
-    } finally {
-      setIsLoading(false);
     }
 
     return null;
@@ -148,11 +141,27 @@ export function AuthProvider({ children }) {
 
     try {
       setIsLoading(true);
+
+      const response = await fetch(`/api/auth/logout`, {
+        method: "GET",
+        credentials: "same-origin",
+      });
+
+      const { error } = await response.json();
+
+      if (!response.ok) {
+        throw error;
+      }
+
+      setCurrentUser(await getCurrentUser());
+      return true;
     } catch (error) {
       setError(error);
     } finally {
       setIsLoading(false);
     }
+
+    return false;
   }
 
   return (

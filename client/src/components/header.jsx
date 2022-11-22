@@ -4,15 +4,15 @@ import { FaBars, FaUser } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { MdLanguage } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/auth";
 
 function Header() {
+  const { currentUser, logout } = useAuth();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
   const [isLoading, setIsLoading] = useState(false);
-  const currentUser = null;
-  const login = () => {};
-  const logout = () => {};
 
   useEffect(() => {
     const onScroll = (e) => {
@@ -69,22 +69,6 @@ function Header() {
           {!isLoading &&
             (currentUser ? (
               <>
-                {currentUser && currentUser.isAuthor && (
-                  <li>
-                    <Link to="/article/new">New Article</Link>
-                  </li>
-                )}
-
-                <li>
-                  <Link to={`/user/${currentUser.id}`}>Profile</Link>
-                </li>
-
-                {currentUser && currentUser.isAdmin && (
-                  <li>
-                    <Link to="/settings">Settings</Link>
-                  </li>
-                )}
-
                 <li>
                   <button onClick={logout}>Logout</button>
                 </li>
