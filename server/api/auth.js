@@ -35,7 +35,7 @@ authRouter.post("/", async (req, res) => {
 
     const [user, wasJustCreated] = await User.findOrCreate({
       where: {
-        strategyId: sub,
+        email,
       },
       defaults: {
         strategyId: sub,
@@ -60,7 +60,7 @@ authRouter.post("/", async (req, res) => {
       }
     );
 
-    res.json({ message: "Login successful!", user });
+    res.json({ message: "Login successful!" });
     return;
   }
 
@@ -153,6 +153,21 @@ authRouter.post("/login", async (req, res) => {
 
   res.json({
     message: "Login successful!",
+  });
+});
+
+authRouter.get("/current-user", async (req, res) => {
+  const { authToken } = req.signedCookies;
+
+  if (!authToken) {
+    res.json({ user: null });
+    return;
+  }
+
+  res.json({
+    user: await User.findByPk(jwt.verify(authToken, JWT_SECRET).id, {
+      plain: true,
+    }),
   });
 });
 

@@ -12,6 +12,40 @@ export function AuthProvider({ children }) {
   //   if (error) console.error(error);
   // }, [error]);
 
+  useEffect(() => {
+    (async () => {
+      setCurrentUser(await getCurrentUser());
+    })();
+  }, []);
+
+  async function getCurrentUser() {
+    if (isLoading) return;
+
+    try {
+      setIsLoading(true);
+
+      const response = await fetch(`/api/auth/current-user`, {
+        method: "GET",
+
+        credentials: "same-origin",
+      });
+
+      const { error, user } = await response.json();
+
+      if (!response.ok) {
+        throw error;
+      }
+
+      return user;
+    } catch (error) {
+      setError(error);
+    } finally {
+      setIsLoading(false);
+    }
+
+    return null;
+  }
+
   async function login({ email, password }) {
     if (isLoading) return;
 
@@ -60,12 +94,14 @@ export function AuthProvider({ children }) {
         body: JSON.stringify({ strategy }),
       });
 
-      const { error, user } = await response.json();
+      const { error } = await response.json();
 
       if (!response.ok) {
         throw error;
       }
 
+      const user = await getCurrentUser();
+      console.log("after google: ", user);
       setCurrentUser(user);
       return true;
     } catch (error) {
