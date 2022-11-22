@@ -8,12 +8,12 @@ const { NODE_ENV } = process.env;
 const User = sequelize.define("users", {
   strategyId: {
     type: DataTypes.STRING,
-    unique: true,
+    unique: "strategyId",
   },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
+    unique: "email",
   },
   passwordHash: {
     type: DataTypes.STRING,
