@@ -126,7 +126,8 @@ authRouter.post("/login", async (req, res) => {
     throw new HttpError("", 400, details);
   }
 
-  const user = await User.findOne({ where: { email }, plain: true });
+  // NOTE: Must use raw: true to read the password hash
+  const user = await User.findOne({ where: { email }, plain: true, raw: true });
 
   if (!user) {
     details.email = "No account found with that email.";
@@ -165,9 +166,11 @@ authRouter.get("/current-user", async (req, res) => {
   }
 
   res.json({
-    user: await User.findByPk(jwt.verify(authToken, JWT_SECRET).id, {
-      plain: true,
-    }),
+    user: {
+      ...(await User.findByPk(jwt.verify(authToken, JWT_SECRET).id, {
+        plain: true,
+      })),
+    },
   });
 });
 

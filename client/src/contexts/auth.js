@@ -61,13 +61,13 @@ export function AuthProvider({ children }) {
         body: JSON.stringify({ email, password }),
       });
 
-      const { error, user } = await response.json();
+      const { error } = await response.json();
 
       if (!response.ok) {
         throw error;
       }
 
-      setCurrentUser(user);
+      setCurrentUser(await getCurrentUser());
       return true;
     } catch (error) {
       setError(error);
@@ -100,9 +100,7 @@ export function AuthProvider({ children }) {
         throw error;
       }
 
-      const user = await getCurrentUser();
-      console.log("after google: ", user);
-      setCurrentUser(user);
+      setCurrentUser(await getCurrentUser());
       return true;
     } catch (error) {
       setError(error);
@@ -128,13 +126,13 @@ export function AuthProvider({ children }) {
         body: JSON.stringify({ email, password }),
       });
 
-      const { error, user } = await response.json();
+      const { error } = await response.json();
 
       if (!response.ok) {
         throw error;
       }
 
-      setCurrentUser(user);
+      setCurrentUser(await getCurrentUser());
       return true;
     } catch (error) {
       setError(error);

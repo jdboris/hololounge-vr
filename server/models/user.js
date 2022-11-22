@@ -17,6 +17,10 @@ const User = sequelize.define("users", {
   },
   passwordHash: {
     type: DataTypes.STRING,
+    get() {
+      // NOTE: Prevent ever reading the password hash by accident.
+      return undefined;
+    },
   },
   givenName: {
     type: DataTypes.STRING,
