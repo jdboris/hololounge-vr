@@ -1,26 +1,46 @@
 import theme from "@jdboris/css-themes/space-station";
 import { useEffect, useRef, useState } from "react";
-import { FaNetworkWired, FaUserAlt, FaWifi } from "react-icons/fa";
+import { FaNetworkWired, FaUserAlt, FaWifi, FaPlay } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
 
 function GameCard() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const videoRef = useRef();
 
   useEffect(() => {
     if (videoRef.current) {
       if (isOpen) {
-        videoRef.current.play();
         videoRef.current.scrollIntoView({
           alignToTop: true,
           behavior: "smooth",
         });
+        playVideo();
       } else {
-        videoRef.current.pause();
-        videoRef.current.currentTime = 0;
+        pauseVideo();
       }
     }
   }, [isOpen]);
+
+  const playVideo = () => {
+    if (videoRef.current) {
+      if (videoRef.current.ended) {
+        videoRef.current.currentTime = 0;
+      }
+
+      videoRef.current.play();
+      setIsPaused(false);
+
+      videoRef.current.onended = () => setIsPaused(true);
+    }
+  };
+
+  const pauseVideo = () => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+      setIsPaused(true);
+    }
+  };
 
   return (
     <li className={theme.card + " " + (isOpen ? theme.open : "")}>
@@ -32,14 +52,17 @@ function GameCard() {
         />
       )}
       {isOpen && (
-        <video
-          ref={videoRef}
-          poster="https://cdn.akamai.steamstatic.com/steam/apps/1849900/header.jpg"
-          src="https://cdn.akamai.steamstatic.com/steam/apps/256910182/movie480_vp9.webm"
-          onClick={(e) =>
-            e.target.paused ? e.target.play() : e.target.pause()
-          }
-        />
+        <div
+          className={theme.videoPlayer}
+          onClick={(e) => (e.target.paused ? playVideo() : pauseVideo())}
+        >
+          <video
+            ref={videoRef}
+            poster="https://cdn.akamai.steamstatic.com/steam/apps/1849900/header.jpg"
+            src="https://cdn.akamai.steamstatic.com/steam/apps/256910182/movie480_vp9.webm"
+          />
+          {isPaused && <FaPlay />}
+        </div>
       )}
       <header>
         <span onClick={() => setIsOpen(true)}>Among Us VR</span>

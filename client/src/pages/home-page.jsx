@@ -40,6 +40,14 @@ function HomePage() {
           <section>
             <ul>
               <GameCard />
+              <GameCard />
+              <GameCard />
+              <GameCard />
+              <GameCard />
+              <GameCard />
+              <li className={theme.card + " " + theme.flexFiller}></li>
+              <li className={theme.card + " " + theme.flexFiller}></li>
+              <li className={theme.card + " " + theme.flexFiller}></li>
             </ul>
           </section>
         </main>
