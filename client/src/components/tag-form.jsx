@@ -51,12 +51,10 @@ function TagForm({
         {mode === "create" && "New Tag"} {mode === "update" && "Update Tag"}
       </div>
       {sucess?.message && (
-        <small className={theme.success}>{sucess?.message}</small>
+        <small className={theme.success}>{sucess.message}</small>
       )}
 
-      {error?.message && (
-        <small className={theme.error}>{error?.message}</small>
-      )}
+      {error?.message && <small className={theme.error}>{error.message}</small>}
       <fieldset disabled={isLoading}>
         <label>
           {error?.details?.name && (
@@ -71,12 +69,20 @@ function TagForm({
             name="name"
             placeholder="Tag"
             value={tag.name || ""}
-            onChange={(e) =>
+            onChange={(e) => {
+              if (!e.target.value.toLocaleLowerCase().match(/^[a-z-/]*$/)) {
+                errorDetail({
+                  name: "Tag may only contain letters and '-', or '/'.",
+                });
+                return;
+              }
+
               setTag((old) => ({
                 ...old,
                 name: e.target.value.toLocaleLowerCase(),
-              })) || errorDetail({ name: null })
-            }
+              }));
+              errorDetail({ name: null });
+            }}
           />
         </label>
 

@@ -25,6 +25,10 @@ const Tag = sequelize.define("tags", {
       isLowercase: {
         msg: `Tag must be all lowercase.`,
       },
+      is: {
+        args: /^[a-z-/]+$/,
+        msg: "Tag may only contain letters and '-', or '/'.",
+      },
     },
   },
 });

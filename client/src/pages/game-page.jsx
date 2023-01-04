@@ -23,7 +23,6 @@ function GamePage() {
           <h1>Games</h1>
         </header>
 
-        <h4>Tags</h4>
         <ul className={theme.badges}>
           {tags.map((tag) => (
             <li className={theme.badge}>{tag.name}</li>
