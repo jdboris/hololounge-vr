@@ -35,6 +35,11 @@ const User = sequelize.define("users", {
   photoUrl: {
     type: DataTypes.STRING,
   },
+  isAdmin: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
 });
 
 try {
