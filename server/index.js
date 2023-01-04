@@ -1,10 +1,13 @@
 import express from "express";
 import path from "path";
 import * as dotenv from "dotenv";
-import authRouter from "./api/auth.js";
+import authRouter from "./routes/auth.js";
+import tagRouter from "./routes/tags.js";
+// import gameRouter from "./routes/games.js";
 import { HttpError } from "./utils.js";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
+import { ValidationError } from "sequelize";
 
 const app = express();
 
@@ -28,6 +31,8 @@ if (NODE_ENV !== "development") {
 
 // API Routes
 app.use("/api/auth", authRouter);
+app.use("/api/tags", tagRouter);
+// app.use("/api/games", gameRouter);
 
 // Default to React app
 app.get("*", (req, res) => {
@@ -41,6 +46,21 @@ app.get("*", (req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
+  if (err instanceof ValidationError) {
+    res.status(400).json({
+      error: {
+        details: err.errors.reduce(
+          (details, error) => ({
+            ...details,
+            [error.path]: error.message,
+          }),
+          {}
+        ),
+      },
+    });
+    return;
+  }
+
   if (!(err instanceof HttpError)) {
     console.error(err);
     res.status(500).json(

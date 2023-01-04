@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import theme from "@jdboris/css-themes/space-station";
-import { FaBars, FaUser } from "react-icons/fa";
+import { FaBars, FaUser, FaVrCardboard } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { MdLanguage } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
@@ -58,6 +58,9 @@ function Header() {
             }
           }}
         >
+          <li>
+            <Link to="/games">{isMenuOpen && <FaVrCardboard />} Games</Link>
+          </li>
           <li>
             <Link to="/account">{isMenuOpen && <FaUser />} Account</Link>
           </li>
