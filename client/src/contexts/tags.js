@@ -13,7 +13,7 @@ export function TagProvider({ children }) {
 
   async function getTags() {
     try {
-      const response = await fetch(`/api/tags/all`, {
+      const response = await fetch(`/api/tags`, {
         method: "GET",
         credentials: "same-origin",
       });

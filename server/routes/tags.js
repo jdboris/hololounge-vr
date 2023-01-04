@@ -4,12 +4,15 @@ import { HttpError } from "../utils.js";
 import * as dotenv from "dotenv";
 import { getCurrentUser } from "../api/auth.js";
 import Tag from "../models/tag.js";
-import { ValidationError } from "sequelize";
 
 dotenv.config();
 const { NODE_ENV } = process.env;
 
 const tagRouter = express.Router();
+
+tagRouter.get("/", async (req, res) => {
+  res.json({ tags: await Tag.findAll({ order: [["name", "ASC"]] }) });
+});
 
 tagRouter.post("/", async (req, res) => {
   const user = await getCurrentUser(req);

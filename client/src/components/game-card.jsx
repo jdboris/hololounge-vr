@@ -74,7 +74,7 @@ function GameCard() {
       </header>
       {isOpen && (
         <main>
-          <ul>
+          <ul className={theme.badges}>
             <li className={theme.badge}>casual</li>
             <li className={theme.badge}>social</li>
             <li className={theme.badge}>funny</li>

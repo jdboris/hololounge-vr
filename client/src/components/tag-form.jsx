@@ -10,6 +10,7 @@ function TagForm({
   setError,
   isLoading,
   saveTag,
+  onCreate,
 }) {
   const [sucess, setSuccess] = useState(null);
   const [mode, setMode] = useState(defaultMode);
@@ -40,19 +41,23 @@ function TagForm({
           const { name } = await saveTag(tag);
           setTag({});
           setSuccess({ message: `Tag "${name}" created.` });
+          onCreate();
 
           return;
         }
       }}
     >
+      <div className={theme.h3}>
+        {mode === "create" && "New Tag"} {mode === "update" && "Update Tag"}
+      </div>
+      {sucess?.message && (
+        <small className={theme.success}>{sucess?.message}</small>
+      )}
+
+      {error?.message && (
+        <small className={theme.error}>{error?.message}</small>
+      )}
       <fieldset disabled={isLoading}>
-        <div className={theme.h3}>
-          {mode === "create" && "New Tag"} {mode === "update" && "Update Tag"}
-        </div>
-        {sucess?.message && (
-          <div className={theme.success}>{sucess.message}</div>
-        )}
-        {error?.message && <div className={theme.error}>{error.message}</div>}
         <label>
           {error?.details?.name && (
             <div className={theme.error}>
@@ -67,8 +72,10 @@ function TagForm({
             placeholder="Tag"
             value={tag.name || ""}
             onChange={(e) =>
-              setTag((old) => ({ ...old, name: e.target.value })) ||
-              errorDetail({ name: null })
+              setTag((old) => ({
+                ...old,
+                name: e.target.value.toLocaleLowerCase(),
+              })) || errorDetail({ name: null })
             }
           />
         </label>

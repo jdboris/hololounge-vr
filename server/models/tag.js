@@ -13,6 +13,7 @@ const Tag = sequelize.define("tags", {
     type: DataTypes.STRING(MAX_NAME_LENGTH),
     allowNull: false,
     unique: { name: "unique_tag_name", msg: "Tag already exists." },
+
     validate: {
       len: {
         args: [MIN_NAME_LENGTH, MAX_NAME_LENGTH],
@@ -20,6 +21,9 @@ const Tag = sequelize.define("tags", {
       },
       notNull: {
         msg: `Tag must be ${MIN_NAME_LENGTH}-${MAX_NAME_LENGTH} characters.`,
+      },
+      isLowercase: {
+        msg: `Tag must be all lowercase.`,
       },
     },
   },
