@@ -1,12 +1,8 @@
 import express from "express";
 import { HttpError } from "../utils.js";
 
-import * as dotenv from "dotenv";
 import { getCurrentUser } from "../api/auth.js";
 import Tag from "../models/tag.js";
-
-dotenv.config();
-const { NODE_ENV } = process.env;
 
 const tagRouter = express.Router();
 

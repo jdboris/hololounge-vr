@@ -20,7 +20,10 @@ const Tag = sequelize.define("tags", {
         msg: `Tag must be ${MIN_NAME_LENGTH}-${MAX_NAME_LENGTH} characters.`,
       },
       notNull: {
-        msg: `Tag must be ${MIN_NAME_LENGTH}-${MAX_NAME_LENGTH} characters.`,
+        msg: `Tag is a required field.`,
+      },
+      notEmpty: {
+        msg: `Tag is a required field.`,
       },
       isLowercase: {
         msg: `Tag must be all lowercase.`,

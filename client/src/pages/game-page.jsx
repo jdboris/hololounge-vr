@@ -1,6 +1,7 @@
 import theme from "@jdboris/css-themes/space-station";
 import { useState } from "react";
 import { useEffect } from "react";
+import GameForm from "../components/game-form";
 import TagForm from "../components/tag-form";
 import { useAuth } from "../contexts/auth";
 import { useTags } from "../contexts/tags";
@@ -36,6 +37,18 @@ function GamePage() {
             isLoading={isLoading}
             saveTag={saveTag}
             onCreate={async () => setTags((await getTags()) || tags)}
+          />
+        )}
+
+        {currentUser?.isAdmin && (
+          <GameForm
+            mode="create"
+            error={error}
+            setError={setError}
+            isLoading={isLoading}
+            saveGame={saveTag}
+            onCreate={async () => setTags((await getTags()) || tags)}
+            tags={tags}
           />
         )}
       </section>
