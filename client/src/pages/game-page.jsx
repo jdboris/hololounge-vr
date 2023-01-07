@@ -26,7 +26,9 @@ function GamePage() {
 
         <ul className={theme.badges}>
           {tags.map((tag) => (
-            <li className={theme.badge}>{tag.name}</li>
+            <li key={`tag-${tag.id}`} className={theme.badge}>
+              {tag.name}
+            </li>
           ))}
         </ul>
         {currentUser?.isAdmin && (

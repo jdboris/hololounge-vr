@@ -11,10 +11,11 @@ import {
   FaVrCardboard,
 } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
+import Game from "../dtos/game";
 
 function GameForm({
   mode: defaultMode,
-  game: defaultGame,
+  game: defaultGame = new Game(),
   tags,
   error,
   setError,
@@ -23,7 +24,7 @@ function GameForm({
   onCreate,
 }) {
   const [mode, setMode] = useState(defaultMode);
-  const [game, setGame] = useState({ ...defaultGame });
+  const [game, setGame] = useState(defaultGame);
   const [isOpen, setIsOpen] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const videoRef = useRef();
@@ -86,7 +87,9 @@ function GameForm({
                   value={game.posterUrl}
                   placeholder="Poster URL"
                   onChange={(e) =>
-                    setGame((old) => ({ ...old, posterUrl: e.target.value }))
+                    setGame(
+                      (old) => new Game({ ...old, posterUrl: e.target.value })
+                    )
                   }
                 />
               </label>
@@ -97,7 +100,9 @@ function GameForm({
                   value={game.trailerUrl}
                   placeholder="Trailer URL"
                   onChange={(e) =>
-                    setGame((old) => ({ ...old, trailerUrl: e.target.value }))
+                    setGame(
+                      (old) => new Game({ ...old, trailerUrl: e.target.value })
+                    )
                   }
                 />
               </label>
@@ -116,7 +121,7 @@ function GameForm({
                 value={game.title}
                 placeholder="Title"
                 onChange={(e) =>
-                  setGame((old) => ({ ...old, title: e.target.value }))
+                  setGame((old) => new Game({ ...old, title: e.target.value }))
                 }
               />
             </label>
@@ -134,28 +139,47 @@ function GameForm({
         <main>
           {mode == "create" || mode == "update" ? (
             <ul className={theme.badges}>
-              {tags?.map((tag) => (
-                <li>
-                  <label className={theme.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      // checked={game.hasLocalMultiplayer}
-                      // onChange={(e) =>
-                      //   setGame((old) => ({
-                      //     ...old,
-                      //     hasLocalMultiplayer: e.target.checked,
-                      //   }))
-                      // }
-                    />
-                    <span className={theme.badge}>{tag.name}</span>
-                  </label>
-                </li>
-              ))}
+              {tags?.map((tag) => {
+                const gameTag = game.tags?.find(
+                  (gameTag) => gameTag.id === tag.id
+                );
+
+                return (
+                  <li key={`game-${game.id}-tag-${tag.id}`}>
+                    <label className={theme.checkboxLabel}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(gameTag)}
+                        onChange={(e) =>
+                          setGame((old) => {
+                            const copy = new Game(old);
+
+                            if (!gameTag) {
+                              copy.tags.push({ ...tag });
+                            } else {
+                              copy.tags = copy.tags.filter(
+                                (tag) => tag.id != gameTag.id
+                              );
+                            }
+                            return copy;
+                          })
+                        }
+                      />
+                      <span className={theme.badge}>{tag.name}</span>
+                    </label>
+                  </li>
+                );
+              })}
             </ul>
           ) : (
             <ul className={theme.badges}>
               {game.tags?.map((tag) => (
-                <li className={theme.badge}>{tag.name}</li>
+                <li
+                  key={`game-${game.id}-tag-${tag.id}`}
+                  className={theme.badge}
+                >
+                  {tag.name}
+                </li>
               ))}
             </ul>
           )}
@@ -170,10 +194,13 @@ function GameForm({
                   value={game.playerMinimum}
                   placeholder="Min."
                   onChange={(e) =>
-                    setGame((old) => ({
-                      ...old,
-                      playerMinimum: e.target.value,
-                    }))
+                    setGame(
+                      (old) =>
+                        new Game({
+                          ...old,
+                          playerMinimum: e.target.value,
+                        })
+                    )
                   }
                 />
               ) : (
@@ -187,10 +214,13 @@ function GameForm({
                   value={game.playerMaximum}
                   placeholder="Max."
                   onChange={(e) =>
-                    setGame((old) => ({
-                      ...old,
-                      playerMaximum: e.target.value,
-                    }))
+                    setGame(
+                      (old) =>
+                        new Game({
+                          ...old,
+                          playerMaximum: e.target.value,
+                        })
+                    )
                   }
                 />
               ) : (
@@ -205,10 +235,13 @@ function GameForm({
                         type="checkbox"
                         checked={game.hasLocalMultiplayer}
                         onChange={(e) =>
-                          setGame((old) => ({
-                            ...old,
-                            hasLocalMultiplayer: e.target.checked,
-                          }))
+                          setGame(
+                            (old) =>
+                              new Game({
+                                ...old,
+                                hasLocalMultiplayer: e.target.checked,
+                              })
+                          )
                         }
                       />
                       <FaNetworkWired />
@@ -222,10 +255,13 @@ function GameForm({
                         type="checkbox"
                         checked={game.hasOnlineMultiplayer}
                         onChange={(e) =>
-                          setGame((old) => ({
-                            ...old,
-                            hasOnlineMultiplayer: e.target.checked,
-                          }))
+                          setGame(
+                            (old) =>
+                              new Game({
+                                ...old,
+                                hasOnlineMultiplayer: e.target.checked,
+                              })
+                          )
                         }
                       />
                       <FaWifi />
@@ -244,10 +280,13 @@ function GameForm({
                 value={game.summary}
                 placeholder="Summary..."
                 onChange={(e) =>
-                  setGame((old) => ({
-                    ...old,
-                    summary: e.target.value,
-                  }))
+                  setGame(
+                    (old) =>
+                      new Game({
+                        ...old,
+                        summary: e.target.value,
+                      })
+                  )
                 }
               ></textarea>
             </label>
