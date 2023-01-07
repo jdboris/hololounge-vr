@@ -7,7 +7,9 @@ import Game from "../models/game.js";
 const gameRouter = express.Router();
 
 gameRouter.get("/", async (req, res) => {
-  res.json({ games: await Game.findAll({ order: [["title", "ASC"]] }) });
+  res.json({
+    games: await Game.findAll({ order: [["title", "ASC"]], include: "tags" }),
+  });
 });
 
 gameRouter.post("/", async (req, res) => {

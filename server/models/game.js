@@ -15,6 +15,9 @@ const MAX_URL_LENGTH = 1024;
 const MIN_PLAYER_MIN = 1;
 const MIN_PLAYER_MAX = 1;
 
+const MIN_SUMMARY_LENGTH = 50;
+const MAX_SUMMARY_LENGTH = 1024;
+
 const Game = sequelize.define("games", {
   title: {
     type: DataTypes.STRING(MAX_TITLE_LENGTH),
@@ -79,17 +82,14 @@ const Game = sequelize.define("games", {
 
     validate: {
       len: {
-        args: [MIN_URL_LENGTH, MAX_URL_LENGTH],
-        msg: `Must be ${MIN_URL_LENGTH}-${MAX_URL_LENGTH} characters.`,
+        args: [MIN_SUMMARY_LENGTH, MAX_SUMMARY_LENGTH],
+        msg: `Must be ${MIN_SUMMARY_LENGTH}-${MAX_SUMMARY_LENGTH} characters.`,
       },
       notNull: {
         msg: `Summary is a required field.`,
       },
       notEmpty: {
         msg: `Summary is a required field.`,
-      },
-      isUrl: {
-        msg: "Must be a valid URL.",
       },
     },
   },
@@ -139,16 +139,7 @@ const Game = sequelize.define("games", {
   },
 });
 
-Game.hasMany(Tag, { as: "tags" });
-
-try {
-  if (NODE_ENV === "development") {
-    await Game.sync({ alter: true });
-  } else {
-    await Game.sync();
-  }
-} catch (error) {
-  console.error("Unable to create 'games' table :", error);
-}
+Tag.belongsToMany(Game, { as: "games", through: "game_tags" });
+Game.belongsToMany(Tag, { as: "tags", through: "game_tags" });
 
 export default Game;

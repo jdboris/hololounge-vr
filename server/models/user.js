@@ -42,14 +42,4 @@ const User = sequelize.define("users", {
   },
 });
 
-try {
-  if (NODE_ENV === "development") {
-    await User.sync({ alter: true });
-  } else {
-    await User.sync();
-  }
-} catch (error) {
-  console.error("Unable to create 'users' table :", error);
-}
-
 export default User;

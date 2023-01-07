@@ -36,14 +36,4 @@ const Tag = sequelize.define("tags", {
   },
 });
 
-try {
-  if (NODE_ENV === "development") {
-    await Tag.sync({ alter: true });
-  } else {
-    await Tag.sync();
-  }
-} catch (error) {
-  console.error("Unable to create 'tags' table :", error);
-}
-
 export default Tag;

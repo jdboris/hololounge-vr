@@ -4,8 +4,13 @@ import mysql from "mysql2/promise";
 
 dotenv.config();
 
-const { DATABASE_NAME, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST } =
-  process.env;
+const {
+  NODE_ENV,
+  DATABASE_NAME,
+  DATABASE_USERNAME,
+  DATABASE_PASSWORD,
+  DATABASE_HOST,
+} = process.env;
 
 const connection = await mysql.createConnection({
   host: DATABASE_HOST,
