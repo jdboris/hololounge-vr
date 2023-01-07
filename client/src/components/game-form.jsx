@@ -23,6 +23,7 @@ function GameForm({
   saveGame,
   onCreate,
 }) {
+  const [sucess, setSuccess] = useState(null);
   const [mode, setMode] = useState(defaultMode);
   const [game, setGame] = useState(defaultGame);
   const [isOpen, setIsOpen] = useState(false);
@@ -67,10 +68,24 @@ function GameForm({
     <form
       className={theme.card + " " + (isOpen ? theme.open : "")}
       onClick={() => !isOpen && setIsOpen(true)}
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
 
-        console.log("game: ", game);
+        setSuccess(null);
+        setError(null);
+
+        if (mode === "create" || mode === "update") {
+          const { title } = await saveGame(game);
+
+          if (mode === "create") {
+            setGame(new Game().validate());
+          }
+
+          setSuccess({ message: `Game "${title}" created.` });
+          onCreate();
+
+          return;
+        }
       }}
     >
       <div className={theme.overlay} onClick={() => setIsOpen(false)}></div>
@@ -92,8 +107,8 @@ function GameForm({
                   value={game.posterUrl}
                   placeholder="Poster URL"
                   onChange={(e) =>
-                    setGame(
-                      (old) => new Game({ ...old, posterUrl: e.target.value })
+                    setGame((old) =>
+                      new Game({ ...old, posterUrl: e.target.value }).validate()
                     )
                   }
                 />
@@ -105,8 +120,11 @@ function GameForm({
                   value={game.trailerUrl}
                   placeholder="Trailer URL"
                   onChange={(e) =>
-                    setGame(
-                      (old) => new Game({ ...old, trailerUrl: e.target.value })
+                    setGame((old) =>
+                      new Game({
+                        ...old,
+                        trailerUrl: e.target.value,
+                      }).validate()
                     )
                   }
                 />
@@ -126,7 +144,9 @@ function GameForm({
                 value={game.title}
                 placeholder="Title"
                 onChange={(e) =>
-                  setGame((old) => new Game({ ...old, title: e.target.value }))
+                  setGame((old) =>
+                    new Game({ ...old, title: e.target.value }).validate()
+                  )
                 }
               />
             </label>
@@ -168,7 +188,7 @@ function GameForm({
                               (tag) => tag.id != gameTag.id
                             );
                           }
-                          return copy;
+                          return copy.validate();
                         })
                       }
                     />
@@ -204,10 +224,11 @@ function GameForm({
                       (old) =>
                         new Game({
                           ...old,
-                          playerMinimum: e.target.value,
+                          playerMinimum: Number(e.target.value),
                         })
                     )
                   }
+                  onBlur={() => setGame((old) => ({ ...old.validate() }))}
                 />
               ) : (
                 game.playerMinimum
@@ -224,10 +245,11 @@ function GameForm({
                       (old) =>
                         new Game({
                           ...old,
-                          playerMaximum: e.target.value,
+                          playerMaximum: Number(e.target.value),
                         })
                     )
                   }
+                  onBlur={() => setGame((old) => ({ ...old.validate() }))}
                 />
               ) : (
                 game.playerMaximum
@@ -241,12 +263,11 @@ function GameForm({
                         type="checkbox"
                         checked={game.hasLocalMultiplayer}
                         onChange={(e) =>
-                          setGame(
-                            (old) =>
-                              new Game({
-                                ...old,
-                                hasLocalMultiplayer: e.target.checked,
-                              })
+                          setGame((old) =>
+                            new Game({
+                              ...old,
+                              hasLocalMultiplayer: e.target.checked,
+                            }).validate()
                           )
                         }
                       />
@@ -261,12 +282,11 @@ function GameForm({
                         type="checkbox"
                         checked={game.hasOnlineMultiplayer}
                         onChange={(e) =>
-                          setGame(
-                            (old) =>
-                              new Game({
-                                ...old,
-                                hasOnlineMultiplayer: e.target.checked,
-                              })
+                          setGame((old) =>
+                            new Game({
+                              ...old,
+                              hasOnlineMultiplayer: e.target.checked,
+                            }).validate()
                           )
                         }
                       />
@@ -286,12 +306,11 @@ function GameForm({
                 value={game.summary}
                 placeholder="Summary..."
                 onChange={(e) =>
-                  setGame(
-                    (old) =>
-                      new Game({
-                        ...old,
-                        summary: e.target.value,
-                      })
+                  setGame((old) =>
+                    new Game({
+                      ...old,
+                      summary: e.target.value,
+                    }).validate()
                   )
                 }
               ></textarea>

@@ -8,26 +8,29 @@ import { AuthProvider } from "./contexts/auth";
 import SignupPage from "./pages/signup-page";
 import GamePage from "./pages/game-page";
 import { TagProvider } from "./contexts/tags";
+import { GameProvider } from "./contexts/games";
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <TagProvider>
-          <div className={theme.root}>
-            <Header></Header>
+          <GameProvider>
+            <div className={theme.root}>
+              <Header></Header>
 
-            <Routes>
-              <Route path="/login" element={<LoginPage />}></Route>
-              <Route path="/signup" element={<SignupPage />}></Route>
+              <Routes>
+                <Route path="/login" element={<LoginPage />}></Route>
+                <Route path="/signup" element={<SignupPage />}></Route>
 
-              <Route path="/games" element={<GamePage />}></Route>
+                <Route path="/games" element={<GamePage />}></Route>
 
-              <Route path="/" element={<HomePage />}></Route>
-            </Routes>
+                <Route path="/" element={<HomePage />}></Route>
+              </Routes>
 
-            <Footer></Footer>
-          </div>
+              <Footer></Footer>
+            </div>
+          </GameProvider>
         </TagProvider>
       </AuthProvider>
     </BrowserRouter>

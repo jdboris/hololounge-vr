@@ -12,7 +12,7 @@ export default class Game {
 
   constructor(data = {}) {
     Object.assign(this, data);
-    this.validate();
+    // this.validate();
   }
 
   validate() {
@@ -39,6 +39,6 @@ export default class Game {
       this.hasOnlineMultiplayer = false;
     }
 
-    return true;
+    return this;
   }
 }
