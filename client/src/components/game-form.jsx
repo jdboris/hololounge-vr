@@ -64,9 +64,14 @@ function GameForm({
   };
 
   return (
-    <div
+    <form
       className={theme.card + " " + (isOpen ? theme.open : "")}
       onClick={() => !isOpen && setIsOpen(true)}
+      onSubmit={(e) => {
+        e.preventDefault();
+
+        console.log("game: ", game);
+      }}
     >
       <div className={theme.overlay} onClick={() => setIsOpen(false)}></div>
       {!isOpen && (game.posterUrl ? <img src={game.posterUrl} /> : <FaPlus />)}
@@ -139,37 +144,38 @@ function GameForm({
         <main>
           {mode == "create" || mode == "update" ? (
             <ul className={theme.badges}>
-              {tags?.map((tag) => {
-                const gameTag = game.tags?.find(
-                  (gameTag) => gameTag.id === tag.id
-                );
+              {tags?.map((tag) => (
+                <li key={`game-${game.id}-tag-${tag.id}`}>
+                  <label className={theme.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={Boolean(
+                        game.tags?.find((gameTag) => gameTag.id === tag.id)
+                      )}
+                      onChange={(e) =>
+                        setGame((old) => {
+                          const copy = new Game(old);
+                          const gameTag = old.tags?.find(
+                            (gameTag) => gameTag.id === tag.id
+                          );
 
-                return (
-                  <li key={`game-${game.id}-tag-${tag.id}`}>
-                    <label className={theme.checkboxLabel}>
-                      <input
-                        type="checkbox"
-                        checked={Boolean(gameTag)}
-                        onChange={(e) =>
-                          setGame((old) => {
-                            const copy = new Game(old);
-
+                          if (e.target.checked) {
                             if (!gameTag) {
                               copy.tags.push({ ...tag });
-                            } else {
-                              copy.tags = copy.tags.filter(
-                                (tag) => tag.id != gameTag.id
-                              );
                             }
-                            return copy;
-                          })
-                        }
-                      />
-                      <span className={theme.badge}>{tag.name}</span>
-                    </label>
-                  </li>
-                );
-              })}
+                          } else {
+                            copy.tags = copy.tags.filter(
+                              (tag) => tag.id != gameTag.id
+                            );
+                          }
+                          return copy;
+                        })
+                      }
+                    />
+                    <span className={theme.badge}>{tag.name}</span>
+                  </label>
+                </li>
+              ))}
             </ul>
           ) : (
             <ul className={theme.badges}>
@@ -297,7 +303,7 @@ function GameForm({
           {(mode == "create" || mode == "update") && <button>Save</button>}
         </main>
       )}
-    </div>
+    </form>
   );
 }
 
