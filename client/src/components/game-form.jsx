@@ -253,7 +253,7 @@ function GameForm({
                 />
               ) : (
                 game.playerMaximum
-              )}
+              )}{" "}
               {(game.playerMinimum > 1 || game.playerMaximum > 1) && (
                 <>
                   ({" "}

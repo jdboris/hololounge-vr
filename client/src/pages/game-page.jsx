@@ -24,6 +24,10 @@ function GamePage() {
     (async () => {
       setTags((await getTags()) || []);
     })();
+
+    (async () => {
+      setGames((await getGames()) || []);
+    })();
   }, []);
 
   return (
@@ -51,17 +55,35 @@ function GamePage() {
           />
         )}
 
-        {currentUser?.isAdmin && (
-          <GameForm
-            mode="create"
-            error={gameError}
-            setError={setGameError}
-            isLoading={isLoadingGames}
-            saveGame={saveGame}
-            onCreate={async () => setGames((await getGames()) || games)}
-            tags={tags}
-          />
-        )}
+        <ul>
+          {games?.map((game) => (
+            <li key={`game-${game.id}`}>
+              <GameForm
+                mode="read"
+                game={game}
+                error={gameError}
+                setError={setGameError}
+                isLoading={isLoadingGames}
+                saveGame={saveGame}
+                onUpdate={async () => setGames((await getGames()) || games)}
+                tags={tags}
+              />
+            </li>
+          ))}
+          <li>
+            {currentUser?.isAdmin && (
+              <GameForm
+                mode="create"
+                error={gameError}
+                setError={setGameError}
+                isLoading={isLoadingGames}
+                saveGame={saveGame}
+                onCreate={async () => setGames((await getGames()) || games)}
+                tags={tags}
+              />
+            )}
+          </li>
+        </ul>
       </section>
     </main>
   );
