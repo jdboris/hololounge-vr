@@ -7,13 +7,17 @@ export function GameProvider({ children }) {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // useEffect(() => {
-  //   if (error) console.error(error);
-  // }, [error]);
+  useEffect(() => {
+    if (error) console.error(error);
+  }, [error]);
 
-  async function getGames() {
+  async function getGames(filters = null) {
     try {
-      const response = await fetch(`/api/games`, {
+      const params = new URLSearchParams();
+      if (filters) {
+        params.set("filters", JSON.stringify(filters));
+      }
+      const response = await fetch(`/api/games?` + params, {
         method: "GET",
         credentials: "same-origin",
       });

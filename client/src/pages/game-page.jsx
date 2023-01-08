@@ -6,11 +6,15 @@ import TagForm from "../components/tag-form";
 import { useAuth } from "../contexts/auth";
 import { useGames } from "../contexts/games";
 import { useTags } from "../contexts/tags";
+import useDebounced from "../hooks/debounced";
 
 function GamePage() {
   const { currentUser } = useAuth();
   const [tags, setTags] = useState([]);
+  const [filters, setFilters] = useState({ tagIds: [] });
+  const debouncedFilters = useDebounced(filters);
   const [games, setGames] = useState([]);
+  const [filteredGames, setFilteredGames] = useState([]);
   const { saveTag, getTags, error, setError, isLoading } = useTags();
   const {
     saveGame,
@@ -30,6 +34,20 @@ function GamePage() {
     })();
   }, []);
 
+  useEffect(() => {
+    // (async () => {
+    //   setGames((await getGames(debouncedFilters)) || []);
+    // })();
+
+    setFilteredGames(
+      games.filter((game) =>
+        debouncedFilters.tagIds.every((id) =>
+          game.tags.find((gameTag) => gameTag.id == id)
+        )
+      )
+    );
+  }, [debouncedFilters, games]);
+
   return (
     <main>
       <section>
@@ -38,9 +56,32 @@ function GamePage() {
         </header>
 
         <ul className={theme.badges}>
-          {tags.map((tag) => (
-            <li key={`tag-${tag.id}`} className={theme.badge}>
-              {tag.name}
+          {tags?.map((tag) => (
+            <li key={`tag-${tag.id}`}>
+              <label className={theme.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={Boolean(filters.tagIds?.find((id) => id === tag.id))}
+                  onChange={(e) =>
+                    setFilters((old) => {
+                      const copy = { ...old };
+                      const id = copy.tagIds?.find((id) => id === tag.id);
+
+                      if (e.target.checked) {
+                        if (!id) {
+                          copy.tagIds.push(tag.id);
+                        }
+                      } else {
+                        copy.tagIds = copy.tagIds.filter(
+                          (tagId) => tagId != id
+                        );
+                      }
+                      return copy;
+                    })
+                  }
+                />
+                <span className={theme.badge}>{tag.name}</span>
+              </label>
             </li>
           ))}
         </ul>
@@ -56,7 +97,7 @@ function GamePage() {
         )}
 
         <ul>
-          {games?.map((game) => (
+          {filteredGames?.map((game) => (
             <li key={`game-${game.id}`}>
               <GameForm
                 mode="read"
