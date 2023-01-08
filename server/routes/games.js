@@ -18,9 +18,13 @@ gameRouter.post("/", async (req, res) => {
     throw new HttpError("", 403);
   }
 
-  const game = (await Game.create(req.body)).get();
+  const game = await Game.create(req.body);
+  await game.addTags(
+    req.body.tags.map((tag) => tag.id),
+    { through: "tags" }
+  );
 
-  res.json({ message: `Game "${game.title}" created.`, game });
+  res.json({ message: `Game "${game.title}" created.`, game: game.get() });
 });
 
 export default gameRouter;
