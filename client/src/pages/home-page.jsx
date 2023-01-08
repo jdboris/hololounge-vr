@@ -1,15 +1,26 @@
 import theme from "@jdboris/css-themes/space-station";
+import { useEffect } from "react";
 import { useState } from "react";
-import {
-  FaChevronDown,
-  FaNetworkWired,
-  FaUserAlt,
-  FaWifi,
-} from "react-icons/fa";
-import GameCard from "../components/game-card";
+import { FaChevronDown } from "react-icons/fa";
+import GameForm from "../components/game-form";
+import { useGames } from "../contexts/games";
 
 function HomePage() {
   const [isOpen, setIsOpen] = useState(false);
+  const [games, setGames] = useState([]);
+  const {
+    saveGame,
+    getGames,
+    error: gameError,
+    setError: setGameError,
+    isLoading: isLoadingGames,
+  } = useGames();
+
+  useEffect(() => {
+    (async () => {
+      setGames((await getGames()) || []);
+    })();
+  }, []);
 
   return (
     <main>
@@ -39,15 +50,24 @@ function HomePage() {
         <main>
           <section>
             <ul>
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <li className={theme.card + " " + theme.flexFiller}></li>
-              <li className={theme.card + " " + theme.flexFiller}></li>
-              <li className={theme.card + " " + theme.flexFiller}></li>
+              {games?.map((game) => (
+                <li key={`game-${game.id}`}>
+                  <GameForm
+                    mode="read"
+                    game={game}
+                    error={gameError}
+                    setError={setGameError}
+                    isLoading={isLoadingGames}
+                    saveGame={saveGame}
+                    onUpdate={async () => setGames((await getGames()) || games)}
+                  />
+                </li>
+              ))}
+              <li></li>
+              <li></li>
+              <li></li>
+              <li></li>
+              <li></li>
             </ul>
           </section>
         </main>
