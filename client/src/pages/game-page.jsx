@@ -108,6 +108,7 @@ function GamePage() {
                 saveGame={saveGame}
                 onUpdate={async () => setGames((await getGames()) || games)}
                 tags={tags}
+                currentUser={currentUser}
               />
             </li>
           ))}

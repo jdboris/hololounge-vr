@@ -22,6 +22,8 @@ function GameForm({
   isLoading,
   saveGame,
   onCreate,
+  onUpdate,
+  currentUser,
 }) {
   const [sucess, setSuccess] = useState(null);
   const [mode, setMode] = useState(defaultMode);
@@ -75,14 +77,19 @@ function GameForm({
         setError(null);
 
         if (mode === "create" || mode === "update") {
-          const { title } = await saveGame(game);
+          const { title } = (await saveGame(game)) || {};
 
           if (mode === "create") {
-            setGame(new Game().validate());
+            setGame(new Game());
+            onCreate();
+          }
+
+          if (mode === "update") {
+            setMode("read");
+            onUpdate();
           }
 
           setSuccess({ message: `Game "${title}" created.` });
-          onCreate();
 
           return;
         }
@@ -317,6 +324,12 @@ function GameForm({
             </label>
           ) : (
             <p>{game.summary}</p>
+          )}
+
+          {mode == "read" && currentUser?.isAdmin && (
+            <button onClick={(e) => e.preventDefault() || setMode("update")}>
+              Edit
+            </button>
           )}
 
           {(mode == "create" || mode == "update") && <button>Save</button>}

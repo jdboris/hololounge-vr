@@ -38,25 +38,22 @@ export function GameProvider({ children }) {
 
   async function saveGame(game) {
     try {
-      if (game.id) {
-      } else {
-        const response = await fetch(`/api/games`, {
-          method: "POST",
-          credentials: "same-origin",
-          body: JSON.stringify(game),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+      const response = await fetch(`/api/games`, {
+        method: game.id ? "PUT" : "POST",
+        credentials: "same-origin",
+        body: JSON.stringify(game),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-        const { error, ...data } = await response.json();
+      const { error, ...data } = await response.json();
 
-        if (!response.ok) {
-          throw error;
-        }
-
-        return data.game;
+      if (!response.ok) {
+        throw error;
       }
+
+      return data.game;
     } catch (error) {
       setError(error);
     }

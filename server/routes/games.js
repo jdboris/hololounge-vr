@@ -14,17 +14,42 @@ gameRouter.get("/", async (req, res) => {
 
 gameRouter.post("/", async (req, res) => {
   const user = await getCurrentUser(req);
+  if (!user) {
+    throw new HttpError("", 401);
+  }
   if (!user.isAdmin) {
     throw new HttpError("", 403);
   }
 
   const game = await Game.create(req.body);
-  await game.addTags(
+  await game.setTags(
     req.body.tags.map((tag) => tag.id),
     { through: "tags" }
   );
 
   res.json({ message: `Game "${game.title}" created.`, game: game.get() });
+});
+
+gameRouter.put("/", async (req, res) => {
+  const user = await getCurrentUser(req);
+  if (!user) {
+    throw new HttpError("", 401);
+  }
+  if (!user.isAdmin) {
+    throw new HttpError("", 403);
+  }
+
+  await Game.update(req.body, {
+    where: { id: req.body.id },
+  });
+
+  const game = await Game.findByPk(req.body.id);
+  await game.setTags(
+    req.body.tags.map((tag) => tag.id),
+    { through: "tags" }
+  );
+
+  res.json({ message: `Game "${game.title}" updated.`, game: game.get() });
 });
 
 export default gameRouter;
