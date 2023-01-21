@@ -37,6 +37,7 @@ if (!CLIENT_APP_PATH) {
 }
 
 if (NODE_ENV !== "development") {
+  
   // Serve the static files from the React app
   app.use(express.static(CLIENT_APP_PATH));
 }
