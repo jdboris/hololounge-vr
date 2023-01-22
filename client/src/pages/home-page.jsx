@@ -4,6 +4,7 @@ import { useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import GameForm from "../components/game-form";
 import { useGames } from "../contexts/games";
+import PwaInstallButton from "../components/pwa-install-button";
 
 function HomePage() {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,6 +31,7 @@ function HomePage() {
       >
         <strong>Casual VR Fun</strong>
         <small>Try something new. Stay a while.</small>
+        <PwaInstallButton />
 
         <button
           onClick={(e) => {
