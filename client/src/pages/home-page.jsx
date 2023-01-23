@@ -37,7 +37,7 @@ function HomePage() {
           onClick={(e) => {
             e.target
               .closest(`.${theme.landingPage}`)
-              .current.nextSibling.scrollIntoView({
+              .nextSibling.scrollIntoView({
                 behavior: "smooth",
               });
           }}
