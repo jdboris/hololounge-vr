@@ -9,7 +9,8 @@ import * as dotenv from "dotenv";
 import { getCurrentUser } from "../api/auth.js";
 
 dotenv.config();
-const { NODE_ENV, JWT_SECRET, GOOGLE_OAUTH_CLIENT_ID } = process.env;
+const { NODE_ENV, JWT_SECRET, GOOGLE_OAUTH_CLIENT_ID, ADMIN_EMAIL } =
+  process.env;
 
 const authRouter = express.Router();
 
@@ -47,6 +48,13 @@ authRouter.post("/", async (req, res) => {
         photoUrl: picture,
       },
     });
+
+    // Success
+
+    if (ADMIN_EMAIL && user.get().email === ADMIN_EMAIL) {
+      user.isAdmin = true;
+      await user.save();
+    }
 
     res.cookie(
       "authToken",
