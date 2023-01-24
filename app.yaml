@@ -2,16 +2,17 @@ runtime: nodejs18
 
 instance_class: F1
 
+includes:
+  - ./server/env.yaml
+
 handlers:
-  # Serve all static files with url ending with a file extension
-  - url: /(.*\..+)$
-    static_files: client/build/\1
-    upload: client/build/(.*\..+)$
+  # Catch all handler to express app
+  - url: .*
     secure: always
     redirect_http_response_code: 301
-  # Catch all handler to index.html
-  - url: /.*
-    static_files: client/build/index.html
-    upload: client/build/index.html
-    secure: always
-    redirect_http_response_code: 301
+    script: auto
+  # # Serve all static files with url ending with a file extension
+  # - url: /.*
+  #   static_files: client/build/\1
+  #   upload: client/build/(.*\..+)$
+  #   secure: always
