@@ -10,6 +10,11 @@ import { ValidationError } from "sequelize";
 import gameRouter from "./routes/games.js";
 import db from "./db/db.js";
 
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 const app = express();
 
 app.use(bodyParser.json());
@@ -36,25 +41,23 @@ if (!CLIENT_APP_PATH) {
   process.exit(1);
 }
 
-if (NODE_ENV !== "development") {
-  
-  // Serve the static files from the React app
-  app.use(express.static(CLIENT_APP_PATH));
-}
-
 // API Routes
 app.use("/api/auth", authRouter);
 app.use("/api/tags", tagRouter);
 app.use("/api/games", gameRouter);
 
-// Default to React app
-app.get("*", (req, res) => {
+if (NODE_ENV !== "development") {
+  // Serve the static files from the React app
+  app.use(express.static(path.resolve(__dirname, CLIENT_APP_PATH)));
+}
+
+app.get(/.*/, (req, res) => {
   if (NODE_ENV === "development") {
-    res.sendFile(`${path.resolve(process.cwd())}/env-error.html`);
+    res.sendFile(`${path.resolve(__dirname)}/env-error.html`);
     return;
   }
 
-  res.sendFile(`${path.resolve(process.cwd(), CLIENT_APP_PATH)}/index.html`);
+  res.sendFile(`${path.resolve(__dirname, CLIENT_APP_PATH)}/index.html`);
 });
 
 // Error handler
