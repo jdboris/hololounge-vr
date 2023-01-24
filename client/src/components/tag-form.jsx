@@ -56,12 +56,12 @@ function TagForm({
 
       {error?.message && <small className={theme.error}>{error.message}</small>}
       <fieldset disabled={isLoading}>
+        {error?.details?.name && (
+          <div className={theme.error}>
+            <AiOutlineExclamationCircle /> {error.details.name}
+          </div>
+        )}
         <label>
-          {error?.details?.name && (
-            <div className={theme.error}>
-              <AiOutlineExclamationCircle /> {error.details.name}
-            </div>
-          )}
           <FaTag />
 
           <input
