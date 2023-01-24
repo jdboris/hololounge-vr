@@ -1,8 +1,19 @@
-while getopts p: flag
-do
-    case "${flag}" in
-        p) password=${OPTARG};;
-    esac
+#!/bin/bash
+
+while getopts ":p:" opt; do
+  case $opt in
+    p)
+      password=${OPTARG}
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+  esac
 done
 
 gcloud services enable compute.googleapis.com \
@@ -15,3 +26,5 @@ gcloud services enable compute.googleapis.com \
 --host=% \
 --instance hololounge \
 --password $password
+
+$SHELL

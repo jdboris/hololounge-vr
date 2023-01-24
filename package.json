@@ -2,8 +2,10 @@
   "name": "hololounge-vr",
   "version": "0.1.0",
   "description": "",
+  "main": "./server/index.js",
   "scripts": {
-    "start": "node ./server/index.js",
+    "gcp-build": "cd server && npm i",
+    "start": "node .",
     "build": "cd client && npm run build",
     "deploy": "npm run build & gcloud app deploy"
   },
