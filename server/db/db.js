@@ -13,7 +13,9 @@ const {
 } = process.env;
 
 const connection = await mysql.createConnection({
-  host: DATABASE_HOST,
+  ...(NODE_ENV == "development"
+    ? { host: DATABASE_HOST }
+    : { socketPath: DATABASE_HOST }),
   user: DATABASE_USERNAME,
   password: DATABASE_PASSWORD,
 });
@@ -22,16 +24,25 @@ await connection.query(`CREATE DATABASE IF NOT EXISTS ${DATABASE_NAME}`);
 
 connection.end();
 
-const sequelize = new Sequelize(
-  DATABASE_NAME,
-  DATABASE_USERNAME,
-  DATABASE_PASSWORD,
-  {
-    host: DATABASE_HOST,
-    dialect: "mysql",
-  }
-);
+let sequelize = null;
+
 try {
+  sequelize = new Sequelize(
+    DATABASE_NAME,
+    DATABASE_USERNAME,
+    DATABASE_PASSWORD,
+    {
+      dialect: "mysql",
+      ...(NODE_ENV == "development"
+        ? { host: DATABASE_HOST }
+        : {
+            dialectOptions: {
+              socketPath: process.env.DATABASE_HOST,
+            },
+          }),
+    }
+  );
+
   await sequelize.authenticate();
   console.log(
     `Connected to MySQL database '${DATABASE_NAME}' through host '${DATABASE_HOST}'.`
