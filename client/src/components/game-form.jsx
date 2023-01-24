@@ -79,17 +79,19 @@ function GameForm({
         if (mode === "create" || mode === "update") {
           const { title } = (await saveGame(game)) || {};
 
-          if (mode === "create") {
-            setGame(new Game());
-            onCreate();
-          }
+          if (title) {
+            if (mode === "create") {
+              setGame(new Game());
+              onCreate();
+            }
 
-          if (mode === "update") {
-            setMode("read");
-            onUpdate();
-          }
+            if (mode === "update") {
+              setMode("read");
+              onUpdate();
+            }
 
-          setSuccess({ message: `Game "${title}" created.` });
+            setSuccess({ message: `Game "${title}" created.` });
+          }
 
           return;
         }
