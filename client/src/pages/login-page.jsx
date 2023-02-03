@@ -1,4 +1,4 @@
-import theme from "@jdboris/css-themes/space-station/theme.module.scss";
+import theme from "@jdboris/css-themes/space-station";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import GoogleLoginButton from "../components/google-login-button";

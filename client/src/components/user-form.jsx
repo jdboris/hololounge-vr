@@ -1,4 +1,4 @@
-import theme from "@jdboris/css-themes/space-station/theme.module.scss";
+import theme from "@jdboris/css-themes/space-station";
 import { useState } from "react";
 import { FaRegEnvelope } from "react-icons/fa";
 import { MdPassword } from "react-icons/md";

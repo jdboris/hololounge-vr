@@ -1,4 +1,4 @@
-import theme from "@jdboris/css-themes/space-station/theme.module.scss";
+import theme from "@jdboris/css-themes/space-station";
 import { useState } from "react";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
 import { FaTag } from "react-icons/fa";

@@ -33,11 +33,9 @@ function Header() {
   return (
     <header>
       <nav className={isMenuOpen ? theme.open : ""}>
-        <Link
-          to="/"
-          // className={theme.logo}
-        >
+        <Link to="/" className={theme.logo}>
           <img src="logo.svg" />
+          HoloLounge
         </Link>
 
         <div

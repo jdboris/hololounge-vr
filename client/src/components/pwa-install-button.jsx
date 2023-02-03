@@ -45,9 +45,9 @@ function PwaInstallButton() {
 
         // Act on the user's choice
         if (outcome === "accepted") {
-          console.log("User accepted the install prompt.");
+          // console.log("User accepted the install prompt.");
         } else if (outcome === "dismissed") {
-          console.log("User dismissed the install prompt");
+          // console.log("User dismissed the install prompt");
         }
       }}
     >
