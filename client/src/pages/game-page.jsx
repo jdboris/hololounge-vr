@@ -12,7 +12,7 @@ function GamePage() {
   const { currentUser } = useAuth();
   const [tags, setTags] = useState([]);
   const [filters, setFilters] = useState({ tagIds: [] });
-  const debouncedFilters = useDebounced(filters);
+  const debouncedFilters = useDebounced(filters, 1);
   const [games, setGames] = useState([]);
   const [filteredGames, setFilteredGames] = useState([]);
   const { saveTag, getTags, error, setError, isLoading } = useTags();
