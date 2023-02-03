@@ -1,16 +1,41 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
 import theme from "@jdboris/css-themes/space-station";
+import { useEffect } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Footer from "./components/footer";
 import Header from "./components/header";
+import { AuthProvider } from "./contexts/auth";
+import { GameProvider } from "./contexts/games";
+import { TagProvider } from "./contexts/tags";
+import GamePage from "./pages/game-page";
 import HomePage from "./pages/home-page";
 import LoginPage from "./pages/login-page";
-import { AuthProvider } from "./contexts/auth";
 import SignupPage from "./pages/signup-page";
-import GamePage from "./pages/game-page";
-import { TagProvider } from "./contexts/tags";
-import { GameProvider } from "./contexts/games";
 
 function App() {
+  useEffect(() => {
+    (function () {
+      window.SpringboardVRWidget = {
+        url: "https://customer.springboardvr.com",
+        reservationUUID: "1eb9c7a0-9cd0-11ed-8119-538252e85149",
+        mini: 0,
+        color_button_background: "#000000",
+        color_button_text: "#ffffff",
+        button_text: "Book Now",
+      };
+      var e = document.createElement("script");
+      e.type = "text/javascript";
+      e.src = window.SpringboardVRWidget.url + "/static/embed/embed.js";
+      document.getElementsByTagName("head")[0].appendChild(e);
+      var t = document.createElement("link");
+      t.href = window.SpringboardVRWidget.url + "/static/embed/embed.css";
+      t.rel = "stylesheet";
+      document.getElementsByTagName("head")[0].appendChild(t);
+      var n = document.createElement("link");
+      n.href = "https://fonts.googleapis.com/css?family=Open+Sans:600";
+      n.rel = "stylesheet";
+      document.getElementsByTagName("head")[0].appendChild(n);
+    })();
+  });
   return (
     <BrowserRouter>
       <AuthProvider>
