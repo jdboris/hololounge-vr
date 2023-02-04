@@ -239,7 +239,9 @@ function GameForm({
                             })
                         )
                       }
-                      onBlur={() => setGame((old) => ({ ...old.validate() }))}
+                      onBlur={() =>
+                        setGame((old) => new Game({ ...old.validate() }))
+                      }
                     />
                     -
                     <input
@@ -256,7 +258,9 @@ function GameForm({
                             })
                         )
                       }
-                      onBlur={() => setGame((old) => ({ ...old.validate() }))}
+                      onBlur={() =>
+                        setGame((old) => new Game({ ...old.validate() }))
+                      }
                     />
                   </>
                 ) : (
