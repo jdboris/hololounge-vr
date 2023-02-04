@@ -222,47 +222,49 @@ function GameForm({
           <ul>
             <li>
               <FaUserAlt />{" "}
-              {isOpen && (mode == "create" || mode == "update") ? (
-                <input
-                  type="number"
-                  className={theme.small}
-                  value={game.playerMinimum}
-                  placeholder="Min."
-                  onChange={(e) =>
-                    setGame(
-                      (old) =>
-                        new Game({
-                          ...old,
-                          playerMinimum: Number(e.target.value),
-                        })
-                    )
-                  }
-                  onBlur={() => setGame((old) => ({ ...old.validate() }))}
-                />
-              ) : (
-                game.playerMinimum
-              )}
-              -
-              {isOpen && (mode == "create" || mode == "update") ? (
-                <input
-                  type="number"
-                  className={theme.small}
-                  value={game.playerMaximum}
-                  placeholder="Max."
-                  onChange={(e) =>
-                    setGame(
-                      (old) =>
-                        new Game({
-                          ...old,
-                          playerMaximum: Number(e.target.value),
-                        })
-                    )
-                  }
-                  onBlur={() => setGame((old) => ({ ...old.validate() }))}
-                />
-              ) : (
-                game.playerMaximum
-              )}{" "}
+              {isOpen &&
+                (mode == "create" || mode == "update" ? (
+                  <>
+                    <input
+                      type="number"
+                      className={theme.small}
+                      value={game.playerMinimum}
+                      placeholder="Min."
+                      onChange={(e) =>
+                        setGame(
+                          (old) =>
+                            new Game({
+                              ...old,
+                              playerMinimum: Number(e.target.value),
+                            })
+                        )
+                      }
+                      onBlur={() => setGame((old) => ({ ...old.validate() }))}
+                    />
+                    -
+                    <input
+                      type="number"
+                      className={theme.small}
+                      value={game.playerMaximum}
+                      placeholder="Max."
+                      onChange={(e) =>
+                        setGame(
+                          (old) =>
+                            new Game({
+                              ...old,
+                              playerMaximum: Number(e.target.value),
+                            })
+                        )
+                      }
+                      onBlur={() => setGame((old) => ({ ...old.validate() }))}
+                    />
+                  </>
+                ) : (
+                  <>
+                    {game.playerMinimum}
+                    {game.playerMaximum > 1 && <> - {game.playerMaximum}</>}
+                  </>
+                ))}
               {(game.playerMinimum > 1 || game.playerMaximum > 1) && (
                 <>
                   ({" "}
