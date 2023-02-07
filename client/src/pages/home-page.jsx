@@ -1,10 +1,10 @@
 import theme from "@jdboris/css-themes/space-station";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import GameForm from "../components/game-form";
-import { useGames } from "../contexts/games";
 import PwaInstallButton from "../components/pwa-install-button";
+import { useGames } from "../contexts/games";
+import BookingPage from "./booking-page";
 
 function HomePage() {
   const [isOpen, setIsOpen] = useState(false);
@@ -91,6 +91,9 @@ function HomePage() {
             referrerpolicy="no-referrer-when-downgrade"
           ></iframe>
         </main>
+      </section>
+      <section>
+        <BookingPage />
       </section>
     </main>
   );
