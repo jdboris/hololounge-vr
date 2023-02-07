@@ -1,12 +1,12 @@
 import express from "express";
-import { HttpError } from "../utils.js";
+import { HttpError } from "../utils/errors.js";
 import User from "../models/user.js";
 import { OAuth2Client } from "google-auth-library";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 import * as dotenv from "dotenv";
-import { getCurrentUser } from "../api/auth.js";
+import { getCurrentUser } from "../utils/auth.js";
 
 dotenv.config();
 const { NODE_ENV, JWT_SECRET, GOOGLE_OAUTH_CLIENT_ID, ADMIN_EMAIL } =

@@ -1,7 +1,7 @@
 import express from "express";
-import { HttpError } from "../utils.js";
+import { HttpError } from "../utils/errors.js";
 
-import { getCurrentUser } from "../api/auth.js";
+import { getCurrentUser } from "../utils/auth.js";
 import Tag from "../models/tag.js";
 
 const tagRouter = express.Router();

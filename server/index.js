@@ -3,7 +3,7 @@ import path from "path";
 import * as dotenv from "dotenv";
 import authRouter from "./routes/auth.js";
 import tagRouter from "./routes/tags.js";
-import { HttpError } from "./utils.js";
+import { HttpError } from "./utils/errors.js";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import { ValidationError } from "sequelize";
