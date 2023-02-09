@@ -4,6 +4,7 @@ import { FaRegEnvelope } from "react-icons/fa";
 import { MdPassword } from "react-icons/md";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import InputError from "./input-error";
 
 function UserForm({
   mode: defaultMode,
@@ -54,11 +55,7 @@ function UserForm({
         </div>
         {error?.message && <div className={theme.error}>{error.message}</div>}
         <label>
-          {error?.details?.email && (
-            <div className={theme.error}>
-              <AiOutlineExclamationCircle /> {error.details.email}
-            </div>
-          )}
+          <InputError message={error?.details?.email} />
 
           <FaRegEnvelope />
           <input
@@ -74,11 +71,7 @@ function UserForm({
           />
         </label>
         <label>
-          {error?.details?.password && (
-            <div className={theme.error}>
-              <AiOutlineExclamationCircle /> {error.details.password}
-            </div>
-          )}
+          <InputError message={error?.details?.password} />
 
           <MdPassword />
           <input
@@ -100,11 +93,7 @@ function UserForm({
         </label>
         {mode === "signup" && (
           <label>
-            {error?.details?.repeatPassword && (
-              <div className={theme.error}>
-                <AiOutlineExclamationCircle /> {error.details.repeatPassword}
-              </div>
-            )}
+            <InputError message={error?.details?.repeatPassword} />
 
             <MdPassword />
             <input

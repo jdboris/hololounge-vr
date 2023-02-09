@@ -1,4 +1,4 @@
-export default class Game {
+export default class GameDto {
   id = null;
   title = "";
   posterUrl = "";
@@ -12,10 +12,7 @@ export default class Game {
 
   constructor(data = {}) {
     Object.assign(this, data);
-    // this.validate();
-  }
 
-  validate() {
     if (this.playerMinimum <= 0) {
       this.playerMinimum = 1;
     }
@@ -30,7 +27,7 @@ export default class Game {
 
     if (this.playerMaximum > 1) {
       if (!this.hasLocalMultiplayer && !this.hasOnlineMultiplayer) {
-        this.hasLocalMultiplayer = true;
+        this.hasLocalMultiplayer = this;
       }
     }
 
@@ -39,6 +36,6 @@ export default class Game {
       this.hasOnlineMultiplayer = false;
     }
 
-    return this;
+    Object.freeze(this);
   }
 }

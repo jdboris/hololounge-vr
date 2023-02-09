@@ -34,17 +34,20 @@ function Header() {
     <header>
       <nav className={isMenuOpen ? theme.open : ""}>
         <Link to="/" className={theme.logo}>
-          <img src="logo.svg" />
+          <img src="./logo.svg" />
           HoloLounge
         </Link>
 
-        <div
-          className={theme.overlay}
-          onClick={(e) => {
-            setIsMenuOpen(false);
-            e.target.closest("header").scrollTo({ top: 0 });
-          }}
-        ></div>
+        {isMenuOpen && (
+          <div
+            className={theme.overlay}
+            onClick={(e) => {
+              setIsMenuOpen(false);
+              e.target.closest("header").scrollTo({ top: 0 });
+            }}
+          ></div>
+        )}
+
         <ul
           onFocus={(e) => {
             e.target.closest("header").scrollTo({ top: 0 });
@@ -63,7 +66,7 @@ function Header() {
             <Link to="/account">{isMenuOpen && <FaUser />} Account</Link>
           </li>
           <li>
-            <button className={theme.altButton}>
+            <button className={theme.alt}>
               <MdLanguage /> {isMenuOpen && "Language"}
             </button>
           </li>
@@ -84,7 +87,7 @@ function Header() {
         </ul>
 
         <button
-          className={theme.altButton}
+          className={theme.alt}
           onFocus={(e) => {
             e.target.closest("header").scrollTo({ top: 0 });
           }}

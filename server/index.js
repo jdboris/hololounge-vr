@@ -1,17 +1,20 @@
-import express from "express";
-import path from "path";
-import * as dotenv from "dotenv";
-import authRouter from "./routes/auth.js";
-import tagRouter from "./routes/tags.js";
-import { HttpError } from "./utils/errors.js";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
+import * as dotenv from "dotenv";
+import express from "express";
+import path from "path";
 import { ValidationError } from "sequelize";
+import authRouter from "./routes/auth.js";
+import bookingRouter from "./routes/bookings.js";
 import gameRouter from "./routes/games.js";
-import db from "./db/db.js";
+import locationRouter from "./routes/locations.js";
+import tagRouter from "./routes/tags.js";
+import db from "./utils/db.js";
+import { HttpError } from "./utils/errors.js";
 
 import { dirname } from "path";
 import { fileURLToPath } from "url";
+import Booking from "./models/booking.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -45,6 +48,8 @@ if (!CLIENT_APP_PATH) {
 app.use("/api/auth", authRouter);
 app.use("/api/tags", tagRouter);
 app.use("/api/games", gameRouter);
+app.use("/api/bookings", bookingRouter);
+app.use("/api/locations", locationRouter);
 
 if (NODE_ENV !== "development") {
   // Serve the static files from the React app
@@ -82,8 +87,10 @@ app.use((err, req, res, next) => {
     res.status(500).json(
       // Generic error message.
       {
-        ...err,
-        message: "Something went wrong. Try again later.",
+        error: {
+          ...err,
+          message: "Something went wrong. Try again later.",
+        },
       }
     );
     return;

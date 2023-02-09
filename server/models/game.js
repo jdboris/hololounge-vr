@@ -1,10 +1,6 @@
-import sequelize from "../db/db.js";
+import sequelize from "../utils/db.js";
 import { DataTypes } from "sequelize";
-import * as dotenv from "dotenv";
 import Tag from "./tag.js";
-
-dotenv.config();
-const { NODE_ENV } = process.env;
 
 const MIN_TITLE_LENGTH = 1;
 const MAX_TITLE_LENGTH = 255;

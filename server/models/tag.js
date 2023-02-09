@@ -1,9 +1,5 @@
-import sequelize from "../db/db.js";
+import sequelize from "../utils/db.js";
 import { DataTypes } from "sequelize";
-import * as dotenv from "dotenv";
-
-dotenv.config();
-const { NODE_ENV } = process.env;
 
 const MIN_NAME_LENGTH = 3;
 const MAX_NAME_LENGTH = 50;

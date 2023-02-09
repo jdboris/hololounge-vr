@@ -11,11 +11,11 @@ import {
   FaVrCardboard,
 } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
-import Game from "../dtos/game";
+import Game from "dtos/game";
 
 function GameForm({
   mode: defaultMode,
-  game: defaultGame = new Game(),
+  game: defaultGame,
   tags,
   error,
   setError,
@@ -27,7 +27,10 @@ function GameForm({
 }) {
   const [sucess, setSuccess] = useState(null);
   const [mode, setMode] = useState(defaultMode);
-  const [game, setGame] = useState(defaultGame);
+  const [game, setGameRaw] = useState(defaultGame || new Game());
+  function setGame(data) {
+    setGameRaw((old) => new Game({ ...old, ...data }));
+  }
   const [isOpen, setIsOpen] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const videoRef = useRef();
@@ -97,50 +100,49 @@ function GameForm({
         }
       }}
     >
-      <div className={theme.overlay} onClick={() => setIsOpen(false)}></div>
       {!isOpen && (game.posterUrl ? <img src={game.posterUrl} /> : <FaPlus />)}
       {isOpen && (
-        <div
-          className={theme.videoPlayer}
-          onClick={(e) => (e.target.paused ? playVideo() : pauseVideo())}
-        >
-          <video ref={videoRef} poster={game.posterUrl} src={game.trailerUrl} />
-          {isPaused && <FaPlay />}
+        <>
+          <div className={theme.overlay} onClick={() => setIsOpen(false)}></div>
+          <div
+            className={theme.videoPlayer}
+            onClick={(e) => (e.target.paused ? playVideo() : pauseVideo())}
+          >
+            <video
+              ref={videoRef}
+              poster={game.posterUrl}
+              src={game.trailerUrl}
+            />
+            {isPaused && <FaPlay />}
 
-          {(mode == "create" || mode == "update") && (
-            <>
-              <label>
-                <FaImage />
-                <input
-                  type="url"
-                  value={game.posterUrl}
-                  placeholder="Poster URL"
-                  onChange={(e) =>
-                    setGame((old) =>
-                      new Game({ ...old, posterUrl: e.target.value }).validate()
-                    )
-                  }
-                />
-              </label>
-              <label>
-                <FaVideo />
-                <input
-                  type="url"
-                  value={game.trailerUrl}
-                  placeholder="Trailer URL"
-                  onChange={(e) =>
-                    setGame((old) =>
-                      new Game({
-                        ...old,
+            {(mode == "create" || mode == "update") && (
+              <>
+                <label>
+                  <FaImage />
+                  <input
+                    type="url"
+                    value={game.posterUrl}
+                    placeholder="Poster URL"
+                    onChange={(e) => setGame({ posterUrl: e.target.value })}
+                  />
+                </label>
+                <label>
+                  <FaVideo />
+                  <input
+                    type="url"
+                    value={game.trailerUrl}
+                    placeholder="Trailer URL"
+                    onChange={(e) =>
+                      setGame({
                         trailerUrl: e.target.value,
-                      }).validate()
-                    )
-                  }
-                />
-              </label>
-            </>
-          )}
-        </div>
+                      })
+                    }
+                  />
+                </label>
+              </>
+            )}
+          </div>
+        </>
       )}
 
       <header>
@@ -152,11 +154,7 @@ function GameForm({
                 type="text"
                 value={game.title}
                 placeholder="Title"
-                onChange={(e) =>
-                  setGame((old) =>
-                    new Game({ ...old, title: e.target.value }).validate()
-                  )
-                }
+                onChange={(e) => setGame({ title: e.target.value })}
               />
             </label>
           ) : (
@@ -164,7 +162,7 @@ function GameForm({
           )}
         </span>
         {isOpen && (
-          <button className={theme.altButton} onClick={() => setIsOpen(false)}>
+          <button className={theme.alt} onClick={() => setIsOpen(false)}>
             <MdClose />
           </button>
         )}
@@ -182,7 +180,7 @@ function GameForm({
                         game.tags?.find((gameTag) => gameTag.id === tag.id)
                       )}
                       onChange={(e) =>
-                        setGame((old) => {
+                        setGameRaw((old) => {
                           const copy = new Game(old);
                           const gameTag = old.tags?.find(
                             (gameTag) => gameTag.id === tag.id
@@ -197,7 +195,6 @@ function GameForm({
                               (tag) => tag.id != gameTag.id
                             );
                           }
-                          return copy.validate();
                         })
                       }
                     />
@@ -231,16 +228,9 @@ function GameForm({
                       value={game.playerMinimum}
                       placeholder="Min."
                       onChange={(e) =>
-                        setGame(
-                          (old) =>
-                            new Game({
-                              ...old,
-                              playerMinimum: Number(e.target.value),
-                            })
-                        )
-                      }
-                      onBlur={() =>
-                        setGame((old) => new Game({ ...old.validate() }))
+                        setGame({
+                          playerMinimum: Number(e.target.value),
+                        })
                       }
                     />
                     -
@@ -250,17 +240,12 @@ function GameForm({
                       value={game.playerMaximum}
                       placeholder="Max."
                       onChange={(e) =>
-                        setGame(
-                          (old) =>
-                            new Game({
-                              ...old,
-                              playerMaximum: Number(e.target.value),
-                            })
-                        )
+                        setGameRaw((old) => ({
+                          ...old,
+                          playerMaximum: Number(e.target.value),
+                        }))
                       }
-                      onBlur={() =>
-                        setGame((old) => new Game({ ...old.validate() }))
-                      }
+                      onBlur={() => setGame({})}
                     />
                   </>
                 ) : (
@@ -271,6 +256,7 @@ function GameForm({
                 ))}
               {(game.playerMinimum > 1 || game.playerMaximum > 1) && (
                 <>
+                  {" "}
                   ({" "}
                   {mode == "create" || mode == "update" ? (
                     <label className={theme.checkboxLabel}>
@@ -278,12 +264,9 @@ function GameForm({
                         type="checkbox"
                         checked={game.hasLocalMultiplayer}
                         onChange={(e) =>
-                          setGame((old) =>
-                            new Game({
-                              ...old,
-                              hasLocalMultiplayer: e.target.checked,
-                            }).validate()
-                          )
+                          setGame({
+                            hasLocalMultiplayer: e.target.checked,
+                          })
                         }
                       />
                       <FaNetworkWired />
@@ -297,12 +280,9 @@ function GameForm({
                         type="checkbox"
                         checked={game.hasOnlineMultiplayer}
                         onChange={(e) =>
-                          setGame((old) =>
-                            new Game({
-                              ...old,
-                              hasOnlineMultiplayer: e.target.checked,
-                            }).validate()
-                          )
+                          setGame({
+                            hasOnlineMultiplayer: e.target.checked,
+                          })
                         }
                       />
                       <FaWifi />
@@ -321,12 +301,9 @@ function GameForm({
                 value={game.summary}
                 placeholder="Summary..."
                 onChange={(e) =>
-                  setGame((old) =>
-                    new Game({
-                      ...old,
-                      summary: e.target.value,
-                    }).validate()
-                  )
+                  setGame({
+                    summary: e.target.value,
+                  })
                 }
               ></textarea>
             </label>
