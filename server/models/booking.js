@@ -6,9 +6,8 @@ const NAME_MAX_LENGTH = 50;
 const PHONE_MAX_LENGTH = 25;
 
 const Booking = sequelize.define("bookings", {
-  // PREREQUISITE: Must run Booking.removeAttribute("id") first, in a separate sync
   id: {
-    // NOTE: Must match location ID from Springboard
+    // NOTE: Must match booking ID from Springboard
     type: DataTypes.UUID,
     primaryKey: true,
   },
@@ -111,6 +110,11 @@ const Booking = sequelize.define("bookings", {
       },
     },
   },
+});
+
+// NOTE: Required to work around bug that causes sequelize to ignore `id` definition in Model
+sequelize.getQueryInterface().changeColumn("bookings", "id", {
+  type: DataTypes.UUID,
 });
 
 Booking.belongsTo(Location, { as: "location" });

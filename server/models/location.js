@@ -1,12 +1,11 @@
 import sequelize from "../utils/db.js";
-import { DataTypes } from "sequelize";
+import { DataTypes, Sequelize } from "sequelize";
 import Booking from "./booking.js";
 
 const NAME_MIN_LENGTH = 1;
 const NAME_MAX_LENGTH = 100;
 
 const Location = sequelize.define("locations", {
-  // PREREQUISITE: Must run Location.removeAttribute("id") first, in a separate sync
   id: {
     // NOTE: Must match location ID from Springboard
     type: DataTypes.UUID,
@@ -31,6 +30,9 @@ const Location = sequelize.define("locations", {
   },
 });
 
-// Location.removeAttribute("id");
+// NOTE: Required to work around bug that causes sequelize to ignore `id` definition in Model
+sequelize.getQueryInterface().changeColumn("locations", "id", {
+  type: DataTypes.UUID,
+});
 
 export default Location;

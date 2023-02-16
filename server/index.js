@@ -24,14 +24,14 @@ app.use(bodyParser.json());
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
 dotenv.config();
-const { CLIENT_APP_PATH, NODE_ENV, PORT } = process.env;
+const { CLIENT_APP_PATH, NODE_ENV, PORT, ALTER_DB } = process.env;
 
 try {
   // NOTE: Must sync AFTER importing all the models
   if (NODE_ENV === "development") {
     await db.sync({ alter: true });
   } else {
-    await db.sync();
+    await db.sync({ alter: ALTER_DB == "True" });
   }
 } catch (error) {
   console.error("Unable to sync squelize:", error);
