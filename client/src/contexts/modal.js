@@ -8,7 +8,10 @@ function Modal({ content, setContent }) {
   return !content ? (
     <></>
   ) : (
-    <div className={theme.overlay} onClick={() => setContent(null)}>
+    <div
+      className={theme.overlay}
+      onClick={(e) => e.target == e.currentTarget && setContent(null)}
+    >
       <div className={theme.modal}>
         <header>
           <button className={theme.alt} onClick={() => setContent(null)}>
