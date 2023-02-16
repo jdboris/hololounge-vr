@@ -60,7 +60,8 @@ authRouter.post("/", async (req, res) => {
       "authToken",
       jwt.sign(
         { id: user.id, strategy: { name: "google", token: token } },
-        JWT_SECRET
+        JWT_SECRET,
+        { algorithm: "RS256" }
       ),
       {
         httpOnly: true,
@@ -106,7 +107,10 @@ authRouter.post("/signup", async (req, res) => {
 
   res.cookie(
     "authToken",
-    jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "30 days" }),
+    jwt.sign({ id: user.id }, JWT_SECRET, {
+      expiresIn: "30 days",
+      algorithm: "RS256",
+    }),
     {
       httpOnly: true,
       secure: NODE_ENV !== "development",
@@ -161,7 +165,10 @@ authRouter.post("/login", async (req, res) => {
 
   res.cookie(
     "authToken",
-    jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "30 days" }),
+    jwt.sign({ id: user.id }, JWT_SECRET, {
+      expiresIn: "30 days",
+      algorithm: "RS256",
+    }),
     {
       httpOnly: true,
       secure: NODE_ENV !== "development",

@@ -4,7 +4,7 @@ import User from "../models/user.js";
 import * as dotenv from "dotenv";
 
 dotenv.config();
-const { JWT_SECRET } = process.env;
+const { JWT_PUB_KEY } = process.env;
 
 export async function getCurrentUser(req) {
   const { authToken } = req.signedCookies;
@@ -14,8 +14,13 @@ export async function getCurrentUser(req) {
   }
 
   return {
-    ...(await User.findByPk(jwt.verify(authToken, JWT_SECRET).id, {
-      raw: true,
-    })),
+    ...(await User.findByPk(
+      jwt.verify(authToken, JWT_PUB_KEY, {
+        algorithms: ["RS256"],
+      }).id,
+      {
+        raw: true,
+      }
+    )),
   };
 }
