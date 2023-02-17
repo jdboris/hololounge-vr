@@ -8,6 +8,10 @@ export default class BookingDto {
    * @type {Date} If an ISO `string` is privded, it will be parsed.
    */
   birthday;
+  /**
+   * @type {Array<{id: string}>}
+   */
+  stations;
   firstName;
   lastName;
   email;
@@ -44,6 +48,10 @@ export default class BookingDto {
 
     if (!this.phone) {
       errors.phone = "Enter your phone number.";
+    }
+
+    if (!Array.isArray(this.stations) || !this.stations.length) {
+      errors.stations = "Selection station(s) to reserve.";
     }
 
     if (this.startTime && typeof this.startTime == "string") {

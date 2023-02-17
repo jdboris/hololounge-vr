@@ -20,7 +20,11 @@ bookingRouter.post("/", async (req, res) => {
     throw new HttpError(error.message, 400, error.details);
   }
 
-  const { startTime, birthday, firstName, lastName, email, phone } = req.body;
+  /**
+   * @type BookingDto
+   */
+  const { startTime, stations, birthday, firstName, lastName, email, phone } =
+    req.body;
 
   const endTime = new Date(startTime);
   endTime.setHours(endTime.getHours() + 1);
@@ -35,20 +39,18 @@ bookingRouter.post("/", async (req, res) => {
       // e.g. "1989-12-31T15:00:00Z"
       birthday: birthday.toISOString(),
       location: { id: LOCATION_ID },
-      bookingStationTimes: [
-        {
-          experience: { id: EXPERIENCE_ID },
-          station: { id: null },
-          tier: { id: TIER_ID },
-          // NOTE: Must multiply amounts by 100 because of Springboard bug
-          amountDue: 0,
-          amountPaid: 0,
-          discount: null,
-          coupon: null,
-          startedAt: null,
-          endTime,
-        },
-      ],
+      bookingStationTimes: stations.map((station) => ({
+        experience: { id: EXPERIENCE_ID },
+        station: { id: station.id },
+        tier: { id: TIER_ID },
+        // NOTE: Must multiply amounts by 100 because of Springboard bug
+        amountDue: 0,
+        amountPaid: 0,
+        discount: null,
+        coupon: null,
+        startedAt: null,
+        endTime,
+      })),
       guests: [
         {
           firstName,

@@ -1,28 +1,14 @@
 import theme from "@jdboris/css-themes/space-station";
-import { forwardRef, useEffect, useState } from "react";
-import { useMemo } from "react";
-import { useRef } from "react";
-import ReactDatePicker, {
-  setDefaultLocale,
-  registerLocale,
-} from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import "../css/react-datepicker.scss";
-import ja from "date-fns/locale/ja";
 import { format } from "date-fns";
-import {
-  FaCalendar,
-  FaCalendarAlt,
-  FaChevronLeft,
-  FaChevronRight,
-  FaClock,
-  FaPencilAlt,
-  FaRegCalendar,
-  FaRegClock,
-} from "react-icons/fa";
+import ja from "date-fns/locale/ja";
 import Booking from "dtos/booking";
+import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import ReactDatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { FaRegCalendar, FaRegClock } from "react-icons/fa";
 import InputError from "../components/input-error";
 import { useModal } from "../contexts/modal";
+import "../css/react-datepicker.scss";
 
 registerLocale("ja", ja);
 
@@ -36,6 +22,19 @@ class D extends Date {
   }
 }
 
+const stations = [
+  {
+    id: "1bf1a6e0-90f8-11ed-84eb-0d3d846900a0",
+    name: "Station 1",
+    coords: {
+      top: "1.4%",
+      right: "42.6%",
+      width: "20%",
+      height: "30.9%",
+    },
+  },
+];
+
 const CustomInput = forwardRef(({ label, ...props }, ref) => (
   <label>
     <input {...props} type="text" ref={ref} placeholder=" " />
@@ -48,17 +47,13 @@ export default function BookingPage() {
       console.log(
         await (
           await fetch(
-            `/api/locations/2ce14320-90cf-11ed-b97c-b18070c059f2/bookings`
+            `/api/locations/${process.env.REACT_APP_LOCATION_ID}/bookings`
           )
         ).json()
       );
     })();
   }, []);
   const { setModalContent } = useModal();
-
-  // setModalContent(
-  //   "Booking complete! You'll receive a confirmation email shortly."
-  // );
 
   // Calendar stuff...
 
@@ -72,6 +67,7 @@ export default function BookingPage() {
 
   const [formData, setBooking] = useState({
     startTime: now,
+    stations: [],
     birthday: null,
     firstName: "",
     lastName: "",
@@ -227,6 +223,7 @@ export default function BookingPage() {
 
               setBooking({
                 startTime: now,
+                stations: [],
                 birthday: null,
                 firstName: "",
                 lastName: "",
@@ -318,7 +315,6 @@ export default function BookingPage() {
                 />
               </label>
             </fieldset>
-
             <input
               className={theme.timeSlider}
               type="range"
@@ -346,6 +342,34 @@ export default function BookingPage() {
             </datalist>
           </header>
           <main>
+            <figure className={theme.map}>
+              <figcaption>
+                <em>TIP: Select station(s) to reserve.</em>
+              </figcaption>
+              <img src="./floor-map.png" alt="Floor Map" />
+
+              {stations.map((station) => (
+                <label style={station.coords}>
+                  <input
+                    type="checkbox"
+                    name="stations"
+                    value={station.id}
+                    checked={formData.stations.find((x) => x.id == station.id)}
+                    onChange={(e) =>
+                      e.stopPropagation() ||
+                      hideError(e.target.name) ||
+                      setBooking((old) => ({
+                        ...old,
+                        stations: e.target.checked
+                          ? [...old.stations, { ...station }]
+                          : old.stations.filter((x) => x.id != e.target.value),
+                      }))
+                    }
+                  />
+                  <div>{station.name}</div>
+                </label>
+              ))}
+            </figure>
             <aside>
               <div className={theme.h3}>Reservation Details</div>
               <label>
@@ -368,6 +392,19 @@ export default function BookingPage() {
               <label>
                 Duration<span>60 (+5) minutes</span>
               </label>
+              <label>
+                Station(s)
+                {formData.stations.length ? (
+                  <span>
+                    {formData.stations
+                      .map((station) => station.name)
+                      .join(", ")}
+                  </span>
+                ) : (
+                  <span>...</span>
+                )}
+              </label>
+              <InputError message={error?.details?.stations} />
               <fieldset disabled={isLoading}>
                 <div className={theme.h3}>Contact Information</div>
                 <label>
@@ -436,7 +473,7 @@ export default function BookingPage() {
                 </label>
 
                 <InputError message={error?.message} />
-                <button>Book</button>
+                <button>Continue to Payment</button>
               </fieldset>
             </aside>
           </main>
