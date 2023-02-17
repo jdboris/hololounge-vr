@@ -20,14 +20,6 @@ export default class BookingDto {
     Object.seal(this);
     Object.assign(this, data);
 
-    for (const key in this) {
-      if (this[key] === undefined) {
-        throw new Error(
-          `${this.constructor.name} must have a value for "${key}"`
-        );
-      }
-    }
-
     const errors = {};
 
     if (!this.startTime) {

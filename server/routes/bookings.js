@@ -13,9 +13,14 @@ const { WIDGET_ID, LOCATION_ID, EXPERIENCE_ID, TIER_ID, PAYMENT_GATEWAY_ID } =
 const bookingRouter = express.Router();
 
 bookingRouter.post("/", async (req, res) => {
-  // Instantiate a DTO for parsing/validation
-  const { startTime, birthday, firstName, lastName, email, phone } =
-    new BookingDto(req.body);
+  try {
+    // Instantiate a DTO for parsing/validation
+    req.body = new BookingDto(req.body);
+  } catch (error) {
+    throw new HttpError(error.message, 400, error.details);
+  }
+
+  const { startTime, birthday, firstName, lastName, email, phone } = req.body;
 
   const endTime = new Date(startTime);
   endTime.setHours(endTime.getHours() + 1);
