@@ -113,7 +113,7 @@ const Booking = sequelize.define("bookings", {
 });
 
 // NOTE: Required to work around bug that causes sequelize to ignore `id` definition in Model
-sequelize.getQueryInterface().changeColumn("bookings", "id", {
+await sequelize.getQueryInterface().changeColumn("bookings", "id", {
   type: DataTypes.UUID,
 });
 

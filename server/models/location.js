@@ -31,7 +31,7 @@ const Location = sequelize.define("locations", {
 });
 
 // NOTE: Required to work around bug that causes sequelize to ignore `id` definition in Model
-sequelize.getQueryInterface().changeColumn("locations", "id", {
+await sequelize.getQueryInterface().changeColumn("locations", "id", {
   type: DataTypes.UUID,
 });
 
