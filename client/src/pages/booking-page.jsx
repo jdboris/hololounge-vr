@@ -63,6 +63,7 @@ export default function BookingPage() {
   // Calendar stuff...
 
   const [error, setError] = useState();
+  const [isLoading, setIsLoading] = useState(false);
 
   const headingRef = useRef();
   const [interval, setInterval] = useState(5);
@@ -205,35 +206,40 @@ export default function BookingPage() {
           onSubmit={async (e) => {
             e.preventDefault();
             setError(null);
+            try {
+              if (dtoError) {
+                throw dtoError;
+              }
 
-            if (dtoError) {
-              setError(dtoError);
-              return;
-            }
+              setIsLoading(true);
 
-            const response = await fetch(`/api/bookings`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(booking),
-            });
+              const response = await fetch(`/api/bookings`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(booking),
+              });
 
-            const { error, message } = await response.json();
+              const { error, message } = await response.json();
 
-            if (!response.ok) {
+              if (!response.ok) {
+                throw error;
+              }
+
+              setBooking({
+                startTime: now,
+                birthday: null,
+                firstName: "",
+                lastName: "",
+                email: "",
+                phone: "",
+              });
+
+              setModalContent(message);
+            } catch (error) {
               setError(error);
-              return;
             }
 
-            setBooking({
-              startTime: now,
-              birthday: null,
-              firstName: "",
-              lastName: "",
-              email: "",
-              phone: "",
-            });
-
-            setModalContent(message);
+            setIsLoading(false);
           }}
           onChange={(e) => {
             e.target.name &&
@@ -251,10 +257,11 @@ export default function BookingPage() {
           }}
         >
           <header>
-            <fieldset>
+            <fieldset disabled={isLoading}>
               <label>
                 <FaRegCalendar />
                 <ReactDatePicker
+                  disabled={isLoading}
                   customInput={
                     <CustomInput
                       className={[theme.medium, theme.alt].join(" ")}
@@ -278,6 +285,7 @@ export default function BookingPage() {
               <label>
                 <FaRegClock />
                 <ReactDatePicker
+                  disabled={isLoading}
                   customInput={
                     <CustomInput
                       className={[theme.small, theme.alt].join(" ")}
@@ -360,74 +368,76 @@ export default function BookingPage() {
               <label>
                 Duration<span>60 (+5) minutes</span>
               </label>
-              <div className={theme.h3}>Contact Information</div>
-              <label>
-                <InputError message={error?.details?.lastName} />
-                <input
-                  className={theme.alt}
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName || ""}
-                  placeholder=" "
-                  onBlur={(e) => showError(e.target.name)}
-                />
-                <small>Last Name</small>
-              </label>
-              <label>
-                <InputError message={error?.details?.firstName} />
-                <input
-                  className={theme.alt}
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName || ""}
-                  placeholder=" "
-                  onBlur={(e) => showError(e.target.name)}
-                />
-                <small>First Name</small>
-              </label>
-              <label>
-                <InputError message={error?.details?.email} />
-                <input
-                  className={theme.alt}
-                  type="email"
-                  name="email"
-                  value={formData.email || ""}
-                  placeholder=" "
-                  onBlur={(e) => showError(e.target.name)}
-                />
-                <small>Email</small>
-              </label>
-              <label>
-                <InputError message={error?.details?.phone} />
-                <input
-                  className={theme.alt}
-                  type="phone"
-                  name="phone"
-                  value={formData.phone || ""}
-                  placeholder=" "
-                  onBlur={(e) => showError(e.target.name)}
-                />
-                <small>Phone</small>
-              </label>
-              <label>
-                <InputError message={error?.details?.birthday} />
-                <input
-                  className={theme.alt}
-                  type="date"
-                  name="birthday"
-                  value={
-                    formData.birthday
-                      ? format(formData.birthday, "yyyy-MM-dd")
-                      : ""
-                  }
-                  placeholder=" "
-                  onBlur={(e) => showError(e.target.name)}
-                />
-                <small>Date of Birth</small>
-              </label>
+              <fieldset disabled={isLoading}>
+                <div className={theme.h3}>Contact Information</div>
+                <label>
+                  <InputError message={error?.details?.lastName} />
+                  <input
+                    className={theme.alt}
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName || ""}
+                    placeholder=" "
+                    onBlur={(e) => showError(e.target.name)}
+                  />
+                  <small>Last Name</small>
+                </label>
+                <label>
+                  <InputError message={error?.details?.firstName} />
+                  <input
+                    className={theme.alt}
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName || ""}
+                    placeholder=" "
+                    onBlur={(e) => showError(e.target.name)}
+                  />
+                  <small>First Name</small>
+                </label>
+                <label>
+                  <InputError message={error?.details?.email} />
+                  <input
+                    className={theme.alt}
+                    type="email"
+                    name="email"
+                    value={formData.email || ""}
+                    placeholder=" "
+                    onBlur={(e) => showError(e.target.name)}
+                  />
+                  <small>Email</small>
+                </label>
+                <label>
+                  <InputError message={error?.details?.phone} />
+                  <input
+                    className={theme.alt}
+                    type="phone"
+                    name="phone"
+                    value={formData.phone || ""}
+                    placeholder=" "
+                    onBlur={(e) => showError(e.target.name)}
+                  />
+                  <small>Phone</small>
+                </label>
+                <label>
+                  <InputError message={error?.details?.birthday} />
+                  <input
+                    className={theme.alt}
+                    type="date"
+                    name="birthday"
+                    value={
+                      formData.birthday
+                        ? format(formData.birthday, "yyyy-MM-dd")
+                        : ""
+                    }
+                    placeholder=" "
+                    onBlur={(e) => showError(e.target.name)}
+                  />
+                  <small>Date of Birth</small>
+                </label>
 
-              <InputError message={error?.message} />
-              <button>Book</button>
+                <InputError message={error?.message} />
+                <button>Book</button>
+              </fieldset>
             </aside>
           </main>
         </form>
