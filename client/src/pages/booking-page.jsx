@@ -386,7 +386,9 @@ export default function BookingPage() {
             <input
               className={theme.timeSlider}
               onMouseDown={() => setIsSliding(true)}
+              onTouchStart={() => setIsSliding(true)}
               onMouseUp={() => setIsSliding(false)}
+              onTouchEnd={() => setIsSliding(false)}
               type="range"
               min={min}
               max={max}
