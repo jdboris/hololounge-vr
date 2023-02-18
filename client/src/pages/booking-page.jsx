@@ -369,7 +369,6 @@ export default function BookingPage() {
             <input
               className={theme.timeSlider}
               type="range"
-              list="timeMarkers"
               min={min}
               max={max}
               step={1}
@@ -387,7 +386,10 @@ export default function BookingPage() {
                 }))
               }
             />
-            <datalist id="timeMarkers" className={theme.scale}>
+            <datalist
+              className={theme.scale}
+              onClick={(e) => e.preventDefault()}
+            >
               {Array(max + 1 - min)
                 .fill(null)
                 .map((x, i, array) => (
