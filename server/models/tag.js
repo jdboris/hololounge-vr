@@ -1,5 +1,5 @@
-import sequelize from "../utils/db.js";
 import { DataTypes } from "sequelize";
+import sequelize from "../utils/db.js";
 
 const MIN_NAME_LENGTH = 3;
 const MAX_NAME_LENGTH = 50;

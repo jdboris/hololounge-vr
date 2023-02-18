@@ -1,5 +1,5 @@
+import { DataTypes } from "sequelize";
 import sequelize from "../utils/db.js";
-import { DataTypes, Sequelize } from "sequelize";
 import Location from "./location.js";
 
 const NAME_MAX_LENGTH = 50;
@@ -22,6 +22,20 @@ const Booking = sequelize.define("bookings", {
       },
       notEmpty: {
         msg: `Start date is a required field.`,
+      },
+    },
+  },
+
+  duration: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+
+    validate: {
+      notNull: {
+        msg: `Duration is a required field.`,
+      },
+      notEmpty: {
+        msg: `Duration is a required field.`,
       },
     },
   },
@@ -110,11 +124,6 @@ const Booking = sequelize.define("bookings", {
       },
     },
   },
-});
-
-// NOTE: Required to work around bug that causes sequelize to ignore `id` definition in Model
-await sequelize.getQueryInterface().changeColumn("bookings", "id", {
-  type: DataTypes.UUID,
 });
 
 Booking.belongsTo(Location, { as: "location" });

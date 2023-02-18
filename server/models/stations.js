@@ -1,9 +1,11 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../utils/db.js";
+import Booking from "./booking.js";
 
 const NAME_MIN_LENGTH = 1;
-const NAME_MAX_LENGTH = 100;
-const Location = sequelize.define("locations", {
+const NAME_MAX_LENGTH = 10;
+
+const Station = sequelize.define("stations", {
   id: {
     // NOTE: Must match location ID from Springboard
     type: DataTypes.UUID,
@@ -28,4 +30,13 @@ const Location = sequelize.define("locations", {
   },
 });
 
-export default Location;
+Station.belongsToMany(Booking, {
+  as: "bookings",
+  through: "booking_stations",
+});
+Booking.belongsToMany(Station, {
+  as: "stations",
+  through: "booking_stations",
+});
+
+export default Station;

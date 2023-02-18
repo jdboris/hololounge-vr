@@ -1,13 +1,14 @@
-import express from "express";
-import * as dotenv from "dotenv";
-import Booking from "../models/booking.js";
-import BookingDto from "../dtos/booking.js";
-import Location from "../models/location.js";
 import { formatISO } from "date-fns";
+import * as dotenv from "dotenv";
+import express from "express";
+import BookingDto from "../dtos/booking.js";
+import Booking from "../models/booking.js";
+import Location from "../models/location.js";
+import Station from "../models/stations.js";
 import { HttpError } from "../utils/errors.js";
 
 dotenv.config();
-const { WIDGET_ID, LOCATION_ID, EXPERIENCE_ID, TIER_ID, PAYMENT_GATEWAY_ID } =
+const { WIDGET_ID, EXPERIENCE_ID, TIER_ID, LOCATION_ID, PAYMENT_GATEWAY_ID } =
   process.env;
 
 const bookingRouter = express.Router();
@@ -23,11 +24,19 @@ bookingRouter.post("/", async (req, res) => {
   /**
    * @type BookingDto
    */
-  const { startTime, stations, birthday, firstName, lastName, email, phone } =
-    req.body;
+  const {
+    startTime,
+    duration,
+    stations,
+    birthday,
+    firstName,
+    lastName,
+    email,
+    phone,
+  } = req.body;
 
   const endTime = new Date(startTime);
-  endTime.setHours(endTime.getHours() + 1);
+  endTime.setMinutes(endTime.getMinutes() + duration);
 
   const body = JSON.stringify({
     widgetId: WIDGET_ID,
@@ -102,7 +111,7 @@ bookingRouter.post("/", async (req, res) => {
 
   const data = await response.json();
 
-  // Create the location, to automatically sync with Springboard
+  // Create the location, to sync with Springboard
   const location = await Location.findOrCreate({
     where: { id: data.locationId },
     defaults: { id: data.locationId, name: data.location.title },
@@ -111,6 +120,7 @@ bookingRouter.post("/", async (req, res) => {
   const booking = await Booking.create({
     id: data.id,
     startTime: data.startTime,
+    duration: duration,
     birthday: data.host.birthday,
     lastName: data.host.last_name,
     firstName: data.host.first_name,
@@ -118,6 +128,11 @@ bookingRouter.post("/", async (req, res) => {
     phone: data.host.phone,
     locationId: data.locationId,
   });
+
+  await booking.setStations(
+    stations.map((station) => station.id),
+    { through: "stations" }
+  );
 
   res.json({
     message: "Booking complete! You'll receive a confirmation email shortly.",

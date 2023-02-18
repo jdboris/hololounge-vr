@@ -1,5 +1,5 @@
-import sequelize from "../utils/db.js";
 import { DataTypes } from "sequelize";
+import sequelize from "../utils/db.js";
 import Tag from "./tag.js";
 
 const MIN_TITLE_LENGTH = 1;

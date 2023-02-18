@@ -1,5 +1,5 @@
 import theme from "@jdboris/css-themes/space-station";
-import { format } from "date-fns";
+import { format, addMinutes, areIntervalsOverlapping } from "date-fns";
 import ja from "date-fns/locale/ja";
 import Booking from "dtos/booking";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
@@ -42,32 +42,17 @@ const CustomInput = forwardRef(({ label, ...props }, ref) => (
 ));
 
 export default function BookingPage() {
-  useEffect(() => {
-    (async () => {
-      console.log(
-        await (
-          await fetch(
-            `/api/locations/${process.env.REACT_APP_LOCATION_ID}/bookings`
-          )
-        ).json()
-      );
-    })();
-  }, []);
   const { setModalContent } = useModal();
-
-  // Calendar stuff...
-
   const [error, setError] = useState();
   const [isLoading, setIsLoading] = useState(false);
-
   const headingRef = useRef();
-  const [interval, setInterval] = useState(5);
-  const [duration, setDuration] = useState((60 + 5) * 60 * 1000);
   const [now, setNow] = useState(new Date());
+  const [allBookings, setAllBookings] = useState([]);
 
   const [formData, setBooking] = useState({
     startTime: now,
     stations: [],
+    duration: 65,
     birthday: null,
     firstName: "",
     lastName: "",
@@ -113,6 +98,9 @@ export default function BookingPage() {
     });
   };
 
+  const [interval, setInterval] = useState(5);
+  const [duration, setDuration] = useState((60 + 5) * 60 * 1000);
+
   function setStartTime(startTime) {
     setBooking((old) => ({
       ...old,
@@ -137,6 +125,18 @@ export default function BookingPage() {
   const value = useMemo(
     () => toValue(formData.startTime),
     [formData.startTime]
+  );
+
+  const bookingsOfDay = useMemo(
+    () =>
+      allBookings.filter(
+        (x) =>
+          x.startTime > openingTime &&
+          x.startTime < closingTime &&
+          addMinutes(x.startTime, x.duration) > openingTime &&
+          addMinutes(x.startTime, x.duration) < closingTime
+      ),
+    [allBookings, openingTime, closingTime]
   );
 
   // Clamp the datetime AFTER initializing opening and closing times
@@ -182,6 +182,54 @@ export default function BookingPage() {
     );
   }
 
+  function isStationBooked(station) {
+    return bookingsOfDay.find(
+      (booking) =>
+        booking.stations.find((x) => x.id == station.id) &&
+        areIntervalsOverlapping(
+          {
+            start: formData.startTime,
+            end: addMinutes(formData.startTime, formData.duration),
+          },
+          {
+            start: booking.startTime,
+            end: addMinutes(booking.startTime, booking.duration),
+          }
+        )
+    );
+  }
+
+  function addStation(station) {
+    setBooking((old) => ({
+      ...old,
+      stations: [...old.stations, { ...station }],
+    }));
+  }
+
+  function removeStation(station) {
+    setBooking((old) => ({
+      ...old,
+      stations: old.stations.filter((x) => x.id != station.id),
+    }));
+  }
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const bookings = (
+          await (
+            await fetch(
+              `/api/locations/${process.env.REACT_APP_LOCATION_ID}/bookings`
+            )
+          ).json()
+        ).map((x) => new Booking(x));
+        setAllBookings(bookings);
+      } catch (error) {
+        console.error({ ...error });
+      }
+    })();
+  }, []);
+
   return (
     <div className={theme.bookingPage}>
       <header>
@@ -224,12 +272,15 @@ export default function BookingPage() {
               setBooking({
                 startTime: now,
                 stations: [],
+                duration: 65,
                 birthday: null,
                 firstName: "",
                 lastName: "",
                 email: "",
                 phone: "",
               });
+              // NOTE: Call the setter to clamp/round
+              setStartTime(now);
 
               setModalContent(message);
             } catch (error) {
@@ -326,12 +377,21 @@ export default function BookingPage() {
               onChange={(e) => {
                 setStartTime(toDatetime(e.target.value));
               }}
+              onClick={(e) =>
+                e.preventDefault() ||
+                setBooking((old) => ({
+                  ...old,
+                  stations: old.stations.filter(
+                    (station) => !isStationBooked(station)
+                  ),
+                }))
+              }
             />
             <datalist id="timeMarkers" className={theme.scale}>
               {Array(max + 1 - min)
                 .fill(null)
                 .map((x, i, array) => (
-                  <option value={i + min}>
+                  <option value={i + min} key={`time-marker-${i + min}`}>
                     {(i == 0 || i == array.length - 1) &&
                       toDatetime(i + min).toLocaleTimeString("ja-JP", {
                         timeStyle: "short",
@@ -349,21 +409,21 @@ export default function BookingPage() {
               <img src="./floor-map.png" alt="Floor Map" />
 
               {stations.map((station) => (
-                <label style={station.coords}>
+                <label style={station.coords} key={`station-${station.id}`}>
                   <input
                     type="checkbox"
                     name="stations"
                     value={station.id}
-                    checked={formData.stations.find((x) => x.id == station.id)}
+                    disabled={isStationBooked(station)}
+                    checked={
+                      formData.stations.find((x) => x.id == station.id) || false
+                    }
                     onChange={(e) =>
                       e.stopPropagation() ||
                       hideError(e.target.name) ||
-                      setBooking((old) => ({
-                        ...old,
-                        stations: e.target.checked
-                          ? [...old.stations, { ...station }]
-                          : old.stations.filter((x) => x.id != e.target.value),
-                      }))
+                      e.target.checked
+                        ? addStation(station)
+                        : removeStation(station)
                     }
                   />
                   <div>{station.name}</div>

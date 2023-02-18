@@ -8,7 +8,7 @@
     "start": "node .",
     "build": "cd client && npm run build",
     "deploy": "npm run build & gcloud app deploy",
-    "log": "gcloud app logs tail"
+    "logs": "gcloud app logs tail"
   },
   "repository": {
     "type": "git",

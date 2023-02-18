@@ -3,7 +3,7 @@ import cookieParser from "cookie-parser";
 import * as dotenv from "dotenv";
 import express from "express";
 import path from "path";
-import { ValidationError } from "sequelize";
+import { DataTypes, ValidationError } from "sequelize";
 import authRouter from "./routes/auth.js";
 import bookingRouter from "./routes/bookings.js";
 import gameRouter from "./routes/games.js";
@@ -14,7 +14,6 @@ import { HttpError } from "./utils/errors.js";
 
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import Booking from "./models/booking.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -27,7 +26,15 @@ dotenv.config();
 const { CLIENT_APP_PATH, NODE_ENV, PORT, ALTER_DB } = process.env;
 
 try {
-  // NOTE: Must sync AFTER importing all the models
+  // for await (const [key, model] of Object.entries(db.models)) {
+  //   await db.query(`SET FOREIGN_KEY_CHECKS = 0;`);
+  //   await db.query(
+  //     `ALTER TABLE ${key} CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
+  //   );
+  //   await db.query(`SET FOREIGN_KEY_CHECKS = 1;`);
+  // }
+
+  // NOTE: Must sync after importing all the models (i.e. through routes)
   if (NODE_ENV === "development") {
     await db.sync({ alter: true });
   } else {

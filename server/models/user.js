@@ -1,5 +1,5 @@
-import sequelize from "../utils/db.js";
 import { DataTypes } from "sequelize";
+import sequelize from "../utils/db.js";
 
 const User = sequelize.define("users", {
   strategyId: {

@@ -131,3 +131,5 @@ dist
 # Just in case
 *.key
 *.key.pub
+
+/private

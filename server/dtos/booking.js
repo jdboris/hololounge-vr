@@ -5,17 +5,22 @@ export default class BookingDto {
    */
   startTime;
   /**
+   * @type {number} In minutes, including setup time.
+   */
+  duration;
+  stations;
+  /**
    * @type {Date} If an ISO `string` is privded, it will be parsed.
    */
   birthday;
   /**
    * @type {Array<{id: string}>}
    */
-  stations;
   firstName;
   lastName;
   email;
   phone;
+  locationId;
 
   /**
    * @param {BookingDto} data
@@ -52,6 +57,10 @@ export default class BookingDto {
 
     if (!Array.isArray(this.stations) || !this.stations.length) {
       errors.stations = "Selection station(s) to reserve.";
+    }
+
+    if (!this.duration || this.duration != 65) {
+      errors.duration = "Invalid booking duration.";
     }
 
     if (this.startTime && typeof this.startTime == "string") {
