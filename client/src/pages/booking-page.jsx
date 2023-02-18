@@ -144,6 +144,17 @@ export default function BookingPage() {
     setStartTime(formData.startTime);
   }, []);
 
+  const [isSliding, setIsSliding] = useState(false);
+
+  useEffect(() => {
+    if (!isSliding) {
+      setBooking((old) => ({
+        ...old,
+        stations: old.stations.filter((station) => !isStationBooked(station)),
+      }));
+    }
+  }, [formData.startTime, formData.duration, isSliding]);
+
   const min = useMemo(
     () => (openingTime ? toValue(openingTime) : 0),
     [openingTime]
@@ -368,6 +379,8 @@ export default function BookingPage() {
             </fieldset>
             <input
               className={theme.timeSlider}
+              onMouseDown={() => setIsSliding(true)}
+              onMouseUp={() => setIsSliding(false)}
               type="range"
               min={min}
               max={max}
@@ -376,15 +389,6 @@ export default function BookingPage() {
               onChange={(e) => {
                 setStartTime(toDatetime(e.target.value));
               }}
-              onClick={(e) =>
-                e.preventDefault() ||
-                setBooking((old) => ({
-                  ...old,
-                  stations: old.stations.filter(
-                    (station) => !isStationBooked(station)
-                  ),
-                }))
-              }
             />
             <datalist
               className={theme.scale}
