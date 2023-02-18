@@ -1,5 +1,10 @@
 import theme from "@jdboris/css-themes/space-station";
-import { format, addMinutes, areIntervalsOverlapping } from "date-fns";
+import {
+  format,
+  addMinutes,
+  areIntervalsOverlapping,
+  minutesToMilliseconds,
+} from "date-fns";
 import ja from "date-fns/locale/ja";
 import Booking from "dtos/booking";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
@@ -99,7 +104,6 @@ export default function BookingPage() {
   };
 
   const [interval, setInterval] = useState(5);
-  const [duration, setDuration] = useState((60 + 5) * 60 * 1000);
 
   function setStartTime(startTime) {
     setBooking((old) => ({
@@ -161,7 +165,9 @@ export default function BookingPage() {
   );
 
   const max = useMemo(() => {
-    return closingTime ? toValue(closingTime - duration) : 1;
+    return closingTime
+      ? toValue(closingTime - minutesToMilliseconds(formData.duration))
+      : 1;
   }, [closingTime]);
 
   function toIntervals(datetime, i) {
@@ -456,7 +462,10 @@ export default function BookingPage() {
                 </span>
               </label>
               <label>
-                Duration<span>60 (+5) minutes</span>
+                Duration
+                <span>
+                  {formData.duration - interval} (+{interval}) minutes
+                </span>
               </label>
               <label>
                 Station(s)
