@@ -31,75 +31,76 @@ function Header() {
   }, [location.pathname]);
 
   return (
-    <header>
-      <nav className={isMenuOpen ? theme.open : ""}>
-        <Link to="/" className={theme.logo}>
-          <img src="./logo.svg" />
-          HoloLounge
-        </Link>
+    <>
+      {isMenuOpen && (
+        <div
+          className={theme.overlay}
+          onClick={(e) => {
+            setIsMenuOpen(false);
+            e.target.closest("header").scrollTo({ top: 0 });
+          }}
+        ></div>
+      )}
+      <header>
+        <nav className={isMenuOpen ? theme.open : ""}>
+          <Link to="/" className={theme.logo}>
+            <img src="./logo.svg" />
+            HoloLounge
+          </Link>
 
-        {isMenuOpen && (
-          <div
-            className={theme.overlay}
-            onClick={(e) => {
-              setIsMenuOpen(false);
+          <ul
+            onFocus={(e) => {
+              e.target.closest("header").scrollTo({ top: 0 });
+              if (
+                e.target.getBoundingClientRect().top + 5 >=
+                e.target.closest("header").getBoundingClientRect().bottom
+              ) {
+                setIsMenuOpen(true);
+              }
+            }}
+          >
+            <li>
+              <Link to="/games">{isMenuOpen && <FaVrCardboard />} Games</Link>
+            </li>
+            <li>
+              <Link to="/account">{isMenuOpen && <FaUser />} Account</Link>
+            </li>
+            <li>
+              <button className={theme.alt}>
+                <MdLanguage /> {isMenuOpen && "Language"}
+              </button>
+            </li>
+            {!isLoading &&
+              (currentUser ? (
+                <>
+                  <li>
+                    <button onClick={logout}>Logout</button>
+                  </li>
+                </>
+              ) : (
+                <li>
+                  <Link className={theme.button} to="/login">
+                    Login
+                  </Link>
+                </li>
+              ))}
+          </ul>
+
+          <button
+            className={theme.alt}
+            onFocus={(e) => {
               e.target.closest("header").scrollTo({ top: 0 });
             }}
-          ></div>
-        )}
-
-        <ul
-          onFocus={(e) => {
-            e.target.closest("header").scrollTo({ top: 0 });
-            if (
-              e.target.getBoundingClientRect().top + 5 >=
-              e.target.closest("header").getBoundingClientRect().bottom
-            ) {
-              setIsMenuOpen(true);
-            }
-          }}
-        >
-          <li>
-            <Link to="/games">{isMenuOpen && <FaVrCardboard />} Games</Link>
-          </li>
-          <li>
-            <Link to="/account">{isMenuOpen && <FaUser />} Account</Link>
-          </li>
-          <li>
-            <button className={theme.alt}>
-              <MdLanguage /> {isMenuOpen && "Language"}
-            </button>
-          </li>
-          {!isLoading &&
-            (currentUser ? (
-              <>
-                <li>
-                  <button onClick={logout}>Logout</button>
-                </li>
-              </>
-            ) : (
-              <li>
-                <Link className={theme.button} to="/login">
-                  Login
-                </Link>
-              </li>
-            ))}
-        </ul>
-
-        <button
-          className={theme.alt}
-          onFocus={(e) => {
-            e.target.closest("header").scrollTo({ top: 0 });
-          }}
-          onClick={(e) => {
-            e.target.closest("header").scrollTo({ top: 0 });
-            setIsMenuOpen(!isMenuOpen);
-          }}
-        >
-          {!isMenuOpen ? <FaBars /> : <IoMdClose />}
-        </button>
-      </nav>
-    </header>
+            onClick={(e) => {
+              e.target.closest("header").scrollTo({ top: 0 });
+              setIsMenuOpen(!isMenuOpen);
+            }}
+          >
+            {!isMenuOpen ? <FaBars /> : <IoMdClose />}
+          </button>
+        </nav>
+      </header>
+    </>
   );
 }
 

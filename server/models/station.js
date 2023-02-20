@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../utils/db.js";
+import BookingStation from "./booking-station.js";
 import Booking from "./booking.js";
 
 const NAME_MIN_LENGTH = 1;
@@ -32,11 +33,14 @@ const Station = sequelize.define("stations", {
 
 Station.belongsToMany(Booking, {
   as: "bookings",
-  through: "booking_stations",
+  through: BookingStation,
 });
 Booking.belongsToMany(Station, {
   as: "stations",
-  through: "booking_stations",
+  through: BookingStation,
+});
+Booking.hasMany(BookingStation, {
+  as: "bookingStations",
 });
 
 export default Station;

@@ -1,26 +1,44 @@
 export default class BookingDto {
   id = null;
+
   /**
-   * @type {Date} If an ISO `string` is privded, it will be parsed.
+   * @type {string} The UUID of this booking from Springboard.
+   */
+  idInSpringboard;
+
+  /**
+   * @type {string} The ID of the order associated with this booking in Square.
+   */
+  squareOrderId;
+
+  /**
+   * @type {boolean}
+   */
+  isComplete;
+
+  /**
+   * @type {{id: string}} The `Location` that coincides with Springboard's.
+   */
+  location;
+
+  /**
+   * @type {Array<{stationId, experiencePrice: {id: string, duration: number, experience: {id: string}}}>} The `BookingStation`'s that coincides with "bookingTimes" in Springboard.
+   */
+  bookingStations;
+
+  /**
+   * @type {Date} If an ISO `string` is privded, it will be parsed. Meant to be applied to all `Experience`'s.
    */
   startTime;
-  /**
-   * @type {number} In minutes, including setup time.
-   */
-  duration;
-  stations;
+
   /**
    * @type {Date} If an ISO `string` is privded, it will be parsed.
    */
   birthday;
-  /**
-   * @type {Array<{id: string}>}
-   */
   firstName;
   lastName;
   email;
   phone;
-  locationId;
 
   /**
    * @param {BookingDto} data
@@ -30,6 +48,16 @@ export default class BookingDto {
     Object.assign(this, data);
 
     const errors = {};
+
+    // Validation...
+
+    if (!this.location || !this.location.id) {
+      errors.location = "Invalid Location.";
+    }
+
+    if (!Array.isArray(this.bookingStations) || !this.bookingStations.length) {
+      errors.bookingStations = "Selection station(s) to reserve.";
+    }
 
     if (!this.startTime) {
       errors.startTime = "Start Time is a required field.";
@@ -55,13 +83,7 @@ export default class BookingDto {
       errors.phone = "Enter your phone number.";
     }
 
-    if (!Array.isArray(this.stations) || !this.stations.length) {
-      errors.stations = "Selection station(s) to reserve.";
-    }
-
-    if (!this.duration || this.duration != 65) {
-      errors.duration = "Invalid booking duration.";
-    }
+    // Parsing...
 
     if (this.startTime && typeof this.startTime == "string") {
       // Parse as ISO

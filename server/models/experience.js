@@ -1,19 +1,17 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../utils/db.js";
+import ExperiencePrice from "./experience-price.js";
 
 const NAME_MIN_LENGTH = 1;
-const NAME_MAX_LENGTH = 100;
-const Location = sequelize.define("locations", {
+const NAME_MAX_LENGTH = 25;
+
+const Experience = sequelize.define("experiences", {
   id: {
-    // NOTE: Must match location ID from Springboard
+    // NOTE: Must match experience ID from Springboard
     type: DataTypes.UUID,
     primaryKey: true,
   },
-  idInSquare: {
-    type: DataTypes.STRING(255),
-    unique: "unique_location_id_in_square",
-    allowNull: false,
-  },
+
   name: {
     type: DataTypes.STRING(NAME_MAX_LENGTH),
     allowNull: false,
@@ -33,4 +31,6 @@ const Location = sequelize.define("locations", {
   },
 });
 
-export default Location;
+ExperiencePrice.belongsTo(Experience, { as: "experience" });
+
+export default Experience;

@@ -27,10 +27,21 @@ class D extends Date {
   }
 }
 
+const {
+  REACT_APP_LOCATION_ID: LOCATION_ID,
+  REACT_APP_EXPERIENCE_ID: EXPERIENCE_ID,
+  REACT_APP_PRICE_ID: PRICE_ID,
+  REACT_APP_STATION_A_ID: STATION_A_ID,
+} = process.env;
+/**
+ * Represents the duration of the currently "selected" (hard-coded) experience.
+ */
+const EXPERIENCE_DURATION = Number(process.env.REACT_APP_EXPERIENCE_DURATION);
+
 const stations = [
   {
-    id: "1bf1a6e0-90f8-11ed-84eb-0d3d846900a0",
-    name: "Station 1",
+    id: STATION_A_ID,
+    name: "Station A",
     coords: {
       top: "1.4%",
       right: "42.6%",
@@ -52,12 +63,18 @@ export default function BookingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const headingRef = useRef();
   const [now, setNow] = useState(new Date());
+  /**
+   * @type {[Booking[], Function]}
+   */
   const [allBookings, setAllBookings] = useState([]);
 
+  /**
+   * @type {[Booking, Function]}
+   */
   const [formData, setBooking] = useState({
+    bookingStations: [],
+    location: { id: LOCATION_ID },
     startTime: now,
-    stations: [],
-    duration: 65,
     birthday: null,
     firstName: "",
     lastName: "",
@@ -131,17 +148,29 @@ export default function BookingPage() {
     [formData.startTime]
   );
 
-  const bookingsOfDay = useMemo(
-    () =>
-      allBookings.filter(
-        (x) =>
-          x.startTime > openingTime &&
-          x.startTime < closingTime &&
-          addMinutes(x.startTime, x.duration) > openingTime &&
-          addMinutes(x.startTime, x.duration) < closingTime
-      ),
-    [allBookings, openingTime, closingTime]
-  );
+  const bookedStationsOfDay = useMemo(() => {
+    const bookingStations = [];
+
+    allBookings.forEach((b) => {
+      bookingStations.push(
+        ...b.bookingStations
+          .filter((bs) => {
+            const { duration } = bs.experiencePrice;
+
+            return (
+              b.startTime > openingTime &&
+              b.startTime < closingTime &&
+              addMinutes(b.startTime, duration + interval) > openingTime &&
+              addMinutes(b.startTime, duration + interval) < closingTime
+            );
+            // NOTE: Add the startTime to the bookingStation object as a temporary patch
+          })
+          .map((bs) => ({ ...bs, startTime: b.startTime }))
+      );
+    });
+
+    return bookingStations;
+  }, [allBookings, openingTime, closingTime]);
 
   // Clamp the datetime AFTER initializing opening and closing times
   useEffect(() => {
@@ -152,12 +181,21 @@ export default function BookingPage() {
 
   useEffect(() => {
     if (!isSliding) {
+      // Filter out stations that are booked
       setBooking((old) => ({
         ...old,
-        stations: old.stations.filter((station) => !isStationBooked(station)),
+        bookingStations: old.bookingStations.filter(
+          (bs) => !isStationBooked({ id: bs.stationId })
+        ),
       }));
     }
-  }, [formData.startTime, formData.duration, isSliding]);
+  }, [
+    formData.startTime,
+    // TODO: Pass in a memoized array of durations
+    // formData.bookingStations.map((bs) => bs.experiencePrice.duration),
+    EXPERIENCE_DURATION,
+    isSliding,
+  ]);
 
   const min = useMemo(
     () => (openingTime ? toValue(openingTime) : 0),
@@ -166,17 +204,19 @@ export default function BookingPage() {
 
   const max = useMemo(() => {
     return closingTime
-      ? toValue(closingTime - minutesToMilliseconds(formData.duration))
+      ? toValue(
+          closingTime - minutesToMilliseconds(EXPERIENCE_DURATION + interval)
+        )
       : 1;
-  }, [closingTime]);
+  }, [closingTime, EXPERIENCE_DURATION]);
 
-  function toIntervals(datetime, i) {
-    const midnight = new D(datetime).setHours(0, 0, 0, 0);
-    return Math.ceil((datetime - midnight) / 1000 / 60 / i);
+  function toValue(datetime) {
+    return toIntervals(datetime, interval);
   }
 
-  function toValue(datetime, i = interval) {
-    return toIntervals(datetime, i);
+  function toIntervals(datetime, i) {
+    const midnight = new D(openingTime).setHours(0, 0, 0, 0);
+    return Math.ceil((datetime - midnight) / 1000 / 60 / i);
   }
 
   function toDatetime(value) {
@@ -200,33 +240,49 @@ export default function BookingPage() {
   }
 
   function isStationBooked(station) {
-    return bookingsOfDay.find(
-      (booking) =>
-        booking.stations.find((x) => x.id == station.id) &&
+    return bookedStationsOfDay.find((bs) => {
+      return (
+        bs.stationId == station.id &&
         areIntervalsOverlapping(
           {
             start: formData.startTime,
-            end: addMinutes(formData.startTime, formData.duration),
+            end: addMinutes(formData.startTime, EXPERIENCE_DURATION + interval),
           },
           {
-            start: booking.startTime,
-            end: addMinutes(booking.startTime, booking.duration),
+            start: bs.startTime,
+            end: addMinutes(
+              bs.startTime,
+              bs.experiencePrice.duration + interval
+            ),
           }
         )
-    );
+      );
+    });
   }
 
   function addStation(station) {
     setBooking((old) => ({
       ...old,
-      stations: [...old.stations, { ...station }],
+      bookingStations: [
+        ...old.bookingStations,
+        {
+          stationId: station.id,
+          experiencePrice: {
+            id: PRICE_ID,
+            duration: EXPERIENCE_DURATION,
+            experience: { id: EXPERIENCE_ID },
+          },
+        },
+      ],
     }));
   }
 
   function removeStation(station) {
     setBooking((old) => ({
       ...old,
-      stations: old.stations.filter((x) => x.id != station.id),
+      bookingStations: old.bookingStations.filter(
+        (bs) => bs.stationId != station.id
+      ),
     }));
   }
 
@@ -234,17 +290,27 @@ export default function BookingPage() {
     (async () => {
       try {
         const bookings = (
-          await (
-            await fetch(
-              `/api/locations/${process.env.REACT_APP_LOCATION_ID}/bookings`
-            )
-          ).json()
+          await (await fetch(`/api/locations/${LOCATION_ID}/bookings`)).json()
         ).map((x) => new Booking(x));
         setAllBookings(bookings);
       } catch (error) {
-        console.error({ ...error });
+        console.error(error);
+        console.error(error.details);
       }
     })();
+  }, []);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("orderId")) {
+      url.searchParams.delete("transactionId");
+      url.searchParams.delete("orderId");
+      window.history.replaceState(null, "", url);
+
+      setModalContent(
+        "Booking complete! You will receive a receipt and booking confirmation via email."
+      );
+    }
   }, []);
 
   return (
@@ -274,32 +340,33 @@ export default function BookingPage() {
 
               setIsLoading(true);
 
-              const response = await fetch(`/api/bookings`, {
+              const response = await fetch(`/api/checkout`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(booking),
               });
 
-              const { error, message } = await response.json();
+              const { error, message, url } = await response.json();
 
               if (!response.ok) {
                 throw error;
               }
 
-              setBooking({
-                startTime: now,
-                stations: [],
-                duration: 65,
-                birthday: null,
-                firstName: "",
-                lastName: "",
-                email: "",
-                phone: "",
-              });
-              // NOTE: Call the setter to clamp/round
-              setStartTime(now);
+              // setBooking({
+              //   bookingStations: [],
+              //   location: { id: LOCATION_ID },
+              //   startTime: now,
+              //   birthday: null,
+              //   firstName: "",
+              //   lastName: "",
+              //   email: "",
+              //   phone: "",
+              // });
+              // // NOTE: Call the setter to clamp/round
+              // setStartTime(now);
 
               setModalContent(message);
+              window.location.href = url;
             } catch (error) {
               setError(error);
             }
@@ -430,7 +497,9 @@ export default function BookingPage() {
                     value={station.id}
                     disabled={isStationBooked(station)}
                     checked={
-                      formData.stations.find((x) => x.id == station.id) || false
+                      formData.bookingStations.find(
+                        (bs) => bs.stationId == station.id
+                      ) || false
                     }
                     onChange={(e) =>
                       e.stopPropagation() ||
@@ -466,22 +535,24 @@ export default function BookingPage() {
               <label>
                 Duration
                 <span>
-                  {formData.duration - interval} (+{interval}) minutes
+                  {EXPERIENCE_DURATION} (+{interval}) minutes
                 </span>
               </label>
               <label>
                 Station(s)
-                {formData.stations.length ? (
+                {formData.bookingStations.length ? (
                   <span>
-                    {formData.stations
-                      .map((station) => station.name)
+                    {formData.bookingStations
+                      .map(
+                        (bs) => stations.find((s) => s.id == bs.stationId).name
+                      )
                       .join(", ")}
                   </span>
                 ) : (
                   <span>...</span>
                 )}
               </label>
-              <InputError message={error?.details?.stations} />
+              <InputError message={error?.details?.bookingStations} />
               <fieldset disabled={isLoading}>
                 <div className={theme.h3}>Contact Information</div>
                 <label>

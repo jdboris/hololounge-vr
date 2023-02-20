@@ -1,11 +1,11 @@
-import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import * as dotenv from "dotenv";
 import express from "express";
 import path from "path";
-import { DataTypes, ValidationError } from "sequelize";
+import { ValidationError } from "sequelize";
+import checkoutRouter from "./routes/checkout.js";
 import authRouter from "./routes/auth.js";
-import bookingRouter from "./routes/bookings.js";
+import squareBookingRouter from "./routes/square-bookings.js";
 import gameRouter from "./routes/games.js";
 import locationRouter from "./routes/locations.js";
 import tagRouter from "./routes/tags.js";
@@ -16,14 +16,10 @@ import { dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-
-const app = express();
-
-app.use(bodyParser.json());
-app.use(cookieParser(process.env.COOKIE_SECRET));
-
 dotenv.config();
 const { CLIENT_APP_PATH, NODE_ENV, PORT, ALTER_DB } = process.env;
+
+const app = express();
 
 try {
   // for await (const [key, model] of Object.entries(db.models)) {
@@ -51,11 +47,19 @@ if (!CLIENT_APP_PATH) {
   process.exit(1);
 }
 
+app.use(cookieParser(process.env.COOKIE_SECRET));
 // API Routes
+// NOTE: Must use this route BEFORE express.json() middleware
+app.use(
+  "/api/square/bookings",
+  express.raw({ type: "*/*" }),
+  squareBookingRouter
+);
+app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/tags", tagRouter);
+app.use("/api/checkout", checkoutRouter);
 app.use("/api/games", gameRouter);
-app.use("/api/bookings", bookingRouter);
 app.use("/api/locations", locationRouter);
 
 if (NODE_ENV !== "development") {
@@ -95,7 +99,6 @@ app.use((err, req, res, next) => {
       // Generic error message.
       {
         error: {
-          ...err,
           message: "Something went wrong. Try again later.",
         },
       }

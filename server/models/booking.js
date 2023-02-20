@@ -6,10 +6,9 @@ const NAME_MAX_LENGTH = 50;
 const PHONE_MAX_LENGTH = 25;
 
 const Booking = sequelize.define("bookings", {
-  id: {
+  idInSpringboard: {
     // NOTE: Must match booking ID from Springboard
     type: DataTypes.UUID,
-    primaryKey: true,
   },
 
   startTime: {
@@ -22,20 +21,6 @@ const Booking = sequelize.define("bookings", {
       },
       notEmpty: {
         msg: `Start date is a required field.`,
-      },
-    },
-  },
-
-  duration: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-
-    validate: {
-      notNull: {
-        msg: `Duration is a required field.`,
-      },
-      notEmpty: {
-        msg: `Duration is a required field.`,
       },
     },
   },
@@ -123,6 +108,16 @@ const Booking = sequelize.define("bookings", {
         msg: `Phone number is a required field.`,
       },
     },
+  },
+
+  squareOrderId: {
+    type: DataTypes.STRING(255),
+    allowNull: false,
+  },
+
+  isComplete: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
   },
 });
 
