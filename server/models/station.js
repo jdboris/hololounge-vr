@@ -2,6 +2,7 @@ import { DataTypes } from "sequelize";
 import sequelize from "../utils/db.js";
 import BookingStation from "./booking-station.js";
 import Booking from "./booking.js";
+import Location from "./location.js";
 
 const NAME_MIN_LENGTH = 1;
 const NAME_MAX_LENGTH = 10;
@@ -31,6 +32,10 @@ const Station = sequelize.define("stations", {
   },
 });
 
+Location.hasMany(Station, {
+  as: "stations",
+});
+
 Station.belongsToMany(Booking, {
   as: "bookings",
   through: BookingStation,
@@ -39,6 +44,7 @@ Booking.belongsToMany(Station, {
   as: "stations",
   through: BookingStation,
 });
+
 Booking.hasMany(BookingStation, {
   as: "bookingStations",
 });

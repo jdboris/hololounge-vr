@@ -121,6 +121,4 @@ const Booking = sequelize.define("bookings", {
   },
 });
 
-Booking.belongsTo(Location, { as: "location" });
-
 export default Booking;

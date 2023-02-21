@@ -135,7 +135,13 @@ const Game = sequelize.define("games", {
   },
 });
 
-Tag.belongsToMany(Game, { as: "games", through: "game_tags" });
-Game.belongsToMany(Tag, { as: "tags", through: "game_tags" });
+Tag.belongsToMany(Game, {
+  as: "games",
+  through: "game_tags",
+});
+Game.belongsToMany(Tag, {
+  as: "tags",
+  through: "game_tags",
+});
 
 export default Game;

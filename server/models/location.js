@@ -9,9 +9,23 @@ const Location = sequelize.define("locations", {
     type: DataTypes.UUID,
     primaryKey: true,
   },
+
+  widgetId: {
+    // NOTE: ID of the widget in Springboard
+    type: DataTypes.UUID,
+    allowNull: false,
+    unique: "unique_location_widget_id",
+  },
+
+  paymentGatewayId: {
+    // NOTE: ID of the payment gateway in Springboard
+    type: DataTypes.UUID,
+    // allowNull: false,
+    unique: "unique_payment_gateway_id",
+  },
+
   idInSquare: {
     type: DataTypes.STRING(255),
-    unique: "unique_location_id_in_square",
     allowNull: false,
   },
   name: {

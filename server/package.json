@@ -20,7 +20,7 @@
     "google-auth-library": "^8.7.0",
     "jsonwebtoken": "^9.0.0",
     "mysql2": "^2.3.3",
-    "sequelize": "^6.25.6",
+    "sequelize": "^6.28.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

@@ -17,12 +17,7 @@ export default class BookingDto {
   isComplete;
 
   /**
-   * @type {{id: string}} The `Location` that coincides with Springboard's.
-   */
-  location;
-
-  /**
-   * @type {Array<{stationId, experiencePrice: {id: string, duration: number, experience: {id: string}}}>} The `BookingStation`'s that coincides with "bookingTimes" in Springboard.
+   * @type {Array<{location: {id: string}, stationId: string, experiencePrice: {id: string, duration: number, experience: {id: string}}}>} The `BookingStation`'s that coincides with "bookingTimes" in Springboard.
    */
   bookingStations;
 
@@ -50,10 +45,6 @@ export default class BookingDto {
     const errors = {};
 
     // Validation...
-
-    if (!this.location || !this.location.id) {
-      errors.location = "Invalid Location.";
-    }
 
     if (!Array.isArray(this.bookingStations) || !this.bookingStations.length) {
       errors.bookingStations = "Selection station(s) to reserve.";

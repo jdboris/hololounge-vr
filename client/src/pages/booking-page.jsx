@@ -31,23 +31,24 @@ const {
   REACT_APP_LOCATION_ID: LOCATION_ID,
   REACT_APP_EXPERIENCE_ID: EXPERIENCE_ID,
   REACT_APP_PRICE_ID: PRICE_ID,
-  REACT_APP_STATION_A_ID: STATION_A_ID,
 } = process.env;
 /**
  * Represents the duration of the currently "selected" (hard-coded) experience.
  */
 const EXPERIENCE_DURATION = Number(process.env.REACT_APP_EXPERIENCE_DURATION);
 
-const stations = [
+const stationCoords = [
   {
-    id: STATION_A_ID,
-    name: "Station A",
-    coords: {
-      top: "1.4%",
-      right: "42.6%",
-      width: "20%",
-      height: "30.9%",
-    },
+    top: "1.4%",
+    right: "42.6%",
+    width: "20%",
+    height: "30.9%",
+  },
+  {
+    top: "1.4%",
+    right: "21.8%",
+    width: "20%",
+    height: "30.9%",
   },
 ];
 
@@ -67,13 +68,24 @@ export default function BookingPage() {
    * @type {[Booking[], Function]}
    */
   const [allBookings, setAllBookings] = useState([]);
+  /**
+   * @type {[{id: string, stations: {id: string, name: string}[]}[], Function]}
+   */
+  const [allLocations, setAllLocations] = useState([]);
+  const stations = useMemo(
+    () =>
+      allLocations.reduce(
+        (stations, location) => [...stations, ...location.stations],
+        []
+      ),
+    [allLocations]
+  );
 
   /**
    * @type {[Booking, Function]}
    */
   const [formData, setBooking] = useState({
     bookingStations: [],
-    location: { id: LOCATION_ID },
     startTime: now,
     birthday: null,
     firstName: "",
@@ -266,6 +278,7 @@ export default function BookingPage() {
       bookingStations: [
         ...old.bookingStations,
         {
+          location: { id: station.locationId },
           stationId: station.id,
           experiencePrice: {
             id: PRICE_ID,
@@ -289,10 +302,20 @@ export default function BookingPage() {
   useEffect(() => {
     (async () => {
       try {
-        const bookings = (
-          await (await fetch(`/api/locations/${LOCATION_ID}/bookings`)).json()
-        ).map((x) => new Booking(x));
-        setAllBookings(bookings);
+        setAllBookings(
+          (await (await fetch(`/api/bookings/upcoming`)).json()).map(
+            (x) => new Booking(x)
+          )
+        );
+      } catch (error) {
+        console.error(error);
+        console.error(error.details);
+      }
+    })();
+
+    (async () => {
+      try {
+        setAllLocations(await (await fetch(`/api/locations`)).json());
       } catch (error) {
         console.error(error);
         console.error(error.details);
@@ -489,8 +512,8 @@ export default function BookingPage() {
               </figcaption>
               <img src="./floor-map.png" alt="Floor Map" />
 
-              {stations.map((station) => (
-                <label style={station.coords} key={`station-${station.id}`}>
+              {stations.map((station, i) => (
+                <label style={stationCoords[i]} key={`station-${station.id}`}>
                   <input
                     type="checkbox"
                     name="stations"

@@ -31,6 +31,8 @@ const Experience = sequelize.define("experiences", {
   },
 });
 
-ExperiencePrice.belongsTo(Experience, { as: "experience" });
+ExperiencePrice.belongsTo(Experience, {
+  as: "experience",
+});
 
 export default Experience;

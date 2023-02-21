@@ -14,6 +14,17 @@ import { HttpError } from "./utils/errors.js";
 
 import { dirname } from "path";
 import { fileURLToPath } from "url";
+import bookingRouter from "./routes/bookings.js";
+
+import "./models/booking-station.js";
+import "./models/booking.js";
+import "./models/experience-price.js";
+import "./models/experience.js";
+import "./models/game.js";
+import "./models/location.js";
+import "./models/station.js";
+import "./models/tag.js";
+import "./models/user.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 dotenv.config();
@@ -30,12 +41,24 @@ try {
   //   await db.query(`SET FOREIGN_KEY_CHECKS = 1;`);
   // }
 
-  // NOTE: Must sync after importing all the models (i.e. through routes)
-  if (NODE_ENV === "development") {
-    await db.sync({ alter: true });
-  } else {
-    await db.sync({ alter: ALTER_DB == "True" });
+  if (ALTER_DB == "True") {
+    // NOTE: Workaround for duplicating foreign keys bug in sequelize
+    // https://github.com/sequelize/sequelize/pull/14570
+    const results = (
+      await db.query(`
+        SELECT concat('alter table \`',table_schema,'\`.\`',table_name,'\` DROP FOREIGN KEY ',constraint_name,';') AS query
+        FROM information_schema.table_constraints
+        WHERE constraint_type='FOREIGN KEY';
+      `)
+    )[0];
+
+    for await (const { query } of results) {
+      await db.query(query);
+    }
   }
+
+  // NOTE: Must sync after importing all the models (i.e. through routes)
+  await db.sync({ alter: ALTER_DB == "True" });
 } catch (error) {
   console.error("Unable to sync squelize:", error);
 }
@@ -61,6 +84,7 @@ app.use("/api/tags", tagRouter);
 app.use("/api/checkout", checkoutRouter);
 app.use("/api/games", gameRouter);
 app.use("/api/locations", locationRouter);
+app.use("/api/bookings", bookingRouter);
 
 if (NODE_ENV !== "development") {
   // Serve the static files from the React app

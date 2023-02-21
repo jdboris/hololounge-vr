@@ -28,7 +28,6 @@ checkoutRouter.post("/", async (req, res) => {
    * @type BookingDto
    */
   const {
-    location: { id: locationId },
     bookingStations,
     startTime,
     birthday,
@@ -38,7 +37,7 @@ checkoutRouter.post("/", async (req, res) => {
     phone,
   } = req.body;
 
-  const location = await Location.findByPk(locationId);
+  const location = await Location.findByPk(bookingStations[0].location.id);
   if (!location) {
     throw new Error(`Location with ID "${locationId}" not found.`);
   }
@@ -128,6 +127,7 @@ checkoutRouter.post("/", async (req, res) => {
 
   await BookingStation.bulkCreate(
     bookingStations.map((bs) => ({
+      locationId: bs.location.id,
       bookingId: booking.id,
       stationId: bs.stationId,
       experiencePriceId: bs.experiencePrice.id,
