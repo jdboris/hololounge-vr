@@ -88,16 +88,29 @@ app.use("/api/bookings", bookingRouter);
 
 if (NODE_ENV !== "development") {
   // Serve the static files from the React app
-  app.use(express.static(path.resolve(__dirname, CLIENT_APP_PATH)));
+  app.use(
+    express.static(path.resolve(__dirname, CLIENT_APP_PATH), {
+      lastModified: false,
+      etag: false,
+    })
+  );
 }
 
 app.get(/.*/, (req, res) => {
   if (NODE_ENV === "development") {
-    res.sendFile(`${path.resolve(__dirname)}/env-error.html`);
+    res.sendFile(`${path.resolve(__dirname)}/env-error.html`, {
+      lastModified: false,
+      etag: false,
+    });
     return;
   }
 
-  res.sendFile(`${path.resolve(__dirname, CLIENT_APP_PATH)}/index.html`);
+  res.sendFile(`${path.resolve(__dirname, CLIENT_APP_PATH)}/index.html`, {
+    // NOTE: Disable theses headers to allow App Engine's own caching to work correctly
+    // Source: https://stackoverflow.com/a/64848707
+    lastModified: false,
+    etag: false,
+  });
 });
 
 // Error handler
