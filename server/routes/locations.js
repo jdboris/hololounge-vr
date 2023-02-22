@@ -8,7 +8,10 @@ const locationRouter = express.Router();
 
 locationRouter.get("/", async (req, res) => {
   const locations = await Location.findAll({
-    include: ["stations"],
+    include: [
+      "stations",
+      { association: "experiences", include: ["experiencePrices"] },
+    ],
     attributes: {
       exclude: ["createdAt", "updatedAt", "deletedAt"],
     },

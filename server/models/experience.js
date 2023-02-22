@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../utils/db.js";
 import ExperiencePrice from "./experience-price.js";
+import Location from "./location.js";
 
 const NAME_MIN_LENGTH = 1;
 const NAME_MAX_LENGTH = 25;
@@ -31,8 +32,14 @@ const Experience = sequelize.define("experiences", {
   },
 });
 
+Location.hasMany(Experience, { as: "experiences" });
+
 ExperiencePrice.belongsTo(Experience, {
   as: "experience",
+});
+
+Experience.hasMany(ExperiencePrice, {
+  as: "experiencePrices",
 });
 
 export default Experience;

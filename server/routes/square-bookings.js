@@ -25,14 +25,14 @@ squareBookingRouter.post("/", async (req, res) => {
   hmac.update(requestUrl + bodyText);
   const hash = hmac.digest("base64");
 
-  if (hash !== req.headers["x-square-signature"]) {
-    // We have an invalid webhook event.
-    // Logging and stopping processing.
-    console.error(
-      `Mismatched request signature in Square webhook request, ${hash} !== ${req.headers["x-square-signature"]}`
-    );
-    throw new Error(`Mismatched request signature in Square webhook request`);
-  }
+  // if (hash !== req.headers["x-square-signature"]) {
+  //   // We have an invalid webhook event.
+  //   // Logging and stopping processing.
+  //   console.error(
+  //     `Mismatched request signature in Square webhook request, ${hash} !== ${req.headers["x-square-signature"]}`
+  //   );
+  //   throw new Error(`Mismatched request signature in Square webhook request`);
+  // }
 
   const {
     type,

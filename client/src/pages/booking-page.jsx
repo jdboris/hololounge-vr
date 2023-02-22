@@ -27,15 +27,10 @@ class D extends Date {
   }
 }
 
-const {
-  REACT_APP_LOCATION_ID: LOCATION_ID,
-  REACT_APP_EXPERIENCE_ID: EXPERIENCE_ID,
-  REACT_APP_PRICE_ID: PRICE_ID,
-} = process.env;
 /**
  * Represents the duration of the currently "selected" (hard-coded) experience.
  */
-const EXPERIENCE_DURATION = Number(process.env.REACT_APP_EXPERIENCE_DURATION);
+const EXPERIENCE_DURATION = 60;
 
 const stationCoords = [
   {
@@ -72,10 +67,20 @@ export default function BookingPage() {
    * @type {[{id: string, stations: {id: string, name: string}[]}[], Function]}
    */
   const [allLocations, setAllLocations] = useState([]);
+
+  /**
+   * @type {{id: string, locationId: string, experiences: {id: string, name: string}[]}[]}
+   */
   const stations = useMemo(
     () =>
       allLocations.reduce(
-        (stations, location) => [...stations, ...location.stations],
+        (stations, location) => [
+          ...stations,
+          ...location.stations.map((s) => ({
+            ...s,
+            experiences: location.experiences,
+          })),
+        ],
         []
       ),
     [allLocations]
@@ -281,9 +286,8 @@ export default function BookingPage() {
           location: { id: station.locationId },
           stationId: station.id,
           experiencePrice: {
-            id: PRICE_ID,
-            duration: EXPERIENCE_DURATION,
-            experience: { id: EXPERIENCE_ID },
+            experience: { id: station.experiences[0].id },
+            ...station.experiences[0].experiencePrices[0],
           },
         },
       ],
