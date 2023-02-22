@@ -33,4 +33,17 @@ bookingRouter.get("/upcoming", async (req, res) => {
   res.json(bookings);
 });
 
+bookingRouter.post("/:bookingId/checkin", async (req, res) => {
+  const { bookingId } = req.params;
+  const token = await login();
+
+  const booking = await checkIn(bookingId, token);
+
+  for await (const bookingStationTime of booking.bookingStationTimes) {
+    console.log(await startBookingStationTime(bookingStationTime, token));
+  }
+
+  res.json({ success: true });
+});
+
 export default bookingRouter;
