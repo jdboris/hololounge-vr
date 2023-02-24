@@ -65,10 +65,7 @@ export default function BookingPage() {
 
   const { addSection } = useScrollRouting();
   useEffect(
-    () =>
-      sectionRef &&
-      (console.log("ADDING BOOKING SECTION: ", sectionRef) ||
-        addSection({ route: "/booking", ref: sectionRef })),
+    () => sectionRef && addSection({ route: "/booking", ref: sectionRef }),
     [sectionRef]
   );
 
@@ -360,17 +357,6 @@ export default function BookingPage() {
         <h1>Booking</h1>
       </header>
       <main>
-        {url.pathname != "/" && (
-          <button
-            className={theme.fixedButton}
-            onClick={() => {
-              navigate("/booking");
-            }}
-          >
-            <FaRegCalendar /> Book Now
-          </button>
-        )}
-
         <form
           onSubmit={async (e) => {
             e.preventDefault();
@@ -668,6 +654,17 @@ export default function BookingPage() {
             </aside>
           </main>
         </form>
+
+        {url.pathname != "/" && url.pathname != "/booking" && (
+          <button
+            className={theme.fixedButton}
+            onClick={() => {
+              navigate("/booking");
+            }}
+          >
+            <FaRegCalendar /> Book Now
+          </button>
+        )}
       </main>
     </div>
   );
