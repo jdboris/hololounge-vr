@@ -51,11 +51,7 @@ function HomePage() {
 
         <button
           onClick={(e) => {
-            e.target
-              .closest(`.${theme.landingPage}`)
-              .nextSibling.scrollIntoView({
-                behavior: "smooth",
-              });
+            navigate("/location");
           }}
         >
           <FaChevronDown />

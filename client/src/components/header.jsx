@@ -7,25 +7,13 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/auth";
 
 function Header() {
+  const location = useLocation();
   const { currentUser, logout } = useAuth();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
 
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const onScroll = (e) => {
-      if (window.scrollY > 0) {
-      }
-    };
-
-    window.addEventListener("scroll", onScroll);
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, []);
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
@@ -59,18 +47,27 @@ function Header() {
               }
             }}
           >
-            <li>
-              <Link to="/games">{isMenuOpen && <FaVrCardboard />} Games</Link>
-            </li>
-            <li>
-              <Link to="/account">{isMenuOpen && <FaUser />} Account</Link>
-            </li>
+            {!location.pathname.startsWith("/pos") && (
+              <>
+                <li>
+                  <Link to="/games">
+                    {isMenuOpen && <FaVrCardboard />} Games
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/account">{isMenuOpen && <FaUser />} Account</Link>
+                </li>
+              </>
+            )}
+
             <li>
               <button className={theme.alt}>
-                <MdLanguage /> {isMenuOpen && "Language"}
+                <MdLanguage /> English
               </button>
             </li>
-            {!isLoading &&
+
+            {!location.pathname.startsWith("/pos") &&
+              !isLoading &&
               (currentUser ? (
                 <>
                   <li>
@@ -86,18 +83,20 @@ function Header() {
               ))}
           </ul>
 
-          <button
-            className={theme.alt}
-            onFocus={(e) => {
-              e.target.closest("header").scrollTo({ top: 0 });
-            }}
-            onClick={(e) => {
-              e.target.closest("header").scrollTo({ top: 0 });
-              setIsMenuOpen(!isMenuOpen);
-            }}
-          >
-            {!isMenuOpen ? <FaBars /> : <IoMdClose />}
-          </button>
+          {!location.pathname.startsWith("/pos") && (
+            <button
+              className={theme.alt}
+              onFocus={(e) => {
+                e.target.closest("header").scrollTo({ top: 0 });
+              }}
+              onClick={(e) => {
+                e.target.closest("header").scrollTo({ top: 0 });
+                setIsMenuOpen(!isMenuOpen);
+              }}
+            >
+              {!isMenuOpen ? <FaBars /> : <IoMdClose />}
+            </button>
+          )}
         </nav>
       </header>
     </>

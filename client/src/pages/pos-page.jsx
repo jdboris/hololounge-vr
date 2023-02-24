@@ -25,18 +25,6 @@ function PosPage() {
     <main>
       <div className={theme.landingPage}>
         <BookNowButton root="/pos" />
-
-        <button
-          onClick={(e) => {
-            e.target
-              .closest(`.${theme.landingPage}`)
-              .nextSibling.scrollIntoView({
-                behavior: "smooth",
-              });
-          }}
-        >
-          <FaChevronDown />
-        </button>
       </div>
 
       <section ref={bookingSectionRef}>
