@@ -504,7 +504,7 @@ export default function BookingPage() {
               <figcaption>
                 <em>TIP: Select station(s) to reserve.</em>
               </figcaption>
-              <img src="./floor-map.png" alt="Floor Map" />
+              <img src="/floor-map.png" alt="Floor Map" />
 
               {stations.map((station, i) => (
                 <label style={stationCoords[i]} key={`station-${station.id}`}>

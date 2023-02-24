@@ -32,7 +32,7 @@ function Header() {
       <header>
         <nav className={isMenuOpen ? theme.open : ""}>
           <Link to="/" className={theme.logo}>
-            <img src="./logo.svg" />
+            <img src="/logo.svg" />
             HoloLounge
           </Link>
 
