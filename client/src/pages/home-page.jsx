@@ -1,13 +1,18 @@
 import theme from "@jdboris/css-themes/space-station";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import GameForm from "../components/game-form";
 import PwaInstallButton from "../components/pwa-install-button";
 import { useGames } from "../contexts/games";
+import { useScrollRouting } from "../contexts/scroll-routing";
 import BookingPage from "./booking-page";
 
 function HomePage() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { addSection } = useScrollRouting();
+  const locationSectionRef = useRef();
+  useEffect(() => {
+    addSection({ route: "/location", ref: locationSectionRef });
+  }, []);
   const [games, setGames] = useState([]);
   const {
     saveGame,
@@ -78,7 +83,7 @@ function HomePage() {
           </section>
         </main>
       </section>
-      <section>
+      <section ref={locationSectionRef}>
         <header>
           <h1>Location</h1>
         </header>

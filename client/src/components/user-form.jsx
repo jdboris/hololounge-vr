@@ -57,18 +57,20 @@ function UserForm({
         <label>
           <InputError message={error?.details?.email} />
 
-          <FaRegEnvelope />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            autoComplete="email"
-            value={user.email || ""}
-            onChange={(e) =>
-              setUser((old) => ({ ...old, email: e.target.value })) ||
-              errorDetail({ email: null })
-            }
-          />
+          <span>
+            <FaRegEnvelope />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              autoComplete="email"
+              value={user.email || ""}
+              onChange={(e) =>
+                setUser((old) => ({ ...old, email: e.target.value })) ||
+                errorDetail({ email: null })
+              }
+            />
+          </span>
         </label>
         <label>
           <InputError message={error?.details?.password} />

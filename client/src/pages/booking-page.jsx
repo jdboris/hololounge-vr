@@ -1,8 +1,8 @@
 import theme from "@jdboris/css-themes/space-station";
 import {
-  format,
   addMinutes,
   areIntervalsOverlapping,
+  format,
   minutesToMilliseconds,
 } from "date-fns";
 import ja from "date-fns/locale/ja";
@@ -11,8 +11,10 @@ import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import ReactDatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaRegCalendar, FaRegClock } from "react-icons/fa";
+import { useLocation, useNavigate } from "react-router-dom";
 import InputError from "../components/input-error";
 import { useModal } from "../contexts/modal";
+import { useScrollRouting } from "../contexts/scroll-routing";
 import "../css/react-datepicker.scss";
 
 registerLocale("ja", ja);
@@ -54,10 +56,22 @@ const CustomInput = forwardRef(({ label, ...props }, ref) => (
 ));
 
 export default function BookingPage() {
+  const { navigate } = useScrollRouting();
+  const url = useLocation();
   const { setModalContent } = useModal();
   const [error, setError] = useState();
   const [isLoading, setIsLoading] = useState(false);
-  const headingRef = useRef();
+  const sectionRef = useRef();
+
+  const { addSection } = useScrollRouting();
+  useEffect(
+    () =>
+      sectionRef &&
+      (console.log("ADDING BOOKING SECTION: ", sectionRef) ||
+        addSection({ route: "/booking", ref: sectionRef })),
+    [sectionRef]
+  );
+
   const [now, setNow] = useState(new Date());
   /**
    * @type {[Booking[], Function]}
@@ -341,21 +355,22 @@ export default function BookingPage() {
   }, []);
 
   return (
-    <div className={theme.bookingPage}>
+    <div ref={sectionRef} className={theme.bookingPage}>
       <header>
-        <h1 ref={headingRef}>Booking</h1>
+        <h1>Booking</h1>
       </header>
       <main>
-        <button
-          className={theme.fixedButton}
-          onClick={() => {
-            headingRef.current.scrollIntoView({
-              behavior: "smooth",
-            });
-          }}
-        >
-          <FaRegCalendar /> Book Now
-        </button>
+        {url.pathname != "/" && (
+          <button
+            className={theme.fixedButton}
+            onClick={() => {
+              navigate("/booking");
+            }}
+          >
+            <FaRegCalendar /> Book Now
+          </button>
+        )}
+
         <form
           onSubmit={async (e) => {
             e.preventDefault();

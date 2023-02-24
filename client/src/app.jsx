@@ -6,6 +6,7 @@ import Header from "./components/header";
 import { AuthProvider } from "./contexts/auth";
 import { GameProvider } from "./contexts/games";
 import { ModalProvider } from "./contexts/modal";
+import { ScrollRoutingProvider } from "./contexts/scroll-routing";
 import { TagProvider } from "./contexts/tags";
 import GamePage from "./pages/game-page";
 import HomePage from "./pages/home-page";
@@ -44,22 +45,24 @@ function App() {
       <AuthProvider>
         <TagProvider>
           <GameProvider>
-            <div className={theme.root}>
-              <ModalProvider>
-                <Header></Header>
+            <ScrollRoutingProvider>
+              <div className={theme.root}>
+                <ModalProvider>
+                  <Header></Header>
 
-                <Routes>
-                  <Route path="/login" element={<LoginPage />}></Route>
-                  <Route path="/signup" element={<SignupPage />}></Route>
+                  <Routes>
+                    <Route path="/login" element={<LoginPage />}></Route>
+                    <Route path="/signup" element={<SignupPage />}></Route>
 
-                  <Route path="/games" element={<GamePage />}></Route>
+                    <Route path="/games" element={<GamePage />}></Route>
 
-                  <Route path="/" element={<HomePage />}></Route>
-                </Routes>
+                    <Route path="/*" element={<HomePage />}></Route>
+                  </Routes>
 
-                <Footer></Footer>
-              </ModalProvider>
-            </div>
+                  <Footer></Footer>
+                </ModalProvider>
+              </div>
+            </ScrollRoutingProvider>
           </GameProvider>
         </TagProvider>
       </AuthProvider>
