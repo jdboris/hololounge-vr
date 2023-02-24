@@ -7,13 +7,20 @@ import PwaInstallButton from "../components/pwa-install-button";
 import { useGames } from "../contexts/games";
 import { useScrollRouting } from "../contexts/scroll-routing";
 import BookingPage from "./booking-page";
+import LocationPage from "./location-page";
 
 function HomePage() {
   const { addSection } = useScrollRouting();
   const locationSectionRef = useRef();
-  useEffect(() => {
-    addSection({ route: "/location", ref: locationSectionRef });
-  }, []);
+  const bookingSectionRef = useRef();
+  useEffect(
+    () => addSection({ route: "/location", ref: locationSectionRef }),
+    []
+  );
+  useEffect(
+    () => addSection({ route: "/booking", ref: bookingSectionRef }),
+    []
+  );
   const [games, setGames] = useState([]);
   const {
     saveGame,
@@ -86,20 +93,9 @@ function HomePage() {
         </main>
       </section>
       <section ref={locationSectionRef}>
-        <header>
-          <h1>Location</h1>
-        </header>
-        <main>
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d202.47334663880358!2d139.7979293720199!3d35.71211056125108!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188ec6af0d5daf%3A0xb9b05ef5841365b9!2z44CSMTExLTAwMzMgVG9reW8sIFRhaXRvIENpdHksIEhhbmFrYXdhZG8sIDEtY2jFjW1l4oiSNeKIkjIg44K144OG44Op44Kk44OI44OV44K444OT44Or!5e0!3m2!1sen!2sjp!4v1675420143790!5m2!1sen!2sjp"
-            style={{ border: 0, width: "100%", height: "600px" }}
-            allowFullScreen=""
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
-        </main>
+        <LocationPage />
       </section>
-      <section>
+      <section ref={bookingSectionRef}>
         <BookingPage />
       </section>
     </main>

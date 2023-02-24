@@ -11,7 +11,7 @@ import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import ReactDatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaRegCalendar, FaRegClock } from "react-icons/fa";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import InputError from "../components/input-error";
 import { useModal } from "../contexts/modal";
 import { useScrollRouting } from "../contexts/scroll-routing";
@@ -61,13 +61,6 @@ export default function BookingPage() {
   const { setModalContent } = useModal();
   const [error, setError] = useState();
   const [isLoading, setIsLoading] = useState(false);
-  const sectionRef = useRef();
-
-  const { addSection } = useScrollRouting();
-  useEffect(
-    () => sectionRef && addSection({ route: "/booking", ref: sectionRef }),
-    [sectionRef]
-  );
 
   const [now, setNow] = useState(new Date());
   /**
@@ -352,7 +345,7 @@ export default function BookingPage() {
   }, []);
 
   return (
-    <div ref={sectionRef} className={theme.bookingPage}>
+    <div className={theme.bookingPage}>
       <header>
         <h1>Booking</h1>
       </header>
