@@ -657,7 +657,7 @@ export default function BookingPage() {
 
         {url.pathname != "/" && url.pathname != "/booking" && (
           <button
-            className={theme.fixedButton}
+            className={[theme.fixedButton, theme.blue].join(" ")}
             onClick={() => {
               navigate("/booking");
             }}

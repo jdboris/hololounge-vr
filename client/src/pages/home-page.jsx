@@ -1,6 +1,7 @@
 import theme from "@jdboris/css-themes/space-station";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
+import BookNowButton from "../components/book-now-button";
 import GameForm from "../components/game-form";
 import PwaInstallButton from "../components/pwa-install-button";
 import { useGames } from "../contexts/games";
@@ -37,6 +38,7 @@ function HomePage() {
         <strong>Casual VR Fun</strong>
         <small>Try something new. Stay a while.</small>
         <PwaInstallButton />
+        <BookNowButton />
 
         <button
           onClick={(e) => {
