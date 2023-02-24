@@ -7,14 +7,12 @@ import {
 } from "date-fns";
 import ja from "date-fns/locale/ja";
 import Booking from "dtos/booking";
-import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, useEffect, useMemo, useState } from "react";
 import ReactDatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaRegCalendar, FaRegClock } from "react-icons/fa";
-import { useLocation } from "react-router-dom";
 import InputError from "../components/input-error";
 import { useModal } from "../contexts/modal";
-import { useScrollRouting } from "../contexts/scroll-routing";
 import "../css/react-datepicker.scss";
 
 registerLocale("ja", ja);
@@ -56,8 +54,6 @@ const CustomInput = forwardRef(({ label, ...props }, ref) => (
 ));
 
 export default function BookingPage() {
-  const { navigate } = useScrollRouting();
-  const url = useLocation();
   const { setModalContent } = useModal();
   const [error, setError] = useState();
   const [isLoading, setIsLoading] = useState(false);
@@ -647,17 +643,6 @@ export default function BookingPage() {
             </aside>
           </main>
         </form>
-
-        {url.pathname != "/" && url.pathname != "/booking" && (
-          <button
-            className={[theme.fixedButton, theme.blue].join(" ")}
-            onClick={() => {
-              navigate("/booking");
-            }}
-          >
-            <FaRegCalendar /> Book Now
-          </button>
-        )}
       </main>
     </div>
   );

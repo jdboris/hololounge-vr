@@ -9,7 +9,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 export const ScrollRoutingContext = createContext();
 
-export function ScrollRoutingProvider({ children }) {
+export function ScrollRoutingProvider({ root = "", children }) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -86,10 +86,10 @@ export function ScrollRoutingProvider({ children }) {
     }, null);
   }, [observer, entries]);
 
-  const [scrollingTo, setScrollingTo] = useState(false);
+  const [isAutoScrolling, setIsAutoScrolling] = useState(false);
 
   function scrollNavigate(route) {
-    if (scrollingTo) return;
+    if (isAutoScrolling) return;
 
     navigate(route);
 
@@ -103,14 +103,14 @@ export function ScrollRoutingProvider({ children }) {
           behavior: "smooth",
         });
 
-        setScrollingTo(true);
-        setTimeout(() => setScrollingTo(false), 1000);
+        setIsAutoScrolling(true);
+        setTimeout(() => setIsAutoScrolling(false), 1000);
       }
     }
   }
 
   useEffect(() => {
-    if (!mostVisible || scrollingTo) {
+    if (!mostVisible || isAutoScrolling) {
       return;
     }
 
@@ -119,18 +119,9 @@ export function ScrollRoutingProvider({ children }) {
       mostVisible.intersectionRatio == undefined ||
       mostVisible.intersectionRatio < 0.2
     ) {
-      // ...strip all routes from the address.
-      const newPath = entries.reduce(
-        (path, entry) =>
-          path.replace(
-            new RegExp(`\\${entry.target.dataset.__route}$`, "g"),
-            "/"
-          ),
-        location.pathname
-      );
-
-      if (location.pathname != newPath) {
-        navigate(newPath);
+      // ...back to the root.
+      if (location.pathname != root) {
+        navigate(root);
       }
 
       return;
@@ -141,7 +132,7 @@ export function ScrollRoutingProvider({ children }) {
       // ...navigate to it.
       navigate(mostVisible.target.dataset.__route);
     }
-  }, [mostVisible, location.pathname, scrollingTo]);
+  }, [mostVisible, location.pathname, isAutoScrolling]);
 
   function addSection({ route, ref }) {
     if (ref.current) {
@@ -171,7 +162,8 @@ export function ScrollRoutingProvider({ children }) {
 
 /**
  * @typedef ScrollRoutingContextValue
- * @property {({ route: string, sectionRef: ReactElement }) => undefined} addSection
+ * @property {({ rel: string, route: string, sectionRef: ReactElement }) => undefined} addSection
+ * @property {({ route: string }) => undefined} navigate
  */
 
 /**

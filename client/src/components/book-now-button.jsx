@@ -2,13 +2,13 @@ import theme from "@jdboris/css-themes/space-station";
 import { Link } from "react-router-dom";
 import { useScrollRouting } from "../contexts/scroll-routing";
 
-function BookNowButton() {
+function BookNowButton({ root = "" }) {
   const { navigate } = useScrollRouting();
   return (
     <Link
       className={[theme.button, theme.blue].join(" ")}
-      to="/booking"
-      onClick={() => navigate("/booking")}
+      to={root + "/booking"}
+      onClick={() => navigate(root + "/booking")}
     >
       Book Now
     </Link>
