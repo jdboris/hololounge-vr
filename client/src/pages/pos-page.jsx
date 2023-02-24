@@ -22,7 +22,7 @@ function PosPage() {
   );
 
   return (
-    <main>
+    <main className={theme.posPage}>
       <div className={theme.landingPage}>
         <BookNowButton root="/pos" />
       </div>
