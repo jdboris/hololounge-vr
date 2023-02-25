@@ -1,7 +1,7 @@
 import theme from "@jdboris/css-themes/space-station";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronDown, FaRegCalendar } from "react-icons/fa";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import BookNowButton from "../components/book-now-button";
 import GameForm from "../components/game-form";
 import PwaInstallButton from "../components/pwa-install-button";
@@ -98,14 +98,13 @@ function HomePage() {
       </section>
 
       {location.pathname != "/" && location.pathname != "/booking" && (
-        <button
-          className={[theme.fixedButton, theme.blue].join(" ")}
-          onClick={() => {
-            navigate("/booking");
-          }}
+        <Link
+          to="/booking"
+          className={[theme.button, theme.fixedButton, theme.blue].join(" ")}
+          onClick={(e) => e.preventDefault() || navigate("/booking")}
         >
           <FaRegCalendar /> Book Now
-        </button>
+        </Link>
       )}
     </main>
   );
