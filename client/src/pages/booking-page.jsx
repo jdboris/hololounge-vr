@@ -1,9 +1,11 @@
 import theme from "@jdboris/css-themes/space-station";
 import {
   addMinutes,
+  subMinutes,
   areIntervalsOverlapping,
   format,
   minutesToMilliseconds,
+  parseISO,
 } from "date-fns";
 import ja from "date-fns/locale/ja";
 import Booking from "dtos/booking";
@@ -142,12 +144,20 @@ export default function BookingPage() {
   function setStartTime(startTime) {
     setBooking((old) => ({
       ...old,
-      startTime: roundUp(clamp(startTime), interval),
+      startTime: clamp(roundUp(startTime, interval)),
     }));
   }
 
   function clamp(datetime) {
-    return new Date(Math.max(openingTime, Math.min(datetime, closingTime)));
+    return new Date(
+      Math.max(
+        openingTime,
+        Math.min(
+          datetime,
+          subMinutes(closingTime, EXPERIENCE_DURATION + interval)
+        )
+      )
+    );
   }
 
   const openingTime = useMemo(
