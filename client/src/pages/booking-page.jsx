@@ -452,8 +452,8 @@ export default function BookingPage() {
                   locale="ja"
                   showTimeSelect
                   showTimeSelectOnly
-                  timeFormat="p"
-                  dateFormat="p"
+                  timeFormat="HH:mm"
+                  dateFormat="HH:mm"
                   timeIntervals={5}
                   minTime={openingTime}
                   maxTime={
