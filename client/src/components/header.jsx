@@ -9,7 +9,7 @@ import { useScrollRouting } from "../contexts/scroll-routing";
 
 function Header() {
   const location = useLocation();
-  const { navigate } = useScrollRouting();
+  const { navigate, root } = useScrollRouting();
   const { currentUser, logout } = useAuth();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -33,13 +33,7 @@ function Header() {
       )}
       <header>
         <nav className={isMenuOpen ? theme.open : ""}>
-          <Link
-            to={location.pathname.startsWith("/pos") ? "/pos" : "/"}
-            onClick={() =>
-              navigate(location.pathname.startsWith("/pos") ? "/pos" : "/")
-            }
-            className={theme.logo}
-          >
+          <Link to={root} onClick={() => navigate(root)} className={theme.logo}>
             <img src="/logo.svg" />
             HoloLounge
           </Link>

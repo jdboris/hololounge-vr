@@ -90,12 +90,17 @@ export function ScrollRoutingProvider({ roots = [], children }) {
     }, null);
   }, [observer, entries]);
 
-  const [isAutoScrolling, setIsAutoScrolling] = useState(false);
+  const [scrollingTo, setScrollingTo] = useState(null);
 
   function scrollNavigate(route) {
-    if (isAutoScrolling) return;
+    if (scrollingTo) return;
 
     navigate(route);
+
+    if (route == root) {
+      setScrollingTo(document.body);
+      setTimeout(() => setScrollingTo(null), 1000);
+    }
 
     for (const entry of entries) {
       // If the address is at the entry, but it's not visible enough...
@@ -103,18 +108,22 @@ export function ScrollRoutingProvider({ roots = [], children }) {
         route == entry.target.dataset.__route &&
         entry.intersectionRatio < 0.2
       ) {
-        entry.target.scrollIntoView({
-          behavior: "smooth",
-        });
-
-        setIsAutoScrolling(true);
-        setTimeout(() => setIsAutoScrolling(false), 1000);
+        setScrollingTo(entry.target);
+        setTimeout(() => setScrollingTo(null), 1000);
       }
     }
   }
 
   useEffect(() => {
-    if (!mostVisible || isAutoScrolling) {
+    if (!scrollingTo) return;
+
+    scrollingTo.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [scrollingTo]);
+
+  useEffect(() => {
+    if (!mostVisible || scrollingTo) {
       return;
     }
 
@@ -136,7 +145,7 @@ export function ScrollRoutingProvider({ roots = [], children }) {
       // ...navigate to it.
       navigate(mostVisible.target.dataset.__route);
     }
-  }, [mostVisible, location.pathname, isAutoScrolling]);
+  }, [mostVisible, location.pathname, scrollingTo]);
 
   function addSection({ route, ref }) {
     if (ref.current) {
@@ -157,6 +166,7 @@ export function ScrollRoutingProvider({ roots = [], children }) {
       value={{
         addSection,
         navigate: scrollNavigate,
+        root,
       }}
     >
       {children}
@@ -168,6 +178,7 @@ export function ScrollRoutingProvider({ roots = [], children }) {
  * @typedef ScrollRoutingContextValue
  * @property {({ rel: string, route: string, sectionRef: ReactElement }) => undefined} addSection
  * @property {({ route: string }) => undefined} navigate
+ * @property {string} root
  */
 
 /**
