@@ -33,7 +33,11 @@ function Header() {
       )}
       <header>
         <nav className={isMenuOpen ? theme.open : ""}>
-          <Link to={root} onClick={() => navigate(root)} className={theme.logo}>
+          <Link
+            to={root}
+            onClick={(e) => e.preventDefault() || navigate(root)}
+            className={theme.logo}
+          >
             <img src="/logo.svg" />
             HoloLounge
           </Link>

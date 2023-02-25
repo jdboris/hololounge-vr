@@ -8,7 +8,7 @@ function BookNowButton({ root = "" }) {
     <Link
       className={[theme.button, theme.blue].join(" ")}
       to={root + "/booking"}
-      onClick={() => navigate(root + "/booking")}
+      onClick={(e) => e.preventDefault() || navigate(root + "/booking")}
     >
       Book Now
     </Link>
