@@ -33,7 +33,7 @@ bookingRouter.get("/upcoming", async (req, res) => {
   res.json(bookings);
 });
 
-bookingRouter.post("/:bookingId/checkin", async (req, res) => {
+bookingRouter.post("/:bookingId/check-in", async (req, res) => {
   const { bookingId } = req.params;
   const token = await login();
 
