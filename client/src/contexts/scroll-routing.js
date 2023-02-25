@@ -9,9 +9,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 export const ScrollRoutingContext = createContext();
 
-export function ScrollRoutingProvider({ root = "", children }) {
+export function ScrollRoutingProvider({ roots = [], children }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const root = useMemo(
+    () => roots.find((r) => location.pathname.startsWith(r) || ""),
+    [roots, location.pathname]
+  );
 
   /**
    * @type {[{}, Function]}

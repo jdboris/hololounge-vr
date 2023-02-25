@@ -21,33 +21,24 @@ function App() {
           <GameProvider>
             <div className={theme.root}>
               <ModalProvider>
-                <Header></Header>
+                <ScrollRoutingProvider roots={["/pos", "/"]}>
+                  <Header></Header>
 
-                <Routes>
-                  <Route path="/login" element={<LoginPage />}></Route>
-                  <Route path="/signup" element={<SignupPage />}></Route>
-                  <Route path="/games" element={<GamePage />}></Route>
+                  <Routes>
+                    <Route path="/login" element={<LoginPage />}></Route>
+                    <Route path="/signup" element={<SignupPage />}></Route>
+                    <Route path="/games" element={<GamePage />}></Route>
 
-                  <Route
-                    path="/pos/*"
-                    element={
-                      <ScrollRoutingProvider root="/pos">
-                        <PosPage path="/pos" />
-                      </ScrollRoutingProvider>
-                    }
-                  ></Route>
+                    <Route
+                      path="/pos/*"
+                      element={<PosPage path="/pos" />}
+                    ></Route>
 
-                  <Route
-                    path="/*"
-                    element={
-                      <ScrollRoutingProvider>
-                        <HomePage />
-                      </ScrollRoutingProvider>
-                    }
-                  ></Route>
-                </Routes>
+                    <Route path="/*" element={<HomePage />}></Route>
+                  </Routes>
 
-                <Footer></Footer>
+                  <Footer></Footer>
+                </ScrollRoutingProvider>
               </ModalProvider>
             </div>
           </GameProvider>

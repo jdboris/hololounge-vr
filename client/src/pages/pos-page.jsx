@@ -1,11 +1,10 @@
 import theme from "@jdboris/css-themes/space-station";
 import { useEffect, useRef } from "react";
-import { FaChevronDown, FaRegCalendar } from "react-icons/fa";
+import { FaRegCalendar } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
 import BookNowButton from "../components/book-now-button";
 import { useScrollRouting } from "../contexts/scroll-routing";
 import BookingPage from "./booking-page";
-import LocationPage from "./location-page";
 
 function PosPage() {
   const location = useLocation();
