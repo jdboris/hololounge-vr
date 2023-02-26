@@ -47,7 +47,7 @@ export default class BookingDto {
     // Validation...
 
     if (!Array.isArray(this.bookingStations) || !this.bookingStations.length) {
-      errors.bookingStations = "Selection station(s) to reserve.";
+      errors.bookingStations = "Select station(s) to reserve.";
     }
 
     if (!this.startTime) {
