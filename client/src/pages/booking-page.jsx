@@ -368,7 +368,11 @@ export default function BookingPage() {
 
               const response = await fetch(`/api/checkout`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                  "Content-Type": "application/json",
+                  // NOTE: In case the browser doesn't set it automatically...
+                  referer: window.location.origin + window.location.pathname,
+                },
                 body: JSON.stringify(booking),
               });
 
@@ -378,18 +382,17 @@ export default function BookingPage() {
                 throw error;
               }
 
-              // setBooking({
-              //   bookingStations: [],
-              //   location: { id: LOCATION_ID },
-              //   startTime: now,
-              //   birthday: null,
-              //   firstName: "",
-              //   lastName: "",
-              //   email: "",
-              //   phone: "",
-              // });
-              // // NOTE: Call the setter to clamp/round
-              // setStartTime(now);
+              setBooking({
+                bookingStations: [],
+                startTime: now,
+                birthday: null,
+                firstName: "",
+                lastName: "",
+                email: "",
+                phone: "",
+              });
+              // NOTE: Call the setter to clamp/round
+              setStartTime(now);
 
               setModalContent(message);
               window.location.href = url;

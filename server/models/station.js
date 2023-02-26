@@ -40,6 +40,7 @@ Station.belongsToMany(Booking, {
   as: "bookings",
   through: BookingStation,
 });
+
 Booking.belongsToMany(Station, {
   as: "stations",
   through: BookingStation,

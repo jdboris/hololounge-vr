@@ -1,14 +1,11 @@
-import { formatISO } from "date-fns";
 import * as dotenv from "dotenv";
 import express from "express";
 import { v4 as uuid } from "uuid";
 import BookingDto from "../dtos/booking.js";
-import BookingStation from "../models/booking-station.js";
 import Booking from "../models/booking.js";
 import ExperiencePrice from "../models/experience-price.js";
 import Experience from "../models/experience.js";
 import Location from "../models/location.js";
-import Station from "../models/station.js";
 import { HttpError } from "../utils/errors.js";
 
 dotenv.config();
@@ -83,7 +80,7 @@ checkoutRouter.post("/", async (req, res) => {
         ),
       },
       checkout_options: {
-        redirect_url: "https://hololounge.jp",
+        redirect_url: req.headers.referer,
         accepted_payment_methods: {
           apple_pay: true,
           cash_app_pay: true,
@@ -112,26 +109,39 @@ checkoutRouter.post("/", async (req, res) => {
     throw new Error("No checkout URL.");
   }
 
-  // Creating the booking in a pending state...
-  const booking = await Booking.create({
-    startTime,
-    birthday,
-    lastName,
-    firstName,
-    email,
-    phone,
-    locationId: location.id,
-    isComplete: false,
-    squareOrderId: data.payment_link.order_id,
-  });
-
-  await BookingStation.bulkCreate(
-    bookingStations.map((bs) => ({
-      locationId: bs.location.id,
-      bookingId: booking.id,
-      stationId: bs.stationId,
-      experiencePriceId: bs.experiencePrice.id,
-    }))
+  // Creating the bookings in a pending state...
+  await Booking.bulkCreate(
+    Object.values(
+      bookingStations.reduce(
+        (byLocation, bs) => ({
+          ...byLocation,
+          [bs.location.id]: {
+            startTime,
+            birthday,
+            lastName,
+            firstName,
+            email,
+            phone,
+            locationId: bs.location.id,
+            isComplete: false,
+            isCheckedIn: false,
+            squareOrderId: data.payment_link.order_id,
+            bookingStations: [
+              ...(byLocation[bs.location.id]?.bookingStations || []),
+              {
+                experiencePriceId: bs.experiencePrice.id,
+                locationId: bs.location.id,
+                stationId: bs.stationId,
+              },
+            ],
+          },
+        }),
+        {}
+      )
+    ),
+    {
+      include: ["bookingStations"],
+    }
   );
 
   res.json({

@@ -119,6 +119,11 @@ const Booking = sequelize.define("bookings", {
     type: DataTypes.BOOLEAN,
     allowNull: false,
   },
+
+  isCheckedIn: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
 });
 
 export default Booking;

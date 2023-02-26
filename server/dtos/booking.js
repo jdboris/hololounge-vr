@@ -17,6 +17,11 @@ export default class BookingDto {
   isComplete;
 
   /**
+   * @type {boolean}
+   */
+  isCheckedIn;
+
+  /**
    * @type {Array<{location: {id: string}, stationId: string, experiencePrice: {id: string, duration: number, experience: {id: string}}}>} The `BookingStation`'s that coincides with "bookingTimes" in Springboard.
    */
   bookingStations;

@@ -1,21 +1,20 @@
 import theme from "@jdboris/css-themes/space-station";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import { useNavigate } from "react-router-dom";
 import InputError from "../components/input-error";
+import { useModal } from "../contexts/modal";
 import "../css/react-datepicker.scss";
 
 function CheckInPage() {
-  const navigate = useNavigate();
-
-  const [error, setError] = useState();
+  const { setModalContent } = useModal();
+  const [error, setError] = useState({ details: {} });
+  const [isLoading, setIsLoading] = useState(false);
   /**
    * @type {[{firstName: string, lastName: string, email: string}, Function]}
    */
   const [formData, setBooking] = useState({
     firstName: "",
     lastName: "",
-    email: "",
   });
 
   const [booking, dtoError] = useMemo(() => {
@@ -77,8 +76,65 @@ function CheckInPage() {
                       : e.target.value,
                 })));
           }}
+          onSubmit={async (e) => {
+            e.preventDefault();
+
+            setIsLoading(true);
+            setError(null);
+            try {
+              if (dtoError) {
+                throw dtoError;
+              }
+
+              setIsLoading(true);
+
+              const response = await fetch(`/api/bookings/check-in`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(booking),
+              });
+
+              const { error, message, bookings } = await response.json();
+
+              if (!response.ok) {
+                throw error;
+              }
+
+              if (bookings.length) {
+                setTimeout(async () => {
+                  try {
+                    const response = await fetch(`/api/bookings/start`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ bookings }),
+                    });
+
+                    if (!response.ok) {
+                      throw error;
+                    }
+                  } catch (error) {
+                    console.error(error);
+                  }
+
+                  // NOTE: Assuming all the bookings start at the same time.
+                  //       Add a buffer of 5s to account for differences in client vs server time.
+                }, Date.parse(bookings[0].startTime) - new Date() + 5000);
+              }
+
+              setModalContent(message);
+
+              setBooking({
+                firstName: "",
+                lastName: "",
+              });
+            } catch (error) {
+              setError(error);
+            }
+
+            setIsLoading(false);
+          }}
         >
-          <fieldset>
+          <fieldset disabled={isLoading}>
             <label>
               <InputError message={error?.details?.lastName} />
               <input
@@ -104,7 +160,10 @@ function CheckInPage() {
               <small>First Name</small>
             </label>
           </fieldset>
-          <button className={theme.orange}>Check In</button>
+          <InputError message={error?.message} />
+          <button disabled={isLoading} className={theme.orange}>
+            Check In
+          </button>
         </form>
       </main>
     </div>
