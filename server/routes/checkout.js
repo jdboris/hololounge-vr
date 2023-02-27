@@ -50,7 +50,13 @@ checkoutRouter.post("/", async (req, res) => {
 
   const data = isPos
     ? await createTerminalCheckout()
-    : await createPaymentLink();
+    : await createPaymentLink({
+        location,
+        experiences,
+        experiencePrices,
+        bookingStations,
+        referrer,
+      });
   const orderId = isPos ? data.checkout.id : data.payment_link.order_id;
 
   // Creating the bookings in a pending state...

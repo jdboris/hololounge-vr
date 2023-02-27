@@ -41,7 +41,13 @@ export async function createTerminalCheckout() {
   return data;
 }
 
-export async function createPaymentLink() {
+export async function createPaymentLink({
+  location,
+  experiences,
+  experiencePrices,
+  bookingStations,
+  referrer,
+}) {
   const response = await fetch(SQUARE_CREATE_PAYMENT_LINK_URL, {
     method: "POST",
     headers: {
@@ -89,16 +95,17 @@ export async function createPaymentLink() {
       // },
     }),
   });
+  const data = await response.json();
 
   if (!response.ok) {
-    const data = await response.json();
+    console.error(data);
     throw data;
   }
 
   if (!data.payment_link.url) {
-    console.log(data);
+    console.error(data);
     throw new Error("No checkout URL.");
   }
 
-  return await response.json();
+  return data;
 }
