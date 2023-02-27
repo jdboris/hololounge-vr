@@ -8,17 +8,34 @@ import Booking from "../models/booking.js";
 import { HttpError } from "../utils/errors.js";
 
 dotenv.config();
-const { SQUARE_WEBHOOK_SIGNATURE_KEY } = process.env;
+const {
+  SQUARE_SANDBOX_TERMINAL_WEBHOOK_SIGNATURE_KEY,
+  SQUARE_SANDBOX_PAYMENT_WEBHOOK_SIGNATURE_KEY,
+} = process.env;
 
 const squareBookingRouter = express.Router();
 
 // NOTE Square requires using the raw body text to validate the request
-squareBookingRouter.post("/", async (req, res) => {
+squareBookingRouter.post("/payment-updated", async (req, res) => {
+  await handleRequest(req, res, "payment.updated");
+});
+
+// NOTE Square requires using the raw body text to validate the request
+squareBookingRouter.post("/terminal-checkout-updated", async (req, res) => {
+  await handleRequest(req, res, "terminal.checkout.updated");
+});
+
+async function handleRequest(req, res, type) {
   req.body = req.body.toString();
   const bodyText = req.body;
   req.body = JSON.parse(req.body);
 
-  const hmac = createHmac("sha1", SQUARE_WEBHOOK_SIGNATURE_KEY);
+  const hmac = createHmac(
+    "sha1",
+    type == "terminal.checkout.updated"
+      ? SQUARE_SANDBOX_TERMINAL_WEBHOOK_SIGNATURE_KEY
+      : SQUARE_SANDBOX_PAYMENT_WEBHOOK_SIGNATURE_KEY
+  );
   const requestUrl = `https://${req.get("host")}${req.originalUrl}`;
   hmac.update(requestUrl + bodyText);
   const hash = hmac.digest("base64");
@@ -33,17 +50,32 @@ squareBookingRouter.post("/", async (req, res) => {
   }
 
   const {
-    type,
     data: {
-      object: {
-        payment: { status, order_id: orderId },
-      },
+      object: { payment, checkout },
     },
   } = req.body;
 
-  if (type != "payment.updated" || status != "COMPLETED") {
+  console.log("TYPE: ", type);
+
+  if (
+    (type != "payment.updated" && type != "terminal.checkout.updated") ||
+    (payment || checkout).status != "COMPLETED"
+  ) {
     res.json({ success: true });
     return;
+  }
+
+  const orderId =
+    (type == "payment.updated" && payment.order_id) ||
+    (type == "terminal.checkout.updated" && checkout.id);
+
+  if (type == "terminal.checkout.updated") {
+    console.log("orderId: ", orderId);
+    console.log("body: ", req.body);
+  }
+
+  if (!orderId) {
+    throw new Error("Webhook request type valid, but no provided ID.");
   }
 
   // NOTE: Catch ANY ERROR then REFUND/CANCEL
@@ -64,12 +96,17 @@ squareBookingRouter.post("/", async (req, res) => {
     });
 
     if (!bookings.length) {
-      throw Error(
-        `No Booking records found for provided order ID "${orderId}".`
-      );
+      // throw Error(
+      //   `No Booking records found for provided order ID "${orderId}".`
+      // );
+      return;
     }
 
     for await (const booking of bookings) {
+      if (booking.isComplete) {
+        continue;
+      }
+
       /**
        * @type BookingDto
        */
@@ -187,6 +224,6 @@ squareBookingRouter.post("/", async (req, res) => {
     console.error(error);
     // TODO: REFUND/CANCEL THE PAYMENT
   }
-});
+}
 
 export default squareBookingRouter;

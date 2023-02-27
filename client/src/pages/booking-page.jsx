@@ -15,6 +15,7 @@ import { FaRegCalendar, FaRegClock } from "react-icons/fa";
 import InputError from "../components/input-error";
 import { useModal } from "../contexts/modal";
 import "../css/react-datepicker.scss";
+import { DEFAULT_BOOKING_DATA, SANDBOX_MODE } from "../utils/sandbox";
 
 registerLocale("ja", ja);
 
@@ -90,15 +91,19 @@ export default function BookingPage() {
   /**
    * @type {[Booking, Function]}
    */
-  const [formData, setBooking] = useState({
-    bookingStations: [],
-    startTime: now,
-    birthday: null,
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-  });
+  const [formData, setBooking] = useState(
+    SANDBOX_MODE
+      ? DEFAULT_BOOKING_DATA
+      : {
+          bookingStations: [],
+          startTime: now,
+          birthday: null,
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+        }
+  );
 
   const [booking, dtoError] = useMemo(() => {
     try {
@@ -160,7 +165,7 @@ export default function BookingPage() {
   }
 
   const openingTime = useMemo(
-    () => new D(formData.startTime).setHours(10, 0, 0, 0),
+    () => new D(formData.startTime).setHours(SANDBOX_MODE ? 1 : 10, 0, 0, 0),
     [formData.startTime]
   );
 
@@ -376,26 +381,39 @@ export default function BookingPage() {
                 body: JSON.stringify(booking),
               });
 
-              const { error, message, url } = await response.json();
+              const { error, message, redirectUrl } = await response.json();
 
               if (!response.ok) {
                 throw error;
               }
 
-              setBooking({
-                bookingStations: [],
-                startTime: now,
-                birthday: null,
-                firstName: "",
-                lastName: "",
-                email: "",
-                phone: "",
-              });
-              // NOTE: Call the setter to clamp/round
-              setStartTime(now);
+              if (!SANDBOX_MODE) {
+                setBooking({
+                  bookingStations: [],
+                  startTime: now,
+                  birthday: null,
+                  firstName: "",
+                  lastName: "",
+                  email: "",
+                  phone: "",
+                });
+                // NOTE: Call the setter to clamp/round
+                setStartTime(now);
 
-              setModalContent(message);
-              window.location.href = url;
+                if (redirectUrl) {
+                  setModalContent(message);
+                  window.location.href = redirectUrl;
+                } else {
+                  setModalContent(message, { canClose: false });
+
+                  //   const attemptLimit = 20;
+                  //   for await(let i = 0; i < attemptLimit; i++){
+                  //   await new Promise((resolve, reject) => {
+                  //     setTimeout();
+                  //   });
+                  // }
+                }
+              }
             } catch (error) {
               setError(error);
             }
@@ -403,18 +421,19 @@ export default function BookingPage() {
             setIsLoading(false);
           }}
           onChange={(e) => {
-            e.target.name &&
-              (hideError(e.target.name) ||
-                setBooking((old) => ({
-                  ...old,
-                  [e.target.name]:
-                    e.target.type == "date"
-                      ? e.target.value &&
-                        // NOTE: Add the time to the string so the Date constructor will interpret it as a LOCAL date/time
-                        !isNaN(new Date(`${e.target.value}T00:00`)) &&
-                        new Date(`${e.target.value}T00:00`)
-                      : e.target.value,
-                })));
+            console.log(e.target.value) ||
+              (e.target.name &&
+                (hideError(e.target.name) ||
+                  setBooking((old) => ({
+                    ...old,
+                    [e.target.name]:
+                      e.target.type == "date"
+                        ? e.target.value &&
+                          // NOTE: Add the time to the string so the Date constructor will interpret it as a LOCAL date/time
+                          !isNaN(new Date(`${e.target.value}T00:00`)) &&
+                          new Date(`${e.target.value}T00:00`)
+                        : e.target.value,
+                  }))));
           }}
         >
           <header>

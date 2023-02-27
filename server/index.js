@@ -73,11 +73,7 @@ if (!CLIENT_APP_PATH) {
 app.use(cookieParser(process.env.COOKIE_SECRET));
 // API Routes
 // NOTE: Must use this route BEFORE express.json() middleware
-app.use(
-  "/api/square/bookings",
-  express.raw({ type: "*/*" }),
-  squareBookingRouter
-);
+app.use("/api/square", express.raw({ type: "*/*" }), squareBookingRouter);
 app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/tags", tagRouter);

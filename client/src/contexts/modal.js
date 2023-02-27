@@ -4,19 +4,26 @@ import { HiX } from "react-icons/hi";
 
 export const ModalContext = createContext();
 
-function Modal({ content, setContent }) {
+function Modal({ content, setContent, canClose }) {
   return !content ? (
     <></>
   ) : (
     <div
       className={theme.overlay}
-      onClick={(e) => e.target == e.currentTarget && setContent(null)}
+      onClick={(e) =>
+        canClose && e.target == e.currentTarget && setContent(null)
+      }
     >
       <div className={theme.modal}>
         <header>
-          <button className={theme.alt} onClick={() => setContent(null)}>
-            <HiX />
-          </button>
+          {canClose && (
+            <button
+              className={theme.alt}
+              onClick={() => canClose && setContent(null)}
+            >
+              <HiX />
+            </button>
+          )}
         </header>
         <main>{content}</main>
       </div>
@@ -25,7 +32,13 @@ function Modal({ content, setContent }) {
 }
 
 export function ModalProvider({ children }) {
-  const [modalContent, setModalContent] = useState();
+  const [canClose, setCanClose] = useState(true);
+  const [modalContent, setModalContentRaw] = useState(null);
+
+  function setModalContent(content, { canClose = true } = {}) {
+    setCanClose(canClose);
+    setModalContentRaw(content);
+  }
 
   return (
     <ModalContext.Provider
@@ -34,7 +47,11 @@ export function ModalProvider({ children }) {
       }}
     >
       {children}
-      <Modal content={modalContent} setContent={setModalContent} />
+      <Modal
+        content={modalContent}
+        setContent={setModalContent}
+        canClose={canClose}
+      />
     </ModalContext.Provider>
   );
 }

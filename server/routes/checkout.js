@@ -1,19 +1,18 @@
-import * as dotenv from "dotenv";
 import express from "express";
-import { v4 as uuid } from "uuid";
 import BookingDto from "../dtos/booking.js";
 import Booking from "../models/booking.js";
 import ExperiencePrice from "../models/experience-price.js";
 import Experience from "../models/experience.js";
 import Location from "../models/location.js";
 import { HttpError } from "../utils/errors.js";
-
-dotenv.config();
-const { SQUARE_CREATE_PAYMENT_LINK_URL, SQUARE_ACCESS_TOKEN } = process.env;
+import { createPaymentLink, createTerminalCheckout } from "../utils/square.js";
 
 const checkoutRouter = express.Router();
 
 checkoutRouter.post("/", async (req, res) => {
+  const referrer = new URL(req.headers.referer);
+  const isPos = /^\/pos\/|^\/pos$/.test(referrer.pathname);
+
   try {
     // Instantiate a DTO for parsing/validation
     req.body = new BookingDto(req.body);
@@ -49,65 +48,10 @@ checkoutRouter.post("/", async (req, res) => {
     throw new Error(`No ExperiencePrices found.`);
   }
 
-  const response = await fetch(SQUARE_CREATE_PAYMENT_LINK_URL, {
-    method: "POST",
-    headers: {
-      "Square-Version": "2023-01-19",
-      Authorization: `Bearer ${SQUARE_ACCESS_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      order: {
-        location_id: location.idInSquare,
-        // Reduce the bookingStations to an array of line item objects grouped by idInSquare
-        line_items: Object.values(
-          bookingStations.reduce((items, bs) => {
-            const { idInSquare } = experiencePrices.find(
-              (ep) => ep.id == bs.experiencePrice.id
-            );
-
-            return {
-              ...items,
-              [idInSquare]: {
-                catalog_object_id: idInSquare,
-                quantity: String(
-                  (Number(items[idInSquare]?.quantity) || 0) + 1
-                ),
-                item_type: "ITEM",
-              },
-            };
-          }, {})
-        ),
-      },
-      checkout_options: {
-        redirect_url: req.headers.referer,
-        accepted_payment_methods: {
-          apple_pay: true,
-          cash_app_pay: true,
-          google_pay: true,
-          afterpay_clearpay: true,
-        },
-      },
-      idempotency_key: uuid(),
-      // NOTE: At this time, pre-populating the Square checkout page is insufficient
-      // pre_populated_data: {
-      //   buyer_email: email,
-      //   buyer_phone_number: phone,
-      // },
-    }),
-  });
-
-  if (!response.ok) {
-    const data = await response.json();
-    throw data;
-  }
-
-  const data = await response.json();
-
-  if (!data.payment_link.url) {
-    console.log(data);
-    throw new Error("No checkout URL.");
-  }
+  const data = isPos
+    ? await createTerminalCheckout()
+    : await createPaymentLink();
+  const orderId = isPos ? data.checkout.id : data.payment_link.order_id;
 
   // Creating the bookings in a pending state...
   await Booking.bulkCreate(
@@ -125,7 +69,7 @@ checkoutRouter.post("/", async (req, res) => {
             locationId: bs.location.id,
             isComplete: false,
             isCheckedIn: false,
-            squareOrderId: data.payment_link.order_id,
+            squareOrderId: orderId,
             bookingStations: [
               ...(byLocation[bs.location.id]?.bookingStations || []),
               {
@@ -144,10 +88,17 @@ checkoutRouter.post("/", async (req, res) => {
     }
   );
 
-  res.json({
-    message: "Redirecting for checkout...",
-    url: data.payment_link.url,
-  });
+  if (isPos) {
+    res.json({
+      message:
+        "Please continue to the payment terminal to complete your order...",
+    });
+  } else {
+    res.json({
+      message: "Redirecting for checkout...",
+      redirectUrl: data.payment_link.url,
+    });
+  }
 });
 
 export default checkoutRouter;
