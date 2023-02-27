@@ -3,31 +3,42 @@ import { v4 as uuid } from "uuid";
 
 dotenv.config();
 const {
-  SQUARE_SANDBOX_CREATE_TERMINAL_CHECKOUT_URL,
-  SQUARE_SANDBOX_TERMINAL_1_DEVICE_ID,
+  SQUARE_CREATE_TERMINAL_CHECKOUT_URL,
+  SQUARE_TERMINAL_1_DEVICE_ID,
   SQUARE_CREATE_PAYMENT_LINK_URL,
-  SQUARE_SANDBOX_ACCESS_TOKEN,
   SQUARE_ACCESS_TOKEN,
 } = process.env;
 
-export async function createTerminalCheckout() {
-  const response = await fetch(SQUARE_SANDBOX_CREATE_TERMINAL_CHECKOUT_URL, {
+export async function createTerminalCheckout({
+  bookingStations,
+  experiencePrices,
+}) {
+  const total = bookingStations.reduce(
+    (total, bs) =>
+      total +
+      Number(
+        experiencePrices.find((ep) => ep.id == bs.experiencePrice.id).price
+      ),
+    0
+  );
+
+  const response = await fetch(SQUARE_CREATE_TERMINAL_CHECKOUT_URL, {
     method: "POST",
     headers: {
       "Square-Version": "2023-01-19",
-      Authorization: `Bearer ${SQUARE_SANDBOX_ACCESS_TOKEN}`,
+      Authorization: `Bearer ${SQUARE_ACCESS_TOKEN}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
       idempotency_key: uuid(),
       checkout: {
         amount_money: {
-          amount: 100,
+          amount: total,
           currency: "JPY",
         },
         payment_options: {},
         device_options: {
-          device_id: SQUARE_SANDBOX_TERMINAL_1_DEVICE_ID,
+          device_id: SQUARE_TERMINAL_1_DEVICE_ID,
         },
       },
     }),
@@ -43,7 +54,6 @@ export async function createTerminalCheckout() {
 
 export async function createPaymentLink({
   location,
-  experiences,
   experiencePrices,
   bookingStations,
   referrer,

@@ -5,9 +5,40 @@ import ExperiencePrice from "../models/experience-price.js";
 import Experience from "../models/experience.js";
 import Location from "../models/location.js";
 import { HttpError } from "../utils/errors.js";
+import { list } from "../utils/localization.js";
 import { createPaymentLink, createTerminalCheckout } from "../utils/square.js";
 
 const checkoutRouter = express.Router();
+
+checkoutRouter.get("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const bookings = await Booking.findAll({
+    where: {
+      squareOrderId: id,
+    },
+    include: ["stations"],
+  });
+
+  if (bookings.find((b) => !b.isComplete)) {
+    res.json({ isComplete: false });
+  } else {
+    res.json({
+      isComplete: true,
+      message: `Booking complete! You will receive a receipt and booking confirmation via email. Your experience(s) at ${list(
+        [
+          ...new Set(
+            bookings.map(({ stations }) => stations.map((s) => s.name)).flat()
+          ),
+        ]
+      )} will start at ${bookings[0].startTime.toLocaleString("ja-JP", {
+        dateStyle: "medium",
+        timeStyle: "short",
+        hourCycle: "h23",
+      })}. Please check in at the in-store kiosk up to 5 minutes in advance.`,
+    });
+  }
+});
 
 checkoutRouter.post("/", async (req, res) => {
   const referrer = new URL(req.headers.referer);
@@ -49,10 +80,9 @@ checkoutRouter.post("/", async (req, res) => {
   }
 
   const data = isPos
-    ? await createTerminalCheckout()
+    ? await createTerminalCheckout({ bookingStations, experiencePrices })
     : await createPaymentLink({
         location,
-        experiences,
         experiencePrices,
         bookingStations,
         referrer,
@@ -98,6 +128,7 @@ checkoutRouter.post("/", async (req, res) => {
     res.json({
       message:
         "Please continue to the payment terminal to complete your order...",
+      id: orderId,
     });
   } else {
     res.json({

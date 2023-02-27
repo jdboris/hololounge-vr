@@ -22,7 +22,7 @@ export default class BookingDto {
   isCheckedIn;
 
   /**
-   * @type {Array<{location: {id: string}, stationId: string, experiencePrice: {id: string, duration: number, experience: {id: string}}}>} The `BookingStation`'s that coincides with "bookingTimes" in Springboard.
+   * @type {Array<{location: {id: string}, stationId: string, experiencePrice: {id: string, duration: number, price: number, experience: {id: string}}}>} The `BookingStation`'s that coincides with "bookingTimes" in Springboard.
    */
   bookingStations;
 

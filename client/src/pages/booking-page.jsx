@@ -381,7 +381,7 @@ export default function BookingPage() {
                 body: JSON.stringify(booking),
               });
 
-              const { error, message, redirectUrl } = await response.json();
+              const { error, id, message, redirectUrl } = await response.json();
 
               if (!response.ok) {
                 throw error;
@@ -399,20 +399,45 @@ export default function BookingPage() {
                 });
                 // NOTE: Call the setter to clamp/round
                 setStartTime(now);
+              }
 
-                if (redirectUrl) {
-                  setModalContent(message);
+              if (redirectUrl) {
+                setModalContent(message);
+                if (!SANDBOX_MODE) {
                   window.location.href = redirectUrl;
-                } else {
-                  setModalContent(message, { canClose: false });
-
-                  //   const attemptLimit = 20;
-                  //   for await(let i = 0; i < attemptLimit; i++){
-                  //   await new Promise((resolve, reject) => {
-                  //     setTimeout();
-                  //   });
-                  // }
                 }
+              } else {
+                setModalContent(message, { canClose: false });
+
+                // TODO: Clear these timeouts in a useEffect cleanup
+                await (async () => {
+                  const LIMIT = 40;
+                  for (let i = 0; i < LIMIT; i++) {
+                    const result = await new Promise((resolve, reject) => {
+                      setTimeout(async () => {
+                        const response = await fetch(`/api/checkout/${id}`);
+                        const { error, message, isComplete } =
+                          await response.json();
+                        // NOTE: May receive 304, which is considered "not OK"
+                        // if (!response.ok) {
+                        if (error) {
+                          setModalContent(error.message);
+                          return reject(error);
+                        }
+
+                        if (isComplete) {
+                          setModalContent(message);
+                          return resolve(true);
+                        }
+                        resolve();
+                      }, 3000);
+                    });
+
+                    if (result) return;
+                  }
+                })();
+
+                setModalContent(null);
               }
             } catch (error) {
               setError(error);
@@ -421,19 +446,18 @@ export default function BookingPage() {
             setIsLoading(false);
           }}
           onChange={(e) => {
-            console.log(e.target.value) ||
-              (e.target.name &&
-                (hideError(e.target.name) ||
-                  setBooking((old) => ({
-                    ...old,
-                    [e.target.name]:
-                      e.target.type == "date"
-                        ? e.target.value &&
-                          // NOTE: Add the time to the string so the Date constructor will interpret it as a LOCAL date/time
-                          !isNaN(new Date(`${e.target.value}T00:00`)) &&
-                          new Date(`${e.target.value}T00:00`)
-                        : e.target.value,
-                  }))));
+            e.target.name &&
+              (hideError(e.target.name) ||
+                setBooking((old) => ({
+                  ...old,
+                  [e.target.name]:
+                    e.target.type == "date"
+                      ? e.target.value &&
+                        // NOTE: Add the time to the string so the Date constructor will interpret it as a LOCAL date/time
+                        !isNaN(new Date(`${e.target.value}T00:00`)) &&
+                        new Date(`${e.target.value}T00:00`)
+                      : e.target.value,
+                })));
           }}
         >
           <header>

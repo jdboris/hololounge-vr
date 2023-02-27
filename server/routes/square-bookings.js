@@ -9,8 +9,8 @@ import { HttpError } from "../utils/errors.js";
 
 dotenv.config();
 const {
-  SQUARE_SANDBOX_TERMINAL_WEBHOOK_SIGNATURE_KEY,
-  SQUARE_SANDBOX_PAYMENT_WEBHOOK_SIGNATURE_KEY,
+  SQUARE_TERMINAL_WEBHOOK_SIGNATURE_KEY,
+  SQUARE_PAYMENT_WEBHOOK_SIGNATURE_KEY,
 } = process.env;
 
 const squareBookingRouter = express.Router();
@@ -33,8 +33,8 @@ async function handleRequest(req, res, type) {
   const hmac = createHmac(
     "sha1",
     type == "terminal.checkout.updated"
-      ? SQUARE_SANDBOX_TERMINAL_WEBHOOK_SIGNATURE_KEY
-      : SQUARE_SANDBOX_PAYMENT_WEBHOOK_SIGNATURE_KEY
+      ? SQUARE_TERMINAL_WEBHOOK_SIGNATURE_KEY
+      : SQUARE_PAYMENT_WEBHOOK_SIGNATURE_KEY
   );
   const requestUrl = `https://${req.get("host")}${req.originalUrl}`;
   hmac.update(requestUrl + bodyText);
