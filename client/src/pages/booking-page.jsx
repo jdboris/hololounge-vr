@@ -55,7 +55,7 @@ const stationCoords = [
 const CustomInput = forwardRef(({ label, error, ...props }, ref) => (
   <label>
     {error && <InputError message={error} />}
-    <input type="text" ref={ref} placeholder=" " {...props} />
+    <input type="text" ref={ref} {...props} placeholder=" " />
     {label && <small>{label}</small>}
   </label>
 ));
