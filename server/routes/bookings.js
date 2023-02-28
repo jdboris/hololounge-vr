@@ -88,15 +88,9 @@ bookingRouter.post("/check-in", async (req, res) => {
 
   if (!soonBookings.length) {
     throw new HttpError(
-      `You may not check in more than 5 minutes before your reservation. (Your next reservation is at ${bookings[0].startTime.toLocaleString(
-        "ja-JP",
-        {
-          dateStyle: "medium",
-          timeStyle: "short",
-          hourCycle: "h23",
-        }
-      )})`,
-      400
+      `You may not check in more than 5 minutes before your reservation. (Your next reservation is at {startTime})`,
+      400,
+      { bookings }
     );
   }
 
@@ -107,13 +101,7 @@ bookingRouter.post("/check-in", async (req, res) => {
       ...new Set(
         soonBookings.map(({ stations }) => stations.map((s) => s.name)).flat()
       ),
-    ])} ${
-      soonBookings[0].startTime < new Date() ? "started" : "will start"
-    } at ${soonBookings[0].startTime.toLocaleString("ja-JP", {
-      dateStyle: "medium",
-      timeStyle: "short",
-      hourCycle: "h23",
-    })}`,
+    ])} {verb} at {startTime}`,
     bookings,
   });
 });

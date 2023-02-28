@@ -31,11 +31,8 @@ checkoutRouter.get("/:id", async (req, res) => {
             bookings.map(({ stations }) => stations.map((s) => s.name)).flat()
           ),
         ]
-      )} will start at ${bookings[0].startTime.toLocaleString("ja-JP", {
-        dateStyle: "medium",
-        timeStyle: "short",
-        hourCycle: "h23",
-      })}. Please check in at the in-store kiosk up to 5 minutes in advance.`,
+      )} will start at {startTime}. Please check in at the in-store kiosk up to 5 minutes in advance.`,
+      startTime: bookings[0].startTime,
     });
   }
 });

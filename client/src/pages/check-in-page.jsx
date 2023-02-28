@@ -4,6 +4,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import InputError from "../components/input-error";
 import { useModal } from "../contexts/modal";
 import "../css/react-datepicker.scss";
+import { parseISO } from "date-fns";
+import { toLocaleString } from "../utils/dates";
 
 function CheckInPage() {
   const { setModalContent } = useModal();
@@ -97,6 +99,12 @@ function CheckInPage() {
               const { error, message, bookings } = await response.json();
 
               if (!response.ok) {
+                const startTime = error?.details?.bookings?.[0].startTime;
+
+                error.message = error.message.replace(
+                  "{startTime}",
+                  toLocaleString(startTime)
+                );
                 throw error;
               }
 
@@ -121,7 +129,16 @@ function CheckInPage() {
                 }, Date.parse(bookings[0].startTime) - new Date() + 5000);
               }
 
-              setModalContent(message);
+              setModalContent(
+                message
+                  .replace(
+                    "{verb}",
+                    bookings[0].startTime < new Date()
+                      ? "started"
+                      : "will start"
+                  )
+                  .replace("{startTime}", toLocaleString(bookings[0].startTime))
+              );
 
               setBooking({
                 firstName: "",

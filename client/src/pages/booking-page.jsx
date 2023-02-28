@@ -15,6 +15,7 @@ import { FaRegCalendar, FaRegClock } from "react-icons/fa";
 import InputError from "../components/input-error";
 import { useModal } from "../contexts/modal";
 import "../css/react-datepicker.scss";
+import { toLocaleString } from "../utils/dates";
 import { DEFAULT_BOOKING_DATA, SANDBOX_MODE } from "../utils/sandbox";
 
 registerLocale("ja", ja);
@@ -416,7 +417,7 @@ export default function BookingPage() {
                     const result = await new Promise((resolve, reject) => {
                       setTimeout(async () => {
                         const response = await fetch(`/api/checkout/${id}`);
-                        const { error, message, isComplete } =
+                        const { error, message, isComplete, startTime } =
                           await response.json();
                         // NOTE: May receive 304, which is considered "not OK"
                         // if (!response.ok) {
@@ -426,7 +427,12 @@ export default function BookingPage() {
                         }
 
                         if (isComplete) {
-                          setModalContent(message);
+                          setModalContent(
+                            message.replace(
+                              "{startTime}",
+                              toLocaleString(startTime)
+                            )
+                          );
                           return resolve(true);
                         }
                         resolve();
