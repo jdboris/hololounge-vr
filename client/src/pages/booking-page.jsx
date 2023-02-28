@@ -643,6 +643,20 @@ export default function BookingPage() {
                   <span>...</span>
                 )}
               </label>
+              <label>
+                Total
+                {formData.bookingStations.length ? (
+                  <span>
+                    ¥
+                    {formData.bookingStations.reduce(
+                      (total, bs) => total + Number(bs.experiencePrice.price),
+                      0
+                    )}
+                  </span>
+                ) : (
+                  <span>...</span>
+                )}
+              </label>
               <InputError message={error?.details?.bookingStations} />
               <fieldset disabled={isLoading}>
                 <div className={theme.h3}>Contact Information</div>
