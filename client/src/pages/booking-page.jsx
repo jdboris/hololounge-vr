@@ -18,7 +18,11 @@ import InputError from "../components/input-error";
 import { useModal } from "../contexts/modal";
 import "../css/react-datepicker.scss";
 import { toLocaleString } from "../utils/dates";
-import { DEFAULT_BOOKING_DATA, SANDBOX_MODE } from "../utils/sandbox";
+import useDebounced from "../hooks/debounced";
+import { SANDBOX_BOOKING_DATA, SANDBOX_MODE } from "../utils/sandbox";
+import { useScrollRouting } from "../contexts/scroll-routing";
+import { useLocation } from "react-router-dom";
+import useTimer from "../hooks/timer";
 
 registerLocale("ja", ja);
 
@@ -64,6 +68,8 @@ export default function BookingPage() {
   const { setModalContent } = useModal();
   const [error, setError] = useState();
   const [isLoading, setIsLoading] = useState(false);
+  const { navigate, root } = useScrollRouting();
+  const url = useLocation();
 
   const [now, setNow] = useState(new Date());
   /**
@@ -93,22 +99,42 @@ export default function BookingPage() {
     [allLocations]
   );
 
+  const DEFAULT_FORM_DATA = {
+    bookingStations: [],
+    startTime: now,
+    birthday: null,
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+  };
+
   /**
    * @type {[Booking, Function]}
    */
   const [formData, setBooking] = useState(
-    SANDBOX_MODE
-      ? DEFAULT_BOOKING_DATA
-      : {
-          bookingStations: [],
-          startTime: now,
-          birthday: null,
-          firstName: "",
-          lastName: "",
-          email: "",
-          phone: "",
-        }
+    SANDBOX_MODE ? { ...SANDBOX_BOOKING_DATA } : { ...DEFAULT_FORM_DATA }
   );
+
+  // Reset the forms and scroll to top 5 minutes after last navigation...
+  const [isTimeUp, restartTimer] = useTimer(minutesToMilliseconds(5));
+
+  useEffect(() => {
+    if (root != "/pos") return;
+
+    restartTimer();
+  }, [url.pathname]);
+
+  useEffect(() => {
+    if (root != "/pos") return;
+
+    if (url.pathname != root) {
+      setBooking({ ...DEFAULT_FORM_DATA });
+      // NOTE: Call the setter to clamp/round
+      setStartTime(now);
+      navigate(root);
+    }
+  }, [isTimeUp]);
 
   const [booking, dtoError] = useMemo(() => {
     try {
@@ -395,15 +421,7 @@ export default function BookingPage() {
               }
 
               if (!SANDBOX_MODE) {
-                setBooking({
-                  bookingStations: [],
-                  startTime: now,
-                  birthday: null,
-                  firstName: "",
-                  lastName: "",
-                  email: "",
-                  phone: "",
-                });
+                setBooking({ ...DEFAULT_FORM_DATA });
                 // NOTE: Call the setter to clamp/round
                 setStartTime(now);
               }

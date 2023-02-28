@@ -2,8 +2,7 @@ import theme from "@jdboris/css-themes/space-station";
 import { useState } from "react";
 import { FaRegEnvelope } from "react-icons/fa";
 import { MdPassword } from "react-icons/md";
-import { AiOutlineExclamationCircle } from "react-icons/ai";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import InputError from "./input-error";
 
 function UserForm({

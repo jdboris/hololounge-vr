@@ -1,5 +1,5 @@
 export const SANDBOX_MODE = false;
-export const DEFAULT_BOOKING_DATA = {
+export const SANDBOX_BOOKING_DATA = {
   bookingStations: [],
   startTime: new Date(),
   birthday: new Date(1990, 1, 1),
