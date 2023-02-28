@@ -2,9 +2,11 @@ import theme from "@jdboris/css-themes/space-station";
 import {
   addMinutes,
   areIntervalsOverlapping,
-  subYears,
+  isValid,
   minutesToMilliseconds,
+  parse,
   subMinutes,
+  subYears,
 } from "date-fns";
 import ja from "date-fns/locale/ja";
 import Booking from "dtos/booking";
@@ -53,7 +55,7 @@ const stationCoords = [
 const CustomInput = forwardRef(({ label, error, ...props }, ref) => (
   <label>
     {error && <InputError message={error} />}
-    <input {...props} type="text" ref={ref} placeholder=" " />
+    <input type="text" ref={ref} placeholder=" " {...props} />
     {label && <small>{label}</small>}
   </label>
 ));
@@ -320,19 +322,21 @@ export default function BookingPage() {
     }));
   }
 
+  async function getBookings() {
+    try {
+      setAllBookings(
+        (await (await fetch(`/api/bookings/upcoming`)).json()).map(
+          (x) => new Booking(x)
+        )
+      );
+    } catch (error) {
+      console.error(error);
+      console.error(error.details);
+    }
+  }
+
   useEffect(() => {
-    (async () => {
-      try {
-        setAllBookings(
-          (await (await fetch(`/api/bookings/upcoming`)).json()).map(
-            (x) => new Booking(x)
-          )
-        );
-      } catch (error) {
-        console.error(error);
-        console.error(error.details);
-      }
-    })();
+    getBookings();
 
     (async () => {
       try {
@@ -453,6 +457,7 @@ export default function BookingPage() {
               setError(error);
             }
 
+            getBookings();
             setIsLoading(false);
           }}
           onChange={(e) => {
@@ -483,6 +488,8 @@ export default function BookingPage() {
                   }
                   selected={formData.startTime}
                   onChange={(date) => {
+                    if (!date || !(date instanceof Date)) return;
+
                     // Bypass the clamping/rounding if this is setting a new day
                     if (date.getDate() != formData.startTime.getDate()) {
                       setBooking((old) => ({ ...old, startTime: date }));
@@ -507,6 +514,8 @@ export default function BookingPage() {
                   }
                   selected={formData.startTime}
                   onChange={(date) => {
+                    if (!date || !(date instanceof Date)) return;
+
                     // Bypass the clamping/rounding if this is setting a new day
                     if (date.getDate() != formData.startTime.getDate()) {
                       setBooking((old) => ({ ...old, startTime: date }));
@@ -690,14 +699,28 @@ export default function BookingPage() {
                     customInput={
                       <CustomInput
                         className={theme.alt}
-                        label={"Date of Birth (YYYY-MM-DD)"}
+                        label={"Date of Birth (YYYY/MM/DD)"}
                         error={error?.details?.birthday}
                       />
                     }
                     name="birthday"
                     selected={formData.birthday}
-                    onChange={(date) => {
-                      setBooking((old) => ({ ...old, birthday: date }));
+                    onChangeRaw={(e) => {
+                      e.stopPropagation();
+
+                      const date = parse(
+                        e.target.value,
+                        "yyyy/MM/dd",
+                        new Date()
+                      );
+                      if (!isValid(date)) {
+                        return;
+                      }
+
+                      setBooking((old) => ({
+                        ...old,
+                        birthday: date,
+                      }));
                     }}
                     onBlur={(e) => showError(e.target.name)}
                     locale="ja"
