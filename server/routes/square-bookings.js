@@ -55,8 +55,6 @@ async function handleRequest(req, res, type) {
     },
   } = req.body;
 
-  console.log("TYPE: ", type);
-
   if (
     (type != "payment.updated" && type != "terminal.checkout.updated") ||
     (payment || checkout).status != "COMPLETED"
@@ -68,11 +66,6 @@ async function handleRequest(req, res, type) {
   const orderId =
     (type == "payment.updated" && payment.order_id) ||
     (type == "terminal.checkout.updated" && checkout.id);
-
-  if (type == "terminal.checkout.updated") {
-    console.log("orderId: ", orderId);
-    console.log("body: ", req.body);
-  }
 
   if (!orderId) {
     throw new Error("Webhook request type valid, but no provided ID.");
