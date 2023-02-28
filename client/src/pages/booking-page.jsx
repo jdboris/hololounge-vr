@@ -755,6 +755,12 @@ export default function BookingPage() {
                         birthday: date,
                       }));
                     }}
+                    onChange={(value) => {
+                      setBooking((old) => ({
+                        ...old,
+                        birthday: value,
+                      }));
+                    }}
                     onBlur={(e) => showError(e.target.name)}
                     locale="ja"
                     dateFormat="yyyy/MM/dd"
