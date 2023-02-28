@@ -39,12 +39,95 @@
     top: 1rem;
     padding-top: 0.7em;
     left: 1.4rem;
+    background: none;
+    width: 32px;
   }
 
   .react-datepicker__navigation--next {
     top: 1rem;
     padding-top: 0.7em;
     right: 1.4rem;
+    background: none;
+    width: 32px;
+  }
+
+  .react-datepicker__current-month--hasMonthDropdown,
+  .react-datepicker__current-month--hasYearDropdown {
+    display: none;
+  }
+
+  .react-datepicker__month-dropdown-container,
+  .react-datepicker__year-dropdown-container {
+    position: relative;
+  }
+
+  .react-datepicker__month-dropdown,
+  .react-datepicker__year-dropdown {
+    background-color: #110e14;
+    color: white;
+    font-family: inherit;
+    letter-spacing: 1px;
+    border: none;
+    padding: 1rem;
+    width: auto;
+    top: 1.4em;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 8em;
+    border: 1px solid;
+
+    .react-datepicker__month-option,
+    .react-datepicker__year-option {
+      border-radius: 0;
+      letter-spacing: 2px;
+      padding: 0.2em 0.6em;
+
+      &:hover {
+        background-color: rgb(18, 18, 18);
+      }
+    }
+
+    .react-datepicker__month-option--selected_month,
+    .react-datepicker__year-option--selected_year {
+      background-color: #0075ff;
+
+      span {
+        display: none;
+      }
+
+      &:hover {
+        background-color: #0075ff;
+      }
+    }
+  }
+
+  /* Dropdown arrows */
+  .react-datepicker__navigation--years {
+    background: none;
+    line-height: 1.7rem;
+    text-align: center;
+    cursor: pointer;
+    padding: 0;
+    border: 0.45rem solid transparent;
+    z-index: 1;
+    height: 10px;
+    width: 10px;
+    text-indent: -999em;
+    overflow: hidden;
+    position: relative;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .react-datepicker__navigation--years.react-datepicker__navigation--years-upcoming {
+    top: -4px;
+    border-bottom-color: #ccc;
+  }
+
+  .react-datepicker__navigation--years.react-datepicker__navigation--years-previous {
+    top: 4px;
+    border-top-color: #ccc;
   }
 
   .react-datepicker__month {

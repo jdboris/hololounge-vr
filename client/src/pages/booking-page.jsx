@@ -2,7 +2,7 @@ import theme from "@jdboris/css-themes/space-station";
 import {
   addMinutes,
   areIntervalsOverlapping,
-  format,
+  subYears,
   minutesToMilliseconds,
   subMinutes,
 } from "date-fns";
@@ -50,9 +50,11 @@ const stationCoords = [
   },
 ];
 
-const CustomInput = forwardRef(({ label, ...props }, ref) => (
+const CustomInput = forwardRef(({ label, error, ...props }, ref) => (
   <label>
+    {error && <InputError message={error} />}
     <input {...props} type="text" ref={ref} placeholder=" " />
+    {label && <small>{label}</small>}
   </label>
 ));
 
@@ -684,20 +686,28 @@ export default function BookingPage() {
                   <small>Phone</small>
                 </label>
                 <label>
-                  <InputError message={error?.details?.birthday} />
-                  <input
-                    className={theme.alt}
-                    type="date"
-                    name="birthday"
-                    value={
-                      formData.birthday
-                        ? format(formData.birthday, "yyyy-MM-dd")
-                        : ""
+                  <ReactDatePicker
+                    customInput={
+                      <CustomInput
+                        className={theme.alt}
+                        label={"Date of Birth (YYYY-MM-DD)"}
+                        error={error?.details?.birthday}
+                      />
                     }
-                    placeholder=" "
+                    name="birthday"
+                    selected={formData.birthday}
+                    onChange={(date) => {
+                      setBooking((old) => ({ ...old, birthday: date }));
+                    }}
                     onBlur={(e) => showError(e.target.name)}
+                    locale="ja"
+                    dateFormat="yyyy/MM/dd"
+                    maxDate={subYears(now, 13)}
+                    showMonthDropdown
+                    showYearDropdown
+                    yearDropdownItemNumber={110}
+                    scrollableYearDropdown
                   />
-                  <small>Date of Birth</small>
                 </label>
 
                 <InputError message={error?.message} />
