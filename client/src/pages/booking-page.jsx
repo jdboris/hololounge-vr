@@ -410,7 +410,7 @@ export default function BookingPage() {
                 setModalContent(message, { canClose: false });
 
                 // TODO: Clear these timeouts in a useEffect cleanup
-                await (async () => {
+                const result = await (async () => {
                   const LIMIT = 40;
                   for (let i = 0; i < LIMIT; i++) {
                     const result = await new Promise((resolve, reject) => {
@@ -433,11 +433,13 @@ export default function BookingPage() {
                       }, 3000);
                     });
 
-                    if (result) return;
+                    if (result) return result;
                   }
                 })();
 
-                setModalContent(null);
+                if (!result) {
+                  setModalContent(null);
+                }
               }
             } catch (error) {
               setError(error);
