@@ -1,16 +1,18 @@
 import theme from "@jdboris/css-themes/space-station";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import { useLocation } from "react-router-dom";
 import InputError from "../components/input-error";
 import { useModal } from "../contexts/modal";
 import "../css/react-datepicker.scss";
-import { parseISO } from "date-fns";
 import { toLocaleString } from "../utils/dates";
 
 function CheckInPage() {
   const { setModalContent } = useModal();
   const [error, setError] = useState({ details: {} });
   const [isLoading, setIsLoading] = useState(false);
+  const location = useLocation();
+
   /**
    * @type {[{firstName: string, lastName: string, email: string}, Function]}
    */
@@ -18,6 +20,14 @@ function CheckInPage() {
     firstName: "",
     lastName: "",
   });
+
+  // Reset form after every navigation
+  useEffect(() => {
+    setBooking({
+      firstName: "",
+      lastName: "",
+    });
+  }, [location.pathname]);
 
   const [booking, dtoError] = useMemo(() => {
     try {
