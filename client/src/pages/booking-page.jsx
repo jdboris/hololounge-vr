@@ -122,6 +122,10 @@ export default function BookingPage() {
   useEffect(() => {
     if (root != "/pos") return;
 
+    setBooking({ ...DEFAULT_FORM_DATA });
+    // NOTE: Call the setter to clamp/round
+    setStartTime(now);
+
     restartTimer();
   }, [url.pathname]);
 
@@ -129,9 +133,6 @@ export default function BookingPage() {
     if (root != "/pos") return;
 
     if (url.pathname != root) {
-      setBooking({ ...DEFAULT_FORM_DATA });
-      // NOTE: Call the setter to clamp/round
-      setStartTime(now);
       navigate(root);
     }
   }, [isTimeUp]);
