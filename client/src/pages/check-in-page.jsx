@@ -6,6 +6,7 @@ import InputError from "../components/input-error";
 import { useModal } from "../contexts/modal";
 import "../css/react-datepicker.scss";
 import { toLocaleString } from "../utils/dates";
+import { FaCheck, FaCheckCircle } from "react-icons/fa";
 
 function CheckInPage() {
   const { setModalContent } = useModal();
@@ -115,6 +116,7 @@ function CheckInPage() {
                   "{startTime}",
                   toLocaleString(startTime)
                 );
+
                 throw error;
               }
 
@@ -140,14 +142,20 @@ function CheckInPage() {
               }
 
               setModalContent(
-                message
-                  .replace(
-                    "{verb}",
-                    bookings[0].startTime < new Date()
-                      ? "started"
-                      : "will start"
-                  )
-                  .replace("{startTime}", toLocaleString(bookings[0].startTime))
+                <>
+                  {message} You are now checked in at these stations. Your
+                  experience(s) will start automatically.
+                  {bookings
+                    .map(({ stations, startTime }) =>
+                      stations.map((s) => (
+                        <div>
+                          <FaCheck className={theme.green} /> {s.name} (
+                          {toLocaleString(startTime)})
+                        </div>
+                      ))
+                    )
+                    .flat()}
+                </>
               );
 
               setBooking({

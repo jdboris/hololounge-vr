@@ -120,6 +120,11 @@ const Booking = sequelize.define("bookings", {
     allowNull: false,
   },
 
+  isCanceled: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
+
   isCheckedIn: {
     type: DataTypes.BOOLEAN,
     allowNull: false,

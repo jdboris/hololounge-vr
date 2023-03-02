@@ -19,6 +19,11 @@ export default class BookingDto {
   /**
    * @type {boolean}
    */
+  isCanceled;
+
+  /**
+   * @type {boolean}
+   */
   isCheckedIn;
 
   /**

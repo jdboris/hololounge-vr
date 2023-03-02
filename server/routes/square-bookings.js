@@ -55,10 +55,7 @@ async function handleRequest(req, res, type) {
     },
   } = req.body;
 
-  if (
-    (type != "payment.updated" && type != "terminal.checkout.updated") ||
-    (payment || checkout).status != "COMPLETED"
-  ) {
+  if (type != "payment.updated" && type != "terminal.checkout.updated") {
     res.json({ success: true });
     return;
   }
@@ -69,6 +66,26 @@ async function handleRequest(req, res, type) {
 
   if (!orderId) {
     throw new Error("Webhook request type valid, but no provided ID.");
+  }
+
+  if ((payment || checkout).status == "CANCELED") {
+    res.json({ success: true });
+    Booking.update(
+      {
+        isCanceled: true,
+      },
+      {
+        where: {
+          squareOrderId: orderId,
+        },
+      }
+    );
+    return;
+  }
+
+  if ((payment || checkout).status != "COMPLETED") {
+    res.json({ success: true });
+    return;
   }
 
   // NOTE: Catch ANY ERROR then REFUND/CANCEL

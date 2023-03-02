@@ -82,9 +82,11 @@ bookingRouter.post("/check-in", async (req, res) => {
     throw new HttpError("No upcoming reservations found under that name.", 404);
   }
 
-  const soonBookings = bookings.filter(
-    (b) => b.startTime < addMinutes(new Date(), 5)
-  );
+  const soonBookings = bookings;
+
+  // const soonBookings = bookings.filter(
+  //   (b) => b.startTime < addMinutes(new Date(), 5)
+  // );
 
   if (!soonBookings.length) {
     throw new HttpError(
@@ -94,15 +96,9 @@ bookingRouter.post("/check-in", async (req, res) => {
     );
   }
 
-  // NOTE: Assuming all the bookings start at the same time, because
-  //       soonBookings only includes bookings that start in the next 5 minutes.
   res.json({
-    message: `Check-in complete! Your experience(s) at ${list([
-      ...new Set(
-        soonBookings.map(({ stations }) => stations.map((s) => s.name)).flat()
-      ),
-    ])} {verb} at {startTime}`,
-    bookings,
+    message: `Check-in complete!`,
+    bookings: soonBookings,
   });
 });
 

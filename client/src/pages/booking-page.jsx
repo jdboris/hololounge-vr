@@ -14,15 +14,14 @@ import { forwardRef, useEffect, useMemo, useState } from "react";
 import ReactDatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaRegCalendar, FaRegClock } from "react-icons/fa";
+import { useLocation } from "react-router-dom";
 import InputError from "../components/input-error";
 import { useModal } from "../contexts/modal";
-import "../css/react-datepicker.scss";
-import { toLocaleString } from "../utils/dates";
-import useDebounced from "../hooks/debounced";
-import { SANDBOX_BOOKING_DATA, SANDBOX_MODE } from "../utils/sandbox";
 import { useScrollRouting } from "../contexts/scroll-routing";
-import { useLocation } from "react-router-dom";
+import "../css/react-datepicker.scss";
 import useTimer from "../hooks/timer";
+import { toLocaleString } from "../utils/dates";
+import { SANDBOX_BOOKING_DATA, SANDBOX_MODE } from "../utils/sandbox";
 
 registerLocale("ja", ja);
 
@@ -99,22 +98,22 @@ export default function BookingPage() {
     [allLocations]
   );
 
-  const DEFAULT_FORM_DATA = {
-    bookingStations: [],
-    startTime: now,
-    birthday: null,
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-  };
+  const DEFAULT_FORM_DATA = SANDBOX_MODE
+    ? { ...SANDBOX_BOOKING_DATA }
+    : {
+        bookingStations: [],
+        startTime: now,
+        birthday: null,
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+      };
 
   /**
    * @type {[Booking, Function]}
    */
-  const [formData, setBooking] = useState(
-    SANDBOX_MODE ? { ...SANDBOX_BOOKING_DATA } : { ...DEFAULT_FORM_DATA }
-  );
+  const [formData, setBooking] = useState({ ...DEFAULT_FORM_DATA });
 
   // Reset the forms and scroll to top 5 minutes after last navigation...
   const [isTimeUp, restartTimer] = useTimer(minutesToMilliseconds(5));
@@ -442,8 +441,13 @@ export default function BookingPage() {
                     const result = await new Promise((resolve, reject) => {
                       setTimeout(async () => {
                         const response = await fetch(`/api/checkout/${id}`);
-                        const { error, message, isComplete, startTime } =
-                          await response.json();
+                        const {
+                          error,
+                          message,
+                          isComplete,
+                          isCanceled,
+                          startTime,
+                        } = await response.json();
                         // NOTE: May receive 304, which is considered "not OK"
                         // if (!response.ok) {
                         if (error) {
@@ -460,17 +464,24 @@ export default function BookingPage() {
                           );
                           return resolve(true);
                         }
-                        resolve();
+
+                        if (isCanceled) {
+                          return resolve(false);
+                        }
+
+                        resolve(null);
                       }, 3000);
                     });
 
-                    if (result) return result;
+                    if (result !== null) return result;
                   }
                 })();
 
                 if (!result) {
                   setModalContent(null);
                 }
+
+                navigate(root);
               }
             } catch (error) {
               setError(error);

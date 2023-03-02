@@ -20,7 +20,9 @@ checkoutRouter.get("/:id", async (req, res) => {
     include: ["stations"],
   });
 
-  if (bookings.find((b) => !b.isComplete)) {
+  if (bookings.find((b) => b.isCanceled)) {
+    res.json({ isCanceled: true });
+  } else if (bookings.find((b) => !b.isComplete)) {
     res.json({ isComplete: false });
   } else {
     res.json({
@@ -101,6 +103,7 @@ checkoutRouter.post("/", async (req, res) => {
             phone,
             locationId: bs.location.id,
             isComplete: false,
+            isCanceled: false,
             isCheckedIn: false,
             squareOrderId: orderId,
             bookingStations: [
