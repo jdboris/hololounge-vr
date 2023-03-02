@@ -70,16 +70,17 @@ function TagForm({
             placeholder="Tag"
             value={tag.name || ""}
             onChange={(e) => {
-              if (!e.target.value.toLocaleLowerCase().match(/^[a-z-/]*$/)) {
-                errorDetail({
-                  name: "Tag may only contain letters and '-', or '/'.",
-                });
-                return;
-              }
+              // if (!e.target.value.toLocaleLowerCase().match(/^[a-z-/]*$/)) {
+              //   errorDetail({
+              //     name: "Tag may only contain letters and '-', or '/'.",
+              //   });
+              //   return;
+              // }
 
               setTag((old) => ({
                 ...old,
-                name: e.target.value.toLocaleLowerCase(),
+                // name: e.target.value.toLocaleLowerCase(),
+                name: e.target.value,
               }));
               errorDetail({ name: null });
             }}

@@ -21,13 +21,13 @@ const Tag = sequelize.define("tags", {
       notEmpty: {
         msg: `Tag is a required field.`,
       },
-      isLowercase: {
-        msg: `Tag must be all lowercase.`,
-      },
-      is: {
-        args: /^[a-z-/]+$/,
-        msg: "Tag may only contain letters and '-', or '/'.",
-      },
+      // isLowercase: {
+      //   msg: `Tag must be all lowercase.`,
+      // },
+      // is: {
+      //   args: /^[a-z-/]+$/,
+      //   msg: "Tag may only contain letters and '-', or '/'.",
+      // },
     },
   },
 });
