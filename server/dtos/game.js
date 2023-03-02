@@ -27,7 +27,7 @@ export default class GameDto {
 
     if (this.playerMaximum > 1) {
       if (!this.hasLocalMultiplayer && !this.hasOnlineMultiplayer) {
-        this.hasLocalMultiplayer = this;
+        this.hasLocalMultiplayer = true;
       }
     }
 
