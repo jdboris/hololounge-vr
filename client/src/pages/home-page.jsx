@@ -46,8 +46,8 @@ function HomePage() {
       >
         <strong>Casual VR Fun</strong>
         <small>Try something new. Stay a while.</small>
-        <PwaInstallButton />
         <BookNowButton />
+        <PwaInstallButton />
 
         <button
           onClick={(e) => {
@@ -58,37 +58,39 @@ function HomePage() {
         </button>
       </div>
       <section>
-        <header>
-          <h1>Games</h1>
-        </header>
-        <main>
-          <section>
-            <main>
-              <ul>
-                {games?.map((game) => (
-                  <li key={`game-${game.id}`}>
-                    <GameForm
-                      mode="read"
-                      game={game}
-                      error={gameError}
-                      setError={setGameError}
-                      isLoading={isLoadingGames}
-                      saveGame={saveGame}
-                      onUpdate={async () =>
-                        setGames((await getGames()) || games)
-                      }
-                    />
-                  </li>
-                ))}
-                <li></li>
-                <li></li>
-                <li></li>
-                <li></li>
-                <li></li>
-              </ul>
-            </main>
-          </section>
-        </main>
+        <div className={theme.gamePage}>
+          <header>
+            <h1>Games</h1>
+          </header>
+          <main>
+            <section>
+              <main>
+                <ul>
+                  {games?.map((game) => (
+                    <li key={`game-${game.id}`}>
+                      <GameForm
+                        mode="read"
+                        game={game}
+                        error={gameError}
+                        setError={setGameError}
+                        isLoading={isLoadingGames}
+                        saveGame={saveGame}
+                        onUpdate={async () =>
+                          setGames((await getGames()) || games)
+                        }
+                      />
+                    </li>
+                  ))}
+                  <li></li>
+                  <li></li>
+                  <li></li>
+                  <li></li>
+                  <li></li>
+                </ul>
+              </main>
+            </section>
+          </main>
+        </div>
       </section>
       <section ref={locationSectionRef}>
         <LocationPage />
