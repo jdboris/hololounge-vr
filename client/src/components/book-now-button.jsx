@@ -10,7 +10,7 @@ function BookNowButton({ root = "" }) {
       to={root + "/booking"}
       onClick={(e) => e.preventDefault() || navigate(root + "/booking")}
     >
-      Book Now
+      BOOK NOW
     </Link>
   );
 }

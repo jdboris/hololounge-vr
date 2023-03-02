@@ -4,6 +4,7 @@ import Footer from "./components/footer";
 import Header from "./components/header";
 import { AuthProvider } from "./contexts/auth";
 import { GameProvider } from "./contexts/games";
+import { Localizationprovider } from "./contexts/localization";
 import { ModalProvider } from "./contexts/modal";
 import { ScrollRoutingProvider } from "./contexts/scroll-routing";
 import { TagProvider } from "./contexts/tags";
@@ -19,35 +20,37 @@ function App() {
       <AuthProvider>
         <TagProvider>
           <GameProvider>
-            <div className={theme.root}>
-              <ModalProvider>
-                <ScrollRoutingProvider roots={["/pos", "/"]}>
-                  <Header></Header>
+            <Localizationprovider>
+              <div className={theme.root}>
+                <ModalProvider>
+                  <ScrollRoutingProvider roots={["/pos", "/"]}>
+                    <Header></Header>
 
-                  <Routes>
-                    <Route path="/login" element={<LoginPage />}></Route>
-                    <Route path="/signup" element={<SignupPage />}></Route>
-                    <Route
-                      path="/games"
-                      element={
-                        <main>
-                          <GamePage />
-                        </main>
-                      }
-                    ></Route>
+                    <Routes>
+                      <Route path="/login" element={<LoginPage />}></Route>
+                      <Route path="/signup" element={<SignupPage />}></Route>
+                      <Route
+                        path="/games"
+                        element={
+                          <main>
+                            <GamePage />
+                          </main>
+                        }
+                      ></Route>
 
-                    <Route
-                      path="/pos/*"
-                      element={<PosPage path="/pos" />}
-                    ></Route>
+                      <Route
+                        path="/pos/*"
+                        element={<PosPage path="/pos" />}
+                      ></Route>
 
-                    <Route path="/*" element={<HomePage />}></Route>
-                  </Routes>
+                      <Route path="/*" element={<HomePage />}></Route>
+                    </Routes>
 
-                  <Footer></Footer>
-                </ScrollRoutingProvider>
-              </ModalProvider>
-            </div>
+                    <Footer></Footer>
+                  </ScrollRoutingProvider>
+                </ModalProvider>
+              </div>
+            </Localizationprovider>
           </GameProvider>
         </TagProvider>
       </AuthProvider>

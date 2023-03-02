@@ -6,8 +6,10 @@ import { MdLanguage } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/auth";
 import { useScrollRouting } from "../contexts/scroll-routing";
+import { useLocalization } from "../contexts/localization";
 
 function Header() {
+  const { language, setLanguage } = useLocalization();
   const location = useLocation();
   const { navigate, root } = useScrollRouting();
   const { currentUser, logout } = useAuth();
@@ -57,19 +59,25 @@ function Header() {
               <>
                 <li>
                   <Link to="/games">
-                    {isMenuOpen && <FaVrCardboard />} Games
+                    {isMenuOpen && <FaVrCardboard />}GAMES
                   </Link>
                 </li>
                 <li>
-                  <Link to="/account">{isMenuOpen && <FaUser />} Account</Link>
+                  <Link to="/account">{isMenuOpen && <FaUser />}ACCOUNT</Link>
                 </li>
               </>
             )}
 
             <li>
-              <button className={theme.alt}>
-                <MdLanguage /> English
-              </button>
+              {language == "EN" ? (
+                <button className={theme.alt} onClick={() => setLanguage("JP")}>
+                  <MdLanguage /> 日本語
+                </button>
+              ) : (
+                <button className={theme.alt} onClick={() => setLanguage("EN")}>
+                  <MdLanguage /> English
+                </button>
+              )}
             </li>
 
             {!location.pathname.startsWith("/pos") &&
@@ -77,13 +85,13 @@ function Header() {
               (currentUser ? (
                 <>
                   <li>
-                    <button onClick={logout}>Logout</button>
+                    <button onClick={logout}>LOGOUT</button>
                   </li>
                 </>
               ) : (
                 <li>
                   <Link className={theme.button} to="/login">
-                    Login
+                    LOGIN
                   </Link>
                 </li>
               ))}

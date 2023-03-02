@@ -1,10 +1,9 @@
 import theme from "@jdboris/css-themes/space-station";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { FaChevronDown, FaRegCalendar } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 import BookNowButton from "../components/book-now-button";
 import PwaInstallButton from "../components/pwa-install-button";
-import { useGames } from "../contexts/games";
 import { useScrollRouting } from "../contexts/scroll-routing";
 import BookingPage from "./booking-page";
 import GamePage from "./game-page";
@@ -59,7 +58,7 @@ function HomePage() {
           className={[theme.button, theme.fixedButton, theme.blue].join(" ")}
           onClick={(e) => e.preventDefault() || navigate("/booking")}
         >
-          <FaRegCalendar /> Book Now
+          <FaRegCalendar /> BOOK NOW
         </Link>
       )}
     </main>

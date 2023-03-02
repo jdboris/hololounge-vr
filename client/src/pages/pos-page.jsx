@@ -43,7 +43,7 @@ function PosPage() {
           className={[theme.button, theme.fixedButton, theme.blue].join(" ")}
           onClick={(e) => e.preventDefault() || navigate("/pos/booking")}
         >
-          <FaRegCalendar /> Book Now
+          <FaRegCalendar /> BOOK NOW
         </Link>
       )}
 
@@ -53,7 +53,7 @@ function PosPage() {
           className={[theme.button, theme.fixedButton, theme.orange].join(" ")}
           onClick={(e) => e.preventDefault() || navigate("/pos/check-in")}
         >
-          <FaLocationArrow /> Check In Now
+          <FaLocationArrow /> CHECK IN NOW
         </Link>
       )}
     </main>

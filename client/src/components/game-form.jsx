@@ -315,11 +315,11 @@ function GameForm({
 
           {mode == "read" && currentUser?.isAdmin && (
             <button onClick={(e) => e.preventDefault() || setMode("update")}>
-              Edit
+              EDIT
             </button>
           )}
 
-          {(mode == "create" || mode == "update") && <button>Save</button>}
+          {(mode == "create" || mode == "update") && <button>SAVE</button>}
         </main>
       )}
     </form>

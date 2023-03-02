@@ -136,7 +136,7 @@ function UserForm({
           </Link>
         )}
         <button>
-          {mode === "login" && "Login"} {mode === "signup" && "Signup"}
+          {mode === "login" && "LOGIN"} {mode === "signup" && "SIGNUP"}
         </button>
       </fieldset>
     </form>

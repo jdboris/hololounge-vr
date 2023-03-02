@@ -51,7 +51,7 @@ function PwaInstallButton() {
         }
       }}
     >
-      Install The App
+      INSTALL THE APP
     </button>
   );
 }

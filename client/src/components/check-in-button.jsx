@@ -10,7 +10,7 @@ function CheckInButton({ root = "" }) {
       to={root + "/check-in"}
       onClick={(e) => e.preventDefault() || navigate(root + "/check-in")}
     >
-      Check In Now
+      CHECK IN NOW
     </Link>
   );
 }

@@ -628,7 +628,8 @@ export default function BookingPage() {
             <figure className={theme.map}>
               <figcaption>
                 <em>
-                  <FaInfoCircle /> Select station(s) to reserve.
+                  <FaInfoCircle />
+                  Select station(s) to reserve.
                 </em>
               </figcaption>
               <img src="/floor-map.png" alt="Floor Map" />
@@ -815,7 +816,7 @@ export default function BookingPage() {
                 </label>
 
                 <InputError message={error?.message} />
-                <button>Continue to Payment</button>
+                <button>CONTINUE TO PAYMENT</button>
               </fieldset>
             </aside>
           </main>

@@ -199,7 +199,7 @@ function CheckInPage() {
           </fieldset>
           <InputError message={error?.message} />
           <button disabled={isLoading} className={theme.orange}>
-            Check In
+            CHECK IN
           </button>
         </form>
       </main>

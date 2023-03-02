@@ -89,11 +89,11 @@ function TagForm({
 
         {mode === "read" && (
           <button onClick={(e) => e.preventDefault() || setMode("update")}>
-            Edit
+            EDIT
           </button>
         )}
-        {mode === "create" && <button>Add</button>}
-        {mode === "update" && <button>Save</button>}
+        {mode === "create" && <button>ADD</button>}
+        {mode === "update" && <button>SAVE</button>}
       </fieldset>
     </form>
   );
