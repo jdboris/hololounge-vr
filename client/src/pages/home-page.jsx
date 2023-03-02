@@ -8,6 +8,7 @@ import PwaInstallButton from "../components/pwa-install-button";
 import { useGames } from "../contexts/games";
 import { useScrollRouting } from "../contexts/scroll-routing";
 import BookingPage from "./booking-page";
+import GamePage from "./game-page";
 import LocationPage from "./location-page";
 
 function HomePage() {
@@ -58,39 +59,7 @@ function HomePage() {
         </button>
       </div>
       <section>
-        <div className={theme.gamePage}>
-          <header>
-            <h1>Games</h1>
-          </header>
-          <main>
-            <section>
-              <main>
-                <ul>
-                  {games?.map((game) => (
-                    <li key={`game-${game.id}`}>
-                      <GameForm
-                        mode="read"
-                        game={game}
-                        error={gameError}
-                        setError={setGameError}
-                        isLoading={isLoadingGames}
-                        saveGame={saveGame}
-                        onUpdate={async () =>
-                          setGames((await getGames()) || games)
-                        }
-                      />
-                    </li>
-                  ))}
-                  <li></li>
-                  <li></li>
-                  <li></li>
-                  <li></li>
-                  <li></li>
-                </ul>
-              </main>
-            </section>
-          </main>
-        </div>
+        <GamePage />
       </section>
       <section ref={locationSectionRef}>
         <LocationPage />

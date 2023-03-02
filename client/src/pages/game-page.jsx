@@ -49,88 +49,88 @@ function GamePage() {
   }, [debouncedFilters, games]);
 
   return (
-    <main>
-      <section>
-        <header>
-          <h1>Games</h1>
-        </header>
-        <main>
-          <ul className={theme.badges}>
-            {tags?.map((tag) => (
-              <li key={`tag-${tag.id}`}>
-                <label className={theme.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    checked={Boolean(
-                      filters.tagIds?.find((id) => id === tag.id)
-                    )}
-                    onChange={(e) =>
-                      setFilters((old) => {
-                        const copy = { ...old };
-                        const id = copy.tagIds?.find((id) => id === tag.id);
+    <section className={theme.gamePage}>
+      <header>
+        <h1>Games</h1>
+      </header>
+      <main>
+        <ul className={theme.badges}>
+          {tags?.map((tag) => (
+            <li key={`tag-${tag.id}`}>
+              <label className={theme.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={Boolean(filters.tagIds?.find((id) => id === tag.id))}
+                  onChange={(e) =>
+                    setFilters((old) => {
+                      const copy = { ...old };
+                      const id = copy.tagIds?.find((id) => id === tag.id);
 
-                        if (e.target.checked) {
-                          if (!id) {
-                            copy.tagIds.push(tag.id);
-                          }
-                        } else {
-                          copy.tagIds = copy.tagIds.filter(
-                            (tagId) => tagId != id
-                          );
+                      if (e.target.checked) {
+                        if (!id) {
+                          copy.tagIds.push(tag.id);
                         }
-                        return copy;
-                      })
-                    }
-                  />
-                  <span className={theme.badge}>{tag.name}</span>
-                </label>
-              </li>
-            ))}
-          </ul>
-          {currentUser?.isAdmin && (
-            <TagForm
-              mode="create"
-              error={error}
-              setError={setError}
-              isLoading={isLoading}
-              saveTag={saveTag}
-              onCreate={async () => setTags((await getTags()) || tags)}
-            />
-          )}
-
-          <ul>
-            {filteredGames?.map((game) => (
-              <li key={`game-${game.id}`}>
-                <GameForm
-                  mode="read"
-                  game={game}
-                  error={gameError}
-                  setError={setGameError}
-                  isLoading={isLoadingGames}
-                  saveGame={saveGame}
-                  onUpdate={async () => setGames((await getGames()) || games)}
-                  tags={tags}
-                  currentUser={currentUser}
+                      } else {
+                        copy.tagIds = copy.tagIds.filter(
+                          (tagId) => tagId != id
+                        );
+                      }
+                      return copy;
+                    })
+                  }
                 />
-              </li>
-            ))}
-            <li>
-              {currentUser?.isAdmin && (
-                <GameForm
-                  mode="create"
-                  error={gameError}
-                  setError={setGameError}
-                  isLoading={isLoadingGames}
-                  saveGame={saveGame}
-                  onCreate={async () => setGames((await getGames()) || games)}
-                  tags={tags}
-                />
-              )}
+                <span className={theme.badge}>{tag.name}</span>
+              </label>
             </li>
-          </ul>
-        </main>
-      </section>
-    </main>
+          ))}
+        </ul>
+        {currentUser?.isAdmin && (
+          <TagForm
+            mode="create"
+            error={error}
+            setError={setError}
+            isLoading={isLoading}
+            saveTag={saveTag}
+            onCreate={async () => setTags((await getTags()) || tags)}
+          />
+        )}
+
+        <ul className={theme.games}>
+          {filteredGames?.map((game) => (
+            <li key={`game-${game.id}`}>
+              <GameForm
+                mode="read"
+                game={game}
+                error={gameError}
+                setError={setGameError}
+                isLoading={isLoadingGames}
+                saveGame={saveGame}
+                onUpdate={async () => setGames((await getGames()) || games)}
+                tags={tags}
+                currentUser={currentUser}
+              />
+            </li>
+          ))}
+          <li>
+            {currentUser?.isAdmin && (
+              <GameForm
+                mode="create"
+                error={gameError}
+                setError={setGameError}
+                isLoading={isLoadingGames}
+                saveGame={saveGame}
+                onCreate={async () => setGames((await getGames()) || games)}
+                tags={tags}
+              />
+            )}
+          </li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
+      </main>
+    </section>
   );
 }
 

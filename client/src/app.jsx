@@ -27,7 +27,14 @@ function App() {
                   <Routes>
                     <Route path="/login" element={<LoginPage />}></Route>
                     <Route path="/signup" element={<SignupPage />}></Route>
-                    <Route path="/games" element={<GamePage />}></Route>
+                    <Route
+                      path="/games"
+                      element={
+                        <main>
+                          <GamePage />
+                        </main>
+                      }
+                    ></Route>
 
                     <Route
                       path="/pos/*"
