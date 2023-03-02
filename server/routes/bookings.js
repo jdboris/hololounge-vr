@@ -1,9 +1,8 @@
-import { addMinutes, subMinutes } from "date-fns";
+import { subMinutes } from "date-fns";
 import express from "express";
 import { col, fn, literal, Op } from "sequelize";
 import Booking from "../models/booking.js";
 import { HttpError } from "../utils/errors.js";
-import { list } from "../utils/localization.js";
 import {
   checkIn,
   login,
@@ -82,11 +81,9 @@ bookingRouter.post("/check-in", async (req, res) => {
     throw new HttpError("No upcoming reservations found under that name.", 404);
   }
 
-  const soonBookings = bookings;
-
-  // const soonBookings = bookings.filter(
-  //   (b) => b.startTime < addMinutes(new Date(), 5)
-  // );
+  const soonBookings = bookings.filter(
+    (b) => b.startTime < addMinutes(new Date(), 5)
+  );
 
   if (!soonBookings.length) {
     throw new HttpError(
@@ -97,7 +94,8 @@ bookingRouter.post("/check-in", async (req, res) => {
   }
 
   res.json({
-    message: `Check-in complete!`,
+    message: `Check-in complete! You are now checked in at these stations. Your
+    experience(s) will start automatically.`,
     bookings: soonBookings,
   });
 });

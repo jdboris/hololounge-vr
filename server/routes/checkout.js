@@ -27,14 +27,9 @@ checkoutRouter.get("/:id", async (req, res) => {
   } else {
     res.json({
       isComplete: true,
-      message: `Booking complete! You will receive a receipt and booking confirmation via email. Your experience(s) at ${list(
-        [
-          ...new Set(
-            bookings.map(({ stations }) => stations.map((s) => s.name)).flat()
-          ),
-        ]
-      )} will start at {startTime}. Please check in at the in-store kiosk up to 5 minutes in advance.`,
-      startTime: bookings[0].startTime,
+      message: `Booking complete! You will receive a receipt and booking confirmation via email. 
+                Please check in at the in-store kiosk up to 5 minutes in advance.`,
+      bookings,
     });
   }
 });

@@ -1,12 +1,12 @@
 import theme from "@jdboris/css-themes/space-station";
 import { useEffect, useMemo, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import { FaCheck } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
 import InputError from "../components/input-error";
 import { useModal } from "../contexts/modal";
 import "../css/react-datepicker.scss";
 import { toLocaleString } from "../utils/dates";
-import { FaCheck, FaCheckCircle } from "react-icons/fa";
 
 function CheckInPage() {
   const { setModalContent } = useModal();
@@ -143,18 +143,20 @@ function CheckInPage() {
 
               setModalContent(
                 <>
-                  {message} You are now checked in at these stations. Your
-                  experience(s) will start automatically.
-                  {bookings
-                    .map(({ stations, startTime }) =>
-                      stations.map((s) => (
-                        <div>
-                          <FaCheck className={theme.green} /> {s.name} (
-                          {toLocaleString(startTime)})
-                        </div>
-                      ))
-                    )
-                    .flat()}
+                  {message}
+
+                  <div>
+                    {bookings
+                      .map(({ stations, startTime }) =>
+                        stations.map((s) => (
+                          <div>
+                            <FaCheck className={theme.green} /> {s.name} (
+                            {toLocaleString(startTime)})
+                          </div>
+                        ))
+                      )
+                      .flat()}
+                  </div>
                 </>
               );
 

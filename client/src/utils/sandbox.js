@@ -1,4 +1,4 @@
-export const SANDBOX_MODE = true;
+export const SANDBOX_MODE = false;
 export const SANDBOX_BOOKING_DATA = {
   bookingStations: [],
   startTime: new Date(),

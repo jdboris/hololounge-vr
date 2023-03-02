@@ -13,7 +13,7 @@ import Booking from "dtos/booking";
 import { forwardRef, useEffect, useMemo, useState } from "react";
 import ReactDatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { FaRegCalendar, FaRegClock } from "react-icons/fa";
+import { FaCheck, FaRegCalendar, FaRegClock } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
 import InputError from "../components/input-error";
 import { useModal } from "../contexts/modal";
@@ -447,8 +447,9 @@ export default function BookingPage() {
                           isComplete,
                           isCanceled,
                           startTime,
+                          bookings,
                         } = await response.json();
-                        // NOTE: May receive 304, which is considered "not OK"
+                        // NOTE: May receive 304, which is considered "not OK" by response.ok
                         // if (!response.ok) {
                         if (error) {
                           setModalContent(error.message);
@@ -457,11 +458,24 @@ export default function BookingPage() {
 
                         if (isComplete) {
                           setModalContent(
-                            message.replace(
-                              "{startTime}",
-                              toLocaleString(startTime)
-                            )
+                            <>
+                              {message}
+
+                              <div>
+                                {bookings
+                                  .map(({ stations, startTime }) =>
+                                    stations.map((s) => (
+                                      <div>
+                                        <FaCheck className={theme.green} />{" "}
+                                        {s.name} ({toLocaleString(startTime)})
+                                      </div>
+                                    ))
+                                  )
+                                  .flat()}
+                              </div>
+                            </>
                           );
+
                           return resolve(true);
                         }
 
