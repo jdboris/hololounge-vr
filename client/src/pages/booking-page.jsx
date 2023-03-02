@@ -127,6 +127,7 @@ export default function BookingPage() {
   useEffect(() => {
     if (root != "/pos") return;
 
+    setError(null);
     setBooking({ ...DEFAULT_FORM_DATA });
     // NOTE: Call the setter to clamp/round
     setStartTime(now);
