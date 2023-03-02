@@ -1,5 +1,6 @@
 {
   "name": "server",
+  "homepage": "https://www.hololounge.jp/",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -20,6 +21,7 @@
     "google-auth-library": "^8.7.0",
     "jsonwebtoken": "^9.0.0",
     "mysql2": "^2.3.3",
+    "nocache": "^3.0.4",
     "sequelize": "^6.28.0",
     "uuid": "^9.0.0"
   },

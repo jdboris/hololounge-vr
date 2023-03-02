@@ -6,13 +6,11 @@ includes:
   - ./server/env.yaml
 
 handlers:
-  # Catch all handler to express app
-  - url: .*
-    secure: always
-    redirect_http_response_code: 301
+  - url: /static
+    static_dir: client/build/static
+  # Serve all static files with url ending with a file extension
+  - url: /(.*\..+)$
+    static_files: client/build/\1
+    upload: client/build/(.*\..+)$
+  - url: /.*
     script: auto
-  # # Serve all static files with url ending with a file extension
-  # - url: /.*
-  #   static_files: client/build/\1
-  #   upload: client/build/(.*\..+)$
-  #   secure: always

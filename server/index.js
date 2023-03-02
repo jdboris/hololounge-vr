@@ -2,6 +2,7 @@ import cookieParser from "cookie-parser";
 import * as dotenv from "dotenv";
 import express from "express";
 import path from "path";
+import nocache from "nocache";
 import { ValidationError } from "sequelize";
 import checkoutRouter from "./routes/checkout.js";
 import authRouter from "./routes/auth.js";
@@ -81,6 +82,8 @@ app.use("/api/checkout", checkoutRouter);
 app.use("/api/games", gameRouter);
 app.use("/api/locations", locationRouter);
 app.use("/api/bookings", bookingRouter);
+
+app.use(nocache());
 
 if (NODE_ENV !== "development") {
   // Serve the static files from the React app
