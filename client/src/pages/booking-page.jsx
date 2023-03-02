@@ -13,7 +13,13 @@ import Booking from "dtos/booking";
 import { forwardRef, useEffect, useMemo, useState } from "react";
 import ReactDatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { FaCheck, FaRegCalendar, FaRegClock } from "react-icons/fa";
+import {
+  FaCheck,
+  FaInfo,
+  FaInfoCircle,
+  FaRegCalendar,
+  FaRegClock,
+} from "react-icons/fa";
 import { useLocation } from "react-router-dom";
 import InputError from "../components/input-error";
 import { useModal } from "../contexts/modal";
@@ -43,14 +49,14 @@ const EXPERIENCE_DURATION = 60;
 const stationCoords = [
   {
     top: "1.4%",
-    right: "42.6%",
-    width: "20%",
+    left: "1.2%",
+    width: "31.6%",
     height: "30.9%",
   },
   {
     top: "1.4%",
-    right: "21.8%",
-    width: "20%",
+    left: "34.1%",
+    width: "31.6%",
     height: "30.9%",
   },
 ];
@@ -58,7 +64,7 @@ const stationCoords = [
 const CustomInput = forwardRef(({ label, error, ...props }, ref) => (
   <label>
     {error && <InputError message={error} />}
-    <input type="text" ref={ref} {...props} placeholder=" " />
+    <input type="text" ref={ref} placeholder=" " {...props} />
     {label && <small>{label}</small>}
   </label>
 ));
@@ -620,7 +626,9 @@ export default function BookingPage() {
           <main>
             <figure className={theme.map}>
               <figcaption>
-                <em>TIP: Select station(s) to reserve.</em>
+                <em>
+                  <FaInfoCircle /> Select station(s) to reserve.
+                </em>
               </figcaption>
               <img src="/floor-map.png" alt="Floor Map" />
 
@@ -649,61 +657,64 @@ export default function BookingPage() {
               ))}
             </figure>
             <aside>
-              <div className={theme.h3}>Reservation Details</div>
-              <label>
-                Date
-                <span>
-                  {formData.startTime.toLocaleDateString("ja-JP", {
-                    dateStyle: "medium",
-                  })}
-                </span>
-              </label>
-              <label>
-                Start Time
-                <span>
-                  {formData.startTime.toLocaleTimeString("ja-JP", {
-                    timeStyle: "short",
-                    hourCycle: "h23",
-                  })}
-                </span>
-              </label>
-              <label>
-                Duration
-                <span>
-                  {EXPERIENCE_DURATION} (+{interval}) minutes
-                </span>
-              </label>
-              <label>
-                Station(s)
-                {formData.bookingStations.length ? (
+              <div>
+                <div className={theme.h3}>Details</div>
+                <label>
+                  Date
                   <span>
-                    {formData.bookingStations
-                      .map(
-                        (bs) => stations.find((s) => s.id == bs.stationId).name
-                      )
-                      .join(", ")}
+                    {formData.startTime.toLocaleDateString("ja-JP", {
+                      dateStyle: "medium",
+                    })}
                   </span>
-                ) : (
-                  <span>...</span>
-                )}
-              </label>
-              <label>
-                Total
-                {formData.bookingStations.length ? (
+                </label>
+                <label>
+                  Start Time
                   <span>
-                    ¥
-                    {formData.bookingStations.reduce(
-                      (total, bs) => total + Number(bs.experiencePrice.price),
-                      0
-                    )}
+                    {formData.startTime.toLocaleTimeString("ja-JP", {
+                      timeStyle: "short",
+                      hourCycle: "h23",
+                    })}
                   </span>
-                ) : (
-                  <span>...</span>
-                )}
-              </label>
-              <InputError message={error?.details?.bookingStations} />
+                </label>
+                <label>
+                  Duration
+                  <span>
+                    {EXPERIENCE_DURATION} (+{interval}) min.
+                  </span>
+                </label>
+                <label>
+                  Station(s)
+                  {formData.bookingStations.length ? (
+                    <>
+                      {formData.bookingStations.map((bs, i, array) => (
+                        <span>
+                          {stations.find((s) => s.id == bs.stationId).name}
+                          {i < array.length - 1 && ", "}
+                        </span>
+                      ))}
+                    </>
+                  ) : (
+                    <span>...</span>
+                  )}
+                </label>
+                <label>
+                  Total
+                  {formData.bookingStations.length ? (
+                    <span>
+                      ¥
+                      {formData.bookingStations.reduce(
+                        (total, bs) => total + Number(bs.experiencePrice.price),
+                        0
+                      )}
+                    </span>
+                  ) : (
+                    <span>...</span>
+                  )}
+                </label>
+                <InputError message={error?.details?.bookingStations} />
+              </div>
               <fieldset disabled={isLoading}>
-                <div className={theme.h3}>Contact Information</div>
+                <div className={theme.h3}>Contact</div>
                 <label>
                   <InputError message={error?.details?.lastName} />
                   <input
@@ -757,10 +768,11 @@ export default function BookingPage() {
                     customInput={
                       <CustomInput
                         className={theme.alt}
-                        label={"Date of Birth (YYYY/MM/DD)"}
+                        label={"Date of Birth"}
                         error={error?.details?.birthday}
                       />
                     }
+                    placeholderText="YYYY/MM/DD"
                     name="birthday"
                     selected={formData.birthday}
                     onChangeRaw={(e) => {
