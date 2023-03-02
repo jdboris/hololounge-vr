@@ -195,6 +195,8 @@ function GameForm({
                               (tag) => tag.id != gameTag.id
                             );
                           }
+
+                          return copy;
                         })
                       }
                     />
