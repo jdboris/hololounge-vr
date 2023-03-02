@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import { FaChevronDown, FaRegCalendar } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 import BookNowButton from "../components/book-now-button";
-import GameForm from "../components/game-form";
 import PwaInstallButton from "../components/pwa-install-button";
 import { useGames } from "../contexts/games";
 import { useScrollRouting } from "../contexts/scroll-routing";
@@ -24,20 +23,6 @@ function HomePage() {
     () => addSection({ route: "/booking", ref: bookingSectionRef }),
     []
   );
-  const [games, setGames] = useState([]);
-  const {
-    saveGame,
-    getGames,
-    error: gameError,
-    setError: setGameError,
-    isLoading: isLoadingGames,
-  } = useGames();
-
-  useEffect(() => {
-    (async () => {
-      setGames((await getGames()) || []);
-    })();
-  }, []);
 
   return (
     <main>
