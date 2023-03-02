@@ -779,6 +779,10 @@ export default function BookingPage() {
                     onChangeRaw={(e) => {
                       e.stopPropagation();
 
+                      // If this event is hijacked by react-datepicker...
+                      if (e.target.value === undefined) return;
+                      e.target.value = e.target.value.replace(/[-\\ ]/g, "/");
+
                       const date = parse(
                         e.target.value,
                         "yyyy/MM/dd",
