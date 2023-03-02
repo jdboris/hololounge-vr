@@ -123,6 +123,10 @@ export function ScrollRoutingProvider({ roots = [], children }) {
   }, [scrollingTo]);
 
   useEffect(() => {
+    if (!entries.find((e) => e.target.dataset.__route == location.pathname)) {
+      return;
+    }
+
     if (!mostVisible || scrollingTo) {
       return;
     }
