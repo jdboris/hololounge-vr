@@ -19,11 +19,11 @@ export function Localizationprovider({ children }) {
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
           mutation.addedNodes.forEach((n) => {
-            localize(n, language);
+            localizeNode(n, language);
           });
         });
       });
-      observer.observe(document, {
+      observer.observe(wrapperRef.current, {
         childList: true,
         subtree: true,
         characterData: true,
@@ -34,15 +34,35 @@ export function Localizationprovider({ children }) {
 
   useEffect(() => {
     if (wrapperRef.current) {
-      localize(document, language);
+      localizeNode(wrapperRef.current, language);
     }
   }, [language, wrapperRef]);
+
+  function localizeNode(el, language) {
+    textNodesUnder(el).forEach((n) => {
+      n.textContent = localize(n.textContent, language);
+    });
+  }
+
+  function localize(text, newLanguage = language) {
+    if (newLanguage == "JP") {
+      const english = text;
+      const japanese = jp(text);
+      cache.jp.en[japanese] = cache.jp.en[japanese] || english;
+      return japanese;
+    }
+
+    if (newLanguage == "EN") {
+      return cache.jp.en[text] || text;
+    }
+  }
 
   return (
     <LocalizationContext.Provider
       value={{
         language,
         setLanguage,
+        localize,
       }}
     >
       <div ref={wrapperRef}>{children}</div>
@@ -54,6 +74,7 @@ export function Localizationprovider({ children }) {
  * @typedef LocalizationContextValue
  * @property {"EN"|"JP"} language
  * @property {(neLanguage: "EN"|"JP") => void} setLanguage
+ * @property {(text: string, language: "EN"|"JP") => string} localize
  */
 
 /**
@@ -61,22 +82,6 @@ export function Localizationprovider({ children }) {
  */
 export function useLocalization() {
   return useContext(LocalizationContext);
-}
-
-function localize(el, language) {
-  textNodesUnder(el).forEach((n) => {
-    if (language == "JP") {
-      const english = n.textContent;
-      n.textContent = jp(n.textContent);
-      cache.jp.en[n.textContent] = english;
-      return;
-    }
-
-    if (language == "EN") {
-      n.textContent = cache.jp.en[n.textContent] || n.textContent;
-      return;
-    }
-  });
 }
 
 function textNodesUnder(el) {
@@ -170,7 +175,7 @@ function jp(english) {
     case `No upcoming reservations found under that name.`:
       return `こちらのお名前では予約を確認できませんでした。`;
     case `You may not check in more than 5 minutes before your reservation. (Your next reservation is at {startTime})`:
-      return `ご予約の時間5分前からチェックインが可能です。（あなたの予約開始時間は｛startTime｝です。）`;
+      return `ご予約の時間5分前からチェックインが可能です。（あなたの予約開始時間は {startTime} です。）`;
     case `Check-in complete! You are now checked in at these stations. Your experience(s) will start automatically.`:
       return `チェックインが完了しました！あなたはこちらのステーションにチェックインしました。それではVR体験をお楽しみください。`;
     case `Booking complete! You will receive a receipt and booking confirmation via email. Please check in at the in-store kiosk up to 5 minutes in advance.`:
@@ -267,6 +272,8 @@ function jp(english) {
       return `ステーション`;
     case `Total`:
       return `合計金額`;
+    case `INSTALL THE APP`:
+      return `アプリをインストールする`;
   }
 
   return english;

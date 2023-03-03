@@ -4,11 +4,13 @@ import "react-datepicker/dist/react-datepicker.css";
 import { FaCheck } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
 import InputError from "../components/input-error";
+import { useLocalization } from "../contexts/localization";
 import { useModal } from "../contexts/modal";
 import "../css/react-datepicker.scss";
 import { toLocaleString } from "../utils/dates";
 
 function CheckInPage() {
+  const { localize } = useLocalization();
   const { setModalContent } = useModal();
   const [error, setError] = useState({ details: {} });
   const [isLoading, setIsLoading] = useState(false);
@@ -112,7 +114,7 @@ function CheckInPage() {
               if (!response.ok) {
                 const startTime = error?.details?.bookings?.[0].startTime;
 
-                error.message = error.message.replace(
+                error.message = localize(error.message).replace(
                   "{startTime}",
                   toLocaleString(startTime)
                 );
