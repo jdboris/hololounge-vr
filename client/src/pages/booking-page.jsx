@@ -67,13 +67,13 @@ const stationCoords = [
     height: "31%",
   },
   {
-    top: "67.6",
+    top: "67.6%",
     left: "1.2%",
     width: "31.6%",
     height: "31%",
   },
-  { top: "67.6", left: "34.2%", width: "31.6%", height: "31%" },
-  { top: "67.6", left: "67.1%", width: "31.6%", height: "31%" },
+  { top: "67.6%", left: "34.2%", width: "31.6%", height: "31%" },
+  { top: "67.6%", left: "67.1%", width: "31.6%", height: "31%" },
 ];
 
 const CustomInput = forwardRef(({ label, error, ...props }, ref) => (
