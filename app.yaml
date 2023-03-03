@@ -8,9 +8,12 @@ includes:
 handlers:
   - url: /static
     static_dir: client/build/static
+  - url: /api/.*
+    script: auto
   # Serve all static files with url ending with a file extension
   - url: /(.*\..+)$
     static_files: client/build/\1
     upload: client/build/(.*\..+)$
-  - url: /.*
-    script: auto
+  - url: /(.*)$
+    static_files: client/build/index.html
+    upload: client/build/(.*)$

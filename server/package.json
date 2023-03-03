@@ -1,6 +1,5 @@
 {
   "name": "server",
-  "homepage": "https://www.hololounge.jp/",
   "version": "0.1.0",
   "private": true,
   "type": "module",

@@ -1,9 +1,9 @@
 {
   "name": "client",
+  "homepage": "https://www.hololounge.jp/",
   "version": "0.1.0",
   "private": true,
   "proxy": "http://localhost:5000",
-  "homepage": ".",
   "dependencies": {
     "@jdboris/css-themes": "^1.3.0",
     "@testing-library/jest-dom": "^5.16.5",
