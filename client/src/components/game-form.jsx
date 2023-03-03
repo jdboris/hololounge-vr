@@ -103,7 +103,11 @@ function GameForm({
       {!isOpen && (game.posterUrl ? <img src={game.posterUrl} /> : <FaPlus />)}
       {isOpen && (
         <>
-          <div className={theme.overlay} onClick={() => setIsOpen(false)}></div>
+          <div
+            className={theme.overlay}
+            style={{ position: "fixed" }}
+            onClick={() => setIsOpen(false)}
+          ></div>
           <div
             className={theme.videoPlayer}
             onClick={(e) => (e.target.paused ? playVideo() : pauseVideo())}

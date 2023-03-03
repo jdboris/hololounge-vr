@@ -27,6 +27,7 @@ function Header() {
       {isMenuOpen && (
         <div
           className={theme.overlay}
+          style={{ position: "fixed" }}
           onClick={(e) => {
             setIsMenuOpen(false);
             e.target.closest("header").scrollTo({ top: 0 });

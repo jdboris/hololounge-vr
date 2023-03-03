@@ -10,6 +10,7 @@ function Modal({ content, setContent, canClose }) {
   ) : (
     <div
       className={theme.overlay}
+      style={{ position: "fixed" }}
       onClick={(e) =>
         canClose && e.target == e.currentTarget && setContent(null)
       }

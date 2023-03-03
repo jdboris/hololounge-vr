@@ -15,18 +15,19 @@ import ReactDatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
   FaCheck,
-  FaInfo,
   FaInfoCircle,
   FaRegCalendar,
   FaRegClock,
 } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
 import InputError from "../components/input-error";
+import Overlay from "../components/overlay";
 import { useModal } from "../contexts/modal";
 import { useScrollRouting } from "../contexts/scroll-routing";
 import "../css/react-datepicker.scss";
 import useTimer from "../hooks/timer";
 import { toLocaleString } from "../utils/dates";
+import { MAINTENANCE_MODE } from "../utils/maintenance";
 import { SANDBOX_BOOKING_DATA, SANDBOX_MODE } from "../utils/sandbox";
 
 registerLocale("ja", ja);
@@ -527,11 +528,11 @@ export default function BookingPage() {
           }}
         >
           <header>
-            <fieldset disabled={isLoading}>
+            <fieldset disabled={isLoading || MAINTENANCE_MODE}>
               <label>
                 <FaRegCalendar />
                 <ReactDatePicker
-                  disabled={isLoading}
+                  disabled={isLoading || MAINTENANCE_MODE}
                   customInput={
                     <CustomInput
                       className={[theme.medium, theme.alt].join(" ")}
@@ -557,7 +558,7 @@ export default function BookingPage() {
               <label>
                 <FaRegClock />
                 <ReactDatePicker
-                  disabled={isLoading}
+                  disabled={isLoading || MAINTENANCE_MODE}
                   customInput={
                     <CustomInput
                       className={[theme.small, theme.alt].join(" ")}
@@ -593,6 +594,7 @@ export default function BookingPage() {
               </label>
             </fieldset>
             <input
+              disabled={isLoading || MAINTENANCE_MODE}
               className={theme.timeSlider}
               onMouseDown={() => setIsSliding(true)}
               onTouchStart={() => setIsSliding(true)}
@@ -640,7 +642,7 @@ export default function BookingPage() {
                     type="checkbox"
                     name="stations"
                     value={station.id}
-                    disabled={isStationBooked(station)}
+                    disabled={isStationBooked(station) || MAINTENANCE_MODE}
                     checked={
                       formData.bookingStations.find(
                         (bs) => bs.stationId == station.id
@@ -715,7 +717,7 @@ export default function BookingPage() {
                 </label>
                 <InputError message={error?.details?.bookingStations} />
               </div>
-              <fieldset disabled={isLoading}>
+              <fieldset disabled={isLoading || MAINTENANCE_MODE}>
                 <div className={theme.h3}>Contact</div>
                 <label>
                   <InputError message={error?.details?.lastName} />
@@ -767,6 +769,7 @@ export default function BookingPage() {
                 </label>
                 <label>
                   <ReactDatePicker
+                    disabled={MAINTENANCE_MODE}
                     customInput={
                       <CustomInput
                         className={theme.alt}
@@ -820,6 +823,7 @@ export default function BookingPage() {
               </fieldset>
             </aside>
           </main>
+          {MAINTENANCE_MODE && <Overlay>COMING SOON!</Overlay>}
         </form>
       </main>
     </div>
