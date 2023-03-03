@@ -22,6 +22,7 @@ import {
 import { useLocation } from "react-router-dom";
 import InputError from "../components/input-error";
 import Overlay from "../components/overlay";
+import { useLocalization } from "../contexts/localization";
 import { useModal } from "../contexts/modal";
 import { useScrollRouting } from "../contexts/scroll-routing";
 import "../css/react-datepicker.scss";
@@ -85,6 +86,7 @@ const CustomInput = forwardRef(({ label, error, ...props }, ref) => (
 ));
 
 export default function BookingPage() {
+  const { localize } = useLocalization();
   const { setModalContent } = useModal();
   const [error, setError] = useState();
   const [isLoading, setIsLoading] = useState(false);
@@ -486,8 +488,10 @@ export default function BookingPage() {
                               <div>
                                 {bookings
                                   .map(({ stations, startTime }) =>
-                                    stations.map((s) => (
-                                      <div>
+                                    stations.map((s, i) => (
+                                      <div
+                                        key={"booking-confirmation-time-" + i}
+                                      >
                                         <FaCheck className={theme.green} />{" "}
                                         {s.name} ({toLocaleString(startTime)})
                                       </div>
@@ -705,8 +709,10 @@ export default function BookingPage() {
                   {formData.bookingStations.length ? (
                     <>
                       {formData.bookingStations.map((bs, i, array) => (
-                        <span>
-                          {stations.find((s) => s.id == bs.stationId).name}
+                        <span key={"order-details-station-" + i}>
+                          {localize(
+                            stations.find((s) => s.id == bs.stationId).name
+                          )}
                           {i < array.length - 1 && ", "}
                         </span>
                       ))}
