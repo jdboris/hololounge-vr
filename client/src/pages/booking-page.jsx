@@ -49,17 +49,31 @@ const EXPERIENCE_DURATION = 60;
 
 const stationCoords = [
   {
-    top: "1.4%",
+    top: "1.5%",
     left: "1.2%",
     width: "31.6%",
-    height: "30.9%",
+    height: "31%",
   },
   {
-    top: "1.4%",
+    top: "1.5%",
     left: "34.1%",
     width: "31.6%",
-    height: "30.9%",
+    height: "31%",
   },
+  {
+    top: "1.5%",
+    left: "67.1%",
+    width: "31.6%",
+    height: "31%",
+  },
+  {
+    top: "67.6",
+    left: "1.2%",
+    width: "31.6%",
+    height: "31%",
+  },
+  { top: "67.6", left: "34.2%", width: "31.6%", height: "31%" },
+  { top: "67.6", left: "67.1%", width: "31.6%", height: "31%" },
 ];
 
 const CustomInput = forwardRef(({ label, error, ...props }, ref) => (
