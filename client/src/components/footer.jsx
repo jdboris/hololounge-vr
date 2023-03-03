@@ -1,5 +1,9 @@
 function Footer() {
-  return <footer></footer>;
+  return (
+    <footer>
+      <div>©{new Date().getFullYear()} 株式会社桜月</div>
+    </footer>
+  );
 }
 
 export default Footer;
