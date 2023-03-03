@@ -11,7 +11,9 @@ const cache = { jp: { en: {} } };
 export const LocalizationContext = createContext();
 
 export function Localizationprovider({ children }) {
-  const [language, setLanguage] = useState("JP");
+  const [language, setLanguage] = useState(
+    localStorage.getItem("language") || "JP"
+  );
   const wrapperRef = useRef();
 
   useEffect(() => {
@@ -37,6 +39,10 @@ export function Localizationprovider({ children }) {
       localizeNode(wrapperRef.current, language);
     }
   }, [language, wrapperRef]);
+
+  useEffect(() => {
+    localStorage.setItem("language", language);
+  }, [language]);
 
   function localizeNode(el, language) {
     textNodesUnder(el).forEach((n) => {
