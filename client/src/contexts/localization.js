@@ -106,6 +106,8 @@ function jp(english) {
       return `ショップについて`;
     case `BOOK NOW`:
       return `今すぐ予約`;
+    case `CHECK IN NOW`:
+      return `チェックインする`;
     case `Location`:
       return `住所`;
     case `Booking`:
