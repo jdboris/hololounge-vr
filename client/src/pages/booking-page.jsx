@@ -234,7 +234,7 @@ export default function BookingPage() {
   function clamp(datetime) {
     return new Date(
       Math.max(
-        Math.max(openingTime, now),
+        Math.max(openingTime, roundUp(now, interval)),
         Math.min(
           datetime,
           subMinutes(closingTime, EXPERIENCE_DURATION + interval)
