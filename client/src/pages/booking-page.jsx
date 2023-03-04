@@ -242,7 +242,7 @@ export default function BookingPage() {
   }
 
   const openingTime = useMemo(
-    () => new D(formData.startTime).setHours(SANDBOX_MODE ? 1 : 10, 0, 0, 0),
+    () => new D(formData.startTime).setHours(1, 0, 0, 0),
     [formData.startTime]
   );
 
