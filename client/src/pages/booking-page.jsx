@@ -814,18 +814,7 @@ export default function BookingPage() {
                     />
                     <small>First Name</small>
                   </label>
-                  <label>
-                    <InputError message={error?.details?.email} />
-                    <input
-                      className={theme.alt}
-                      type="email"
-                      name="email"
-                      value={formData.email || ""}
-                      placeholder=" "
-                      onBlur={(e) => showError(e.target.name)}
-                    />
-                    <small>Email</small>
-                  </label>
+
                   <label>
                     <InputError message={error?.details?.phone} />
                     <input
@@ -887,6 +876,18 @@ export default function BookingPage() {
                       yearDropdownItemNumber={110}
                       scrollableYearDropdown
                     />
+                  </label>
+                  <label>
+                    <InputError message={error?.details?.email} />
+                    <input
+                      className={theme.alt}
+                      type="email"
+                      name="email"
+                      value={formData.email || ""}
+                      placeholder=" "
+                      onBlur={(e) => showError(e.target.name)}
+                    />
+                    <small>Email</small>
                   </label>
                   <br />
                   <div className={theme.row}>
