@@ -103,9 +103,9 @@ function jp(english) {
     case `Games`:
       return `ゲーム`;
     case `Catalog`:
-      return `コレクション`;
+      return `コンテンツ`;
     case `CATALOG`:
-      return `コレクション`;
+      return `コンテンツ`;
     case `ACCOUNT`:
       return `アカウント`;
     // case `English`:
