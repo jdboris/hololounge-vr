@@ -15,7 +15,7 @@ function LocationPage() {
           </div>
           <div>
             <div>Last check-in</div>
-            <time className={theme.tan}>22:50</time>
+            <time className={theme.tan}>22:55</time>
           </div>
           <div className={theme.row}>
             <FaBuilding />

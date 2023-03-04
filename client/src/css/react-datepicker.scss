@@ -9,6 +9,7 @@
 
 .react-datepicker {
   background-color: #110e14;
+  box-shadow: 0px 0px 6px black;
   color: white;
   font-family: inherit;
   letter-spacing: 1px;
@@ -19,6 +20,7 @@
   .react-datepicker__triangle {
     margin-left: 50% !important;
     transform: none !important;
+    display: none;
   }
 
   .react-datepicker__input-container {
@@ -197,11 +199,16 @@
       }
     }
 
+    .react-datepicker__time-list {
+      scroll-snap-type: y mandatory;
+    }
+
     .react-datepicker__time-list-item {
+      scroll-snap-align: start;
       display: flex;
       justify-content: center;
       align-items: center;
-      color: gray;
+      color: white;
     }
 
     .react-datepicker__time-list-item:hover {

@@ -7,14 +7,21 @@ import {
   parse,
   subMinutes,
   subYears,
+  setHours,
+  setMinutes,
+  setMilliseconds,
+  max as maxDate,
 } from "date-fns";
 import ja from "date-fns/locale/ja";
 import Booking from "dtos/booking";
-import { forwardRef, useEffect, useMemo, useState } from "react";
+import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import ReactDatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
+  FaArrowLeft,
+  FaArrowRight,
   FaCheck,
+  FaCreditCard,
   FaInfoCircle,
   FaRegCalendar,
   FaRegClock,
@@ -92,6 +99,7 @@ export default function BookingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { navigate, root } = useScrollRouting();
   const url = useLocation();
+  const timeSelectRef = useRef();
 
   const [now, setNow] = useState(new Date());
   /**
@@ -148,6 +156,9 @@ export default function BookingPage() {
     setBooking({ ...DEFAULT_FORM_DATA });
     // NOTE: Call the setter to clamp/round
     setStartTime(now);
+    setHasSelectedDay(false);
+    setHasSelectedTime(false);
+    setPageNumber(1);
 
     restartTimer();
   }, [url.pathname]);
@@ -160,9 +171,19 @@ export default function BookingPage() {
     }
   }, [isTimeUp]);
 
+  const [hasSelectedDay, setHasSelectedDay] = useState(false);
+  const [hasSelectedTime, setHasSelectedTime] = useState(false);
+
   const [booking, dtoError] = useMemo(() => {
     try {
-      return [new Booking(formData), null];
+      return [
+        new Booking({
+          ...formData,
+          startTime:
+            hasSelectedDay && hasSelectedTime ? formData.startTime : null,
+        }),
+        null,
+      ];
     } catch (error) {
       if (!error.details) {
         throw error;
@@ -200,6 +221,9 @@ export default function BookingPage() {
 
   const [interval, setInterval] = useState(5);
 
+  /**
+   * @param {Date} startTime
+   */
   function setStartTime(startTime) {
     setBooking((old) => ({
       ...old,
@@ -210,7 +234,7 @@ export default function BookingPage() {
   function clamp(datetime) {
     return new Date(
       Math.max(
-        openingTime,
+        Math.max(openingTime, now),
         Math.min(
           datetime,
           subMinutes(closingTime, EXPERIENCE_DURATION + interval)
@@ -225,7 +249,7 @@ export default function BookingPage() {
   );
 
   const closingTime = useMemo(
-    () => new D(formData.startTime).setHours(24 + 1, 0, 0, 0),
+    () => new D(formData.startTime).setHours(24, 0, 0, 0),
     [formData.startTime]
   );
 
@@ -263,38 +287,38 @@ export default function BookingPage() {
     setStartTime(formData.startTime);
   }, []);
 
-  const [isSliding, setIsSliding] = useState(false);
+  // const [isSliding, setIsSliding] = useState(false);
 
   useEffect(() => {
-    if (!isSliding) {
-      // Filter out stations that are booked
-      setBooking((old) => ({
-        ...old,
-        bookingStations: old.bookingStations.filter(
-          (bs) => !isStationBooked({ id: bs.stationId })
-        ),
-      }));
-    }
+    // if (!isSliding) {
+    // Filter out stations that are booked
+    setBooking((old) => ({
+      ...old,
+      bookingStations: old.bookingStations.filter(
+        (bs) => !isStationBooked({ id: bs.stationId })
+      ),
+    }));
+    // }
   }, [
     formData.startTime,
     // TODO: Pass in a memoized array of durations
     // formData.bookingStations.map((bs) => bs.experiencePrice.duration),
     EXPERIENCE_DURATION,
-    isSliding,
+    // isSliding,
   ]);
 
-  const min = useMemo(
-    () => (openingTime ? toValue(openingTime) : 0),
-    [openingTime]
-  );
+  // const min = useMemo(
+  //   () => (openingTime ? toValue(openingTime) : 0),
+  //   [openingTime]
+  // );
 
-  const max = useMemo(() => {
-    return closingTime
-      ? toValue(
-          closingTime - minutesToMilliseconds(EXPERIENCE_DURATION + interval)
-        )
-      : 1;
-  }, [closingTime, EXPERIENCE_DURATION]);
+  // const max = useMemo(() => {
+  //   return closingTime
+  //     ? toValue(
+  //         closingTime - minutesToMilliseconds(EXPERIENCE_DURATION + interval)
+  //       )
+  //     : 1;
+  // }, [closingTime, EXPERIENCE_DURATION]);
 
   function toValue(datetime) {
     return toIntervals(datetime, interval);
@@ -411,6 +435,8 @@ export default function BookingPage() {
     }
   }, []);
 
+  const [pageNumber, setPageNumber] = useState(1);
+
   return (
     <div className={theme.bookingPage}>
       <header>
@@ -424,6 +450,11 @@ export default function BookingPage() {
             try {
               if (dtoError) {
                 throw dtoError;
+              }
+
+              if (pageNumber == 1) {
+                setPageNumber(2);
+                return;
               }
 
               setIsLoading(true);
@@ -448,6 +479,9 @@ export default function BookingPage() {
                 setBooking({ ...DEFAULT_FORM_DATA });
                 // NOTE: Call the setter to clamp/round
                 setStartTime(now);
+                setHasSelectedDay(false);
+                setHasSelectedTime(false);
+                setPageNumber(1);
               }
 
               if (redirectUrl) {
@@ -546,72 +580,7 @@ export default function BookingPage() {
           }}
         >
           <header>
-            <fieldset disabled={isLoading || MAINTENANCE_MODE}>
-              <label>
-                <FaRegCalendar />
-                <ReactDatePicker
-                  disabled={isLoading || MAINTENANCE_MODE}
-                  customInput={
-                    <CustomInput
-                      className={[theme.medium, theme.alt].join(" ")}
-                    />
-                  }
-                  selected={formData.startTime}
-                  onChange={(date) => {
-                    if (!date || !(date instanceof Date)) return;
-
-                    // Bypass the clamping/rounding if this is setting a new day
-                    if (date.getDate() != formData.startTime.getDate()) {
-                      setBooking((old) => ({ ...old, startTime: date }));
-                      return;
-                    }
-                    setStartTime(date);
-                  }}
-                  locale="ja"
-                  dateFormat="yyyy/MM/dd"
-                  minDate={now}
-                />
-              </label>
-
-              <label>
-                <FaRegClock />
-                <ReactDatePicker
-                  disabled={isLoading || MAINTENANCE_MODE}
-                  customInput={
-                    <CustomInput
-                      className={[theme.small, theme.alt].join(" ")}
-                    />
-                  }
-                  selected={formData.startTime}
-                  onChange={(date) => {
-                    if (!date || !(date instanceof Date)) return;
-
-                    // Bypass the clamping/rounding if this is setting a new day
-                    if (date.getDate() != formData.startTime.getDate()) {
-                      setBooking((old) => ({ ...old, startTime: date }));
-                      return;
-                    }
-                    setStartTime(date);
-                  }}
-                  locale="ja"
-                  showTimeSelect
-                  showTimeSelectOnly
-                  timeFormat="HH:mm"
-                  dateFormat="HH:mm"
-                  timeIntervals={5}
-                  minTime={openingTime}
-                  maxTime={
-                    new D(
-                      Math.min(
-                        closingTime,
-                        new D(formData.startTime).setHours(23, 59, 59, 999)
-                      )
-                    )
-                  }
-                />
-              </label>
-            </fieldset>
-            <input
+            {/* <input
               disabled={isLoading || MAINTENANCE_MODE}
               className={theme.timeSlider}
               onMouseDown={() => setIsSliding(true)}
@@ -642,205 +611,352 @@ export default function BookingPage() {
                       })}
                   </option>
                 ))}
-            </datalist>
+            </datalist> */}
           </header>
           <main>
-            <figure className={theme.map}>
-              <figcaption>
-                <em>
-                  <FaInfoCircle />
-                  Select station(s) to reserve.
-                </em>
-              </figcaption>
-              <img src="/floor-map.png" alt="Floor Map" />
+            {pageNumber == 1 && (
+              <figure className={theme.map}>
+                <figcaption>
+                  <em>
+                    {error?.details?.bookingStations ? (
+                      <InputError message={error?.details?.bookingStations} />
+                    ) : (
+                      <>
+                        <FaInfoCircle />
+                        Select station(s) to reserve
+                      </>
+                    )}
+                  </em>
+                </figcaption>
+                <img src="/floor-map.png" alt="Floor Map" />
 
-              {stations.map((station, i) => (
-                <label style={stationCoords[i]} key={`station-${station.id}`}>
-                  <input
-                    type="checkbox"
-                    name="stations"
-                    value={station.id}
-                    disabled={isStationBooked(station) || MAINTENANCE_MODE}
-                    checked={
-                      formData.bookingStations.find(
-                        (bs) => bs.stationId == station.id
-                      ) || false
-                    }
-                    onChange={(e) =>
-                      e.stopPropagation() ||
-                      hideError(e.target.name) ||
-                      e.target.checked
-                        ? addStation(station)
-                        : removeStation(station)
-                    }
-                  />
-                  <div>{station.name}</div>
-                </label>
-              ))}
-            </figure>
-            <aside>
-              <div>
-                <div className={theme.h3}>Details</div>
-                <label>
-                  Date
-                  <span>
-                    {formData.startTime.toLocaleDateString("ja-JP", {
-                      dateStyle: "medium",
-                    })}
-                  </span>
-                </label>
-                <label>
-                  Start Time
-                  <span>
-                    {formData.startTime.toLocaleTimeString("ja-JP", {
-                      timeStyle: "short",
-                      hourCycle: "h23",
-                    })}
-                  </span>
-                </label>
-                <label>
-                  Duration
-                  <span>
-                    {EXPERIENCE_DURATION} (+{interval}) min.
-                  </span>
-                </label>
-                <label>
-                  Station(s)
-                  {formData.bookingStations.length ? (
-                    <>
-                      {formData.bookingStations.map((bs, i, array) => (
-                        <span key={"order-details-station-" + i}>
-                          {localize(
-                            stations.find((s) => s.id == bs.stationId).name
-                          )}
-                          {i < array.length - 1 && ", "}
-                        </span>
-                      ))}
-                    </>
-                  ) : (
-                    <span>...</span>
-                  )}
-                </label>
-                <label>
-                  Total
-                  {formData.bookingStations.length ? (
-                    <span>
-                      ¥
-                      {formData.bookingStations.reduce(
-                        (total, bs) => total + Number(bs.experiencePrice.price),
-                        0
-                      )}
-                    </span>
-                  ) : (
-                    <span>...</span>
-                  )}
-                </label>
-                <InputError message={error?.details?.bookingStations} />
-              </div>
-              <fieldset disabled={isLoading || MAINTENANCE_MODE}>
-                <div className={theme.h3}>Contact</div>
-                <label>
-                  <InputError message={error?.details?.lastName} />
-                  <input
-                    className={theme.alt}
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName || ""}
-                    placeholder=" "
-                    onBlur={(e) => showError(e.target.name)}
-                  />
-                  <small>Last Name</small>
-                </label>
-                <label>
-                  <InputError message={error?.details?.firstName} />
-                  <input
-                    className={theme.alt}
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName || ""}
-                    placeholder=" "
-                    onBlur={(e) => showError(e.target.name)}
-                  />
-                  <small>First Name</small>
-                </label>
-                <label>
-                  <InputError message={error?.details?.email} />
-                  <input
-                    className={theme.alt}
-                    type="email"
-                    name="email"
-                    value={formData.email || ""}
-                    placeholder=" "
-                    onBlur={(e) => showError(e.target.name)}
-                  />
-                  <small>Email</small>
-                </label>
-                <label>
-                  <InputError message={error?.details?.phone} />
-                  <input
-                    className={theme.alt}
-                    type="phone"
-                    name="phone"
-                    value={formData.phone || ""}
-                    placeholder=" "
-                    onBlur={(e) => showError(e.target.name)}
-                  />
-                  <small>Phone</small>
-                </label>
-                <label>
-                  <ReactDatePicker
-                    disabled={MAINTENANCE_MODE}
-                    customInput={
-                      <CustomInput
-                        className={theme.alt}
-                        label={"Date of Birth"}
-                        error={error?.details?.birthday}
-                      />
-                    }
-                    placeholderText="YYYY/MM/DD"
-                    name="birthday"
-                    selected={formData.birthday}
-                    onChangeRaw={(e) => {
-                      e.stopPropagation();
-
-                      // If this event is hijacked by react-datepicker...
-                      if (e.target.value === undefined) return;
-                      e.target.value = e.target.value.replace(/[-\\ ]/g, "/");
-
-                      const date = parse(
-                        e.target.value,
-                        "yyyy/MM/dd",
-                        new Date()
-                      );
-                      if (!isValid(date)) {
-                        return;
+                {stations.map((station, i) => (
+                  <label style={stationCoords[i]} key={`station-${station.id}`}>
+                    <input
+                      type="checkbox"
+                      name="bookingStations"
+                      value={station.id}
+                      disabled={isStationBooked(station) || MAINTENANCE_MODE}
+                      checked={
+                        formData.bookingStations.find(
+                          (bs) => bs.stationId == station.id
+                        ) || false
                       }
+                      onChange={(e) =>
+                        e.stopPropagation() ||
+                        hideError(e.target.name) ||
+                        e.target.checked
+                          ? addStation(station)
+                          : removeStation(station)
+                      }
+                    />
+                    <div>{station.name}</div>
+                  </label>
+                ))}
+              </figure>
+            )}
+            <aside>
+              {pageNumber == 1 && (
+                <fieldset disabled={isLoading || MAINTENANCE_MODE}>
+                  <div className={theme.startTimeFields}>
+                    <div className={theme.h3}>Start Time</div>
+                    <InputError message={error?.details?.startTime} />
+                    <label>
+                      <FaRegCalendar />
+                      <ReactDatePicker
+                        disabled={isLoading || MAINTENANCE_MODE}
+                        customInput={
+                          <CustomInput
+                            className={[theme.medium, theme.alt].join(" ")}
+                          />
+                        }
+                        selected={hasSelectedDay && formData.startTime}
+                        onCalendarOpen={() => setHasSelectedDay(true)}
+                        onChange={(date) => {
+                          if (!date || !(date instanceof Date)) return;
 
-                      setBooking((old) => ({
-                        ...old,
-                        birthday: date,
-                      }));
-                    }}
-                    onChange={(value) => {
-                      setBooking((old) => ({
-                        ...old,
-                        birthday: value,
-                      }));
-                    }}
-                    onBlur={(e) => showError(e.target.name)}
-                    locale="ja"
-                    dateFormat="yyyy/MM/dd"
-                    maxDate={subYears(now, 13)}
-                    showMonthDropdown
-                    showYearDropdown
-                    yearDropdownItemNumber={110}
-                    scrollableYearDropdown
-                  />
-                </label>
+                          setHasSelectedDay(true);
+                          if (hasSelectedTime) hideError("startTime");
 
-                <InputError message={error?.message} />
-                <button>CONTINUE TO PAYMENT</button>
-              </fieldset>
+                          // Bypass the clamping/rounding if this is setting a new day
+                          if (date.getDate() != formData.startTime.getDate()) {
+                            setBooking((old) => ({ ...old, startTime: date }));
+                            return;
+                          }
+
+                          setStartTime(date);
+                        }}
+                        locale="ja"
+                        dateFormat="yyyy/MM/dd"
+                        placeholderText="YYYY/MM/DD"
+                        minDate={now}
+                      />
+                    </label>
+                    <label>
+                      <FaRegClock />
+                      <ReactDatePicker
+                        disabled={isLoading || MAINTENANCE_MODE}
+                        customInput={
+                          <CustomInput
+                            className={[theme.small, theme.alt].join(" ")}
+                          />
+                        }
+                        ref={timeSelectRef}
+                        onCalendarOpen={() => {
+                          setHasSelectedTime(true);
+                          if (hasSelectedDay) hideError("startTime");
+                          setStartTime(roundUp(formData.startTime, interval));
+
+                          // WARNING: HACK
+                          const list =
+                            timeSelectRef?.current?.calendar?.componentNode?.querySelector(
+                              ".react-datepicker__time-list"
+                            );
+                          if (!list) return;
+
+                          let selectedValue = toValue(formData.startTime);
+
+                          list.onscroll = () => {
+                            const newValue =
+                              Math.floor(list.scrollTop / 30) + 3;
+                            if (selectedValue != newValue) {
+                              selectedValue = newValue;
+                              setStartTime(toDatetime(newValue));
+                            }
+                          };
+                        }}
+                        selected={hasSelectedTime && formData.startTime}
+                        onChange={(date) => {
+                          if (!date || !(date instanceof Date)) return;
+
+                          setHasSelectedTime(true);
+
+                          setStartTime(date);
+                        }}
+                        locale="ja"
+                        showTimeSelect
+                        showTimeSelectOnly
+                        timeFormat="HH:mm"
+                        dateFormat="HH:mm"
+                        placeholderText="HH:MM"
+                        timeIntervals={interval}
+                        minTime={maxDate([openingTime, roundUp(now, interval)])}
+                        maxTime={subMinutes(
+                          closingTime,
+                          EXPERIENCE_DURATION + interval
+                        )}
+                        // popperModifiers={[
+                        //   {
+                        //     name: "offset",
+                        //     options: {
+                        //       offset: ({ placement, reference, popper }) => {
+                        //         return [0, -popper.height / 2];
+                        //       },
+                        //     },
+                        //   },
+                        //   {
+                        //     name: "flip",
+                        //     options: {
+                        //       fallbackPlacements: [],
+                        //     },
+                        //   },
+                        // ]}
+                      />
+                    </label>
+                  </div>
+                  <label className={theme.duration}>
+                    Duration
+                    <span>
+                      {EXPERIENCE_DURATION} (+{interval}) min.
+                    </span>
+                  </label>
+                  <div className={theme.h3}>Contact</div>
+                  <label>
+                    <InputError message={error?.details?.lastName} />
+                    <input
+                      className={theme.alt}
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName || ""}
+                      placeholder=" "
+                      onBlur={(e) => showError(e.target.name)}
+                    />
+                    <small>Last Name</small>
+                  </label>
+                  <label>
+                    <InputError message={error?.details?.firstName} />
+                    <input
+                      className={theme.alt}
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName || ""}
+                      placeholder=" "
+                      onBlur={(e) => showError(e.target.name)}
+                    />
+                    <small>First Name</small>
+                  </label>
+                  <label>
+                    <InputError message={error?.details?.email} />
+                    <input
+                      className={theme.alt}
+                      type="email"
+                      name="email"
+                      value={formData.email || ""}
+                      placeholder=" "
+                      onBlur={(e) => showError(e.target.name)}
+                    />
+                    <small>Email</small>
+                  </label>
+                  <label>
+                    <InputError message={error?.details?.phone} />
+                    <input
+                      className={theme.alt}
+                      type="phone"
+                      name="phone"
+                      value={formData.phone || ""}
+                      placeholder=" "
+                      onBlur={(e) => showError(e.target.name)}
+                    />
+                    <small>Phone</small>
+                  </label>
+                  <label>
+                    <ReactDatePicker
+                      disabled={MAINTENANCE_MODE}
+                      customInput={
+                        <CustomInput
+                          className={theme.alt}
+                          label={"Date of Birth"}
+                          error={error?.details?.birthday}
+                        />
+                      }
+                      placeholderText="YYYY/MM/DD"
+                      name="birthday"
+                      selected={formData.birthday}
+                      onChangeRaw={(e) => {
+                        e.stopPropagation();
+
+                        // If this event is hijacked by react-datepicker...
+                        if (e.target.value === undefined) return;
+                        e.target.value = e.target.value.replace(/[-\\ ]/g, "/");
+
+                        const date = parse(
+                          e.target.value,
+                          "yyyy/MM/dd",
+                          new Date()
+                        );
+                        if (!isValid(date)) {
+                          return;
+                        }
+
+                        setBooking((old) => ({
+                          ...old,
+                          birthday: date,
+                        }));
+                      }}
+                      onChange={(value) => {
+                        setBooking((old) => ({
+                          ...old,
+                          birthday: value,
+                        }));
+                      }}
+                      onBlur={(e) => showError(e.target.name)}
+                      locale="ja"
+                      dateFormat="yyyy/MM/dd"
+                      maxDate={subYears(now, 13)}
+                      showMonthDropdown
+                      showYearDropdown
+                      yearDropdownItemNumber={110}
+                      scrollableYearDropdown
+                    />
+                  </label>
+                  <br />
+                  <div className={theme.row}>
+                    <InputError message={error?.details?.bookingStations} />
+
+                    <InputError message={error?.message} />
+                    <button className={theme.blue}>
+                      Continue
+                      <FaArrowRight />
+                    </button>
+                  </div>
+                </fieldset>
+              )}
+              {pageNumber == 2 && (
+                <div>
+                  <div className={theme.h3}>Summary</div>
+                  <label>
+                    Date
+                    <span>
+                      {hasSelectedDay
+                        ? formData.startTime.toLocaleDateString("ja-JP", {
+                            dateStyle: "medium",
+                          })
+                        : "..."}
+                    </span>
+                  </label>
+                  <label>
+                    Start Time
+                    <span>
+                      {hasSelectedTime
+                        ? formData.startTime.toLocaleTimeString("ja-JP", {
+                            timeStyle: "short",
+                            hourCycle: "h23",
+                          })
+                        : "..."}
+                    </span>
+                  </label>
+                  <label>
+                    Duration
+                    <span>
+                      {EXPERIENCE_DURATION} (+{interval}) min.
+                    </span>
+                  </label>
+                  <label className={theme.row}>
+                    Station(s)
+                    {formData.bookingStations.length ? (
+                      <>
+                        {formData.bookingStations.map((bs, i, array) => (
+                          <span key={"order-details-station-" + i}>
+                            {localize(
+                              stations.find((s) => s.id == bs.stationId).name
+                            )}
+                            {i < array.length - 1 && ", "}
+                          </span>
+                        ))}
+                      </>
+                    ) : (
+                      <span>...</span>
+                    )}
+                  </label>
+                  <label>
+                    Total
+                    {formData.bookingStations.length ? (
+                      <span>
+                        ¥
+                        {formData.bookingStations.reduce(
+                          (total, bs) =>
+                            total + Number(bs.experiencePrice.price),
+                          0
+                        )}
+                      </span>
+                    ) : (
+                      <span>...</span>
+                    )}
+                  </label>
+                  <button
+                    className={theme.red}
+                    onClick={(e) => e.preventDefault() || setPageNumber(1)}
+                  >
+                    <FaArrowLeft />
+                    Back
+                  </button>
+
+                  <InputError message={error?.message} />
+                  <button className={theme.blue}>
+                    <FaCreditCard /> PAY WITH CREDIT CARD
+                  </button>
+                </div>
+              )}
             </aside>
           </main>
           {MAINTENANCE_MODE && <Overlay>COMING SOON!</Overlay>}

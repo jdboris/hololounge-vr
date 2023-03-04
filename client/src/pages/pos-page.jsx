@@ -31,7 +31,7 @@ function PosPage() {
         <CheckInButton root="/pos" />
       </div>
 
-      <section ref={bookingSectionRef} style={{ scrollMargin: "-10.5em" }}>
+      <section ref={bookingSectionRef} style={{ scrollMargin: "-3em" }}>
         <BookingPage />
       </section>
 

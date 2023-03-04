@@ -61,7 +61,7 @@ export default class BookingDto {
     }
 
     if (!this.startTime) {
-      errors.startTime = "Start Time is a required field.";
+      errors.startTime = "Enter your reservation's start date and time.";
     }
 
     if (!this.birthday) {
