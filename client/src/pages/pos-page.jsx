@@ -1,7 +1,6 @@
 import theme from "@jdboris/css-themes/space-station";
 import { useEffect, useRef } from "react";
-import { FaLocationArrow, FaRegCalendar } from "react-icons/fa";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import BookNowButton from "../components/book-now-button";
 import CheckInButton from "../components/check-in-button";
 import { useScrollRouting } from "../contexts/scroll-routing";
@@ -38,28 +37,6 @@ function PosPage() {
       <section ref={checkInSectionRef}>
         <CheckInPage />
       </section>
-
-      {location.pathname != "/pos" && location.pathname != "/pos/booking" && (
-        <Link
-          to="/pos/booking"
-          className={[theme.button, theme.fixedButton, theme.blue].join(" ")}
-          onClick={(e) => e.preventDefault() || navigate("/pos/booking")}
-        >
-          <FaRegCalendar />
-          BOOK NOW
-        </Link>
-      )}
-
-      {location.pathname != "/pos" && location.pathname != "/pos/check-in" && (
-        <Link
-          to="/pos/check-in"
-          className={[theme.button, theme.fixedButton, theme.orange].join(" ")}
-          onClick={(e) => e.preventDefault() || navigate("/pos/check-in")}
-        >
-          <FaLocationArrow />
-          CHECK IN NOW
-        </Link>
-      )}
     </main>
   );
 }

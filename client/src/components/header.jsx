@@ -1,12 +1,17 @@
-import { useEffect, useState } from "react";
 import theme from "@jdboris/css-themes/space-station";
-import { FaBars, FaUser, FaVrCardboard } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import {
+  FaBars,
+  FaLocationArrow,
+  FaRegCalendar,
+  FaVrCardboard,
+} from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { MdLanguage } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/auth";
-import { useScrollRouting } from "../contexts/scroll-routing";
 import { useLocalization } from "../contexts/localization";
+import { useScrollRouting } from "../contexts/scroll-routing";
 
 function Header() {
   const { language, setLanguage } = useLocalization();
@@ -70,6 +75,38 @@ function Header() {
                 </li> */}
               </>
             )}
+
+            {location.pathname != "/pos" &&
+              location.pathname != "/pos/check-in" && (
+                <li>
+                  <Link
+                    to="/pos/check-in"
+                    className={[theme.button, theme.orange].join(" ")}
+                    onClick={(e) =>
+                      e.preventDefault() || navigate("/pos/check-in")
+                    }
+                  >
+                    <FaLocationArrow />
+                    CHECK IN NOW
+                  </Link>
+                </li>
+              )}
+
+            {location.pathname != "/pos" &&
+              location.pathname != "/pos/booking" && (
+                <li>
+                  <Link
+                    to="/pos/booking"
+                    className={[theme.button, theme.blue].join(" ")}
+                    onClick={(e) =>
+                      e.preventDefault() || navigate("/pos/booking")
+                    }
+                  >
+                    <FaRegCalendar />
+                    BOOK NOW
+                  </Link>
+                </li>
+              )}
 
             <li>
               {language == "EN" ? (

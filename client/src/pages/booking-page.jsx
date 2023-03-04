@@ -889,7 +889,7 @@ export default function BookingPage() {
                     />
                     <small>Email</small>
                   </label>
-                  <br />
+
                   <div className={theme.row}>
                     <InputError message={error?.details?.bookingStations} />
 
