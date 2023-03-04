@@ -703,20 +703,40 @@ export default function BookingPage() {
                         onCalendarOpen={() => {
                           setHasSelectedTime(true);
                           if (hasSelectedDay) hideError("startTime");
-                          setStartTime(roundUp(formData.startTime, interval));
+                          const newStartTime = roundUp(
+                            formData.startTime,
+                            interval
+                          );
+                          setStartTime(newStartTime);
 
-                          // WARNING: HACK
+                          // WARNING: HACKS
                           const list =
                             timeSelectRef?.current?.calendar?.componentNode?.querySelector(
                               ".react-datepicker__time-list"
                             );
                           if (!list) return;
 
-                          let selectedValue = toValue(formData.startTime);
+                          let selectedValue = toValue(
+                            clamp(roundUp(formData.startTime, interval))
+                          );
+
+                          setTimeout(
+                            () =>
+                              list
+                                .querySelector(
+                                  ".react-datepicker__time-list-item--selected"
+                                )
+                                ?.scrollIntoViewIfNeeded(),
+                            10
+                          );
 
                           list.onscroll = () => {
-                            const newValue =
-                              Math.floor(list.scrollTop / 30) + 3;
+                            const position =
+                              list.scrollTop + list.clientHeight / 2;
+
+                            const newValue = Math.round(
+                              position / list.firstElementChild.offsetHeight
+                            );
                             if (selectedValue != newValue) {
                               selectedValue = newValue;
                               setStartTime(toDatetime(newValue));
