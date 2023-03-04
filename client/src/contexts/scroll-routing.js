@@ -154,7 +154,7 @@ export function ScrollRoutingProvider({ roots = [], children, ...props }) {
       // ...navigate to it.
       navigate(mostVisible.target.dataset.__route);
     }
-  }, [mostVisible?.target]);
+  }, [mostVisible?.target, mostVisible?.intersectionRatio]);
 
   function addSection({ route, ref }) {
     if (ref.current) {
