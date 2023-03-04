@@ -34,7 +34,7 @@ function Header() {
           }}
         ></div>
       )}
-      <header>
+      <header className={root == "/pos" ? theme.minimal : ""}>
         <nav className={isMenuOpen ? theme.open : ""}>
           <Link
             to={root == "/pos" ? "/pos" : "/"}

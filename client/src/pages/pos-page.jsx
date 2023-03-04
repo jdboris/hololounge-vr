@@ -13,10 +13,12 @@ function PosPage() {
   const { addSection, navigate } = useScrollRouting();
   const bookingSectionRef = useRef();
   const checkInSectionRef = useRef();
+
   useEffect(
     () => addSection({ route: "/pos/booking", ref: bookingSectionRef }),
     []
   );
+
   useEffect(
     () => addSection({ route: "/pos/check-in", ref: checkInSectionRef }),
     []
@@ -29,7 +31,7 @@ function PosPage() {
         <CheckInButton root="/pos" />
       </div>
 
-      <section ref={bookingSectionRef}>
+      <section ref={bookingSectionRef} style={{ scrollMargin: "-10.5em" }}>
         <BookingPage />
       </section>
 
