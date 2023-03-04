@@ -9,7 +9,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 export const ScrollRoutingContext = createContext();
 
-export function ScrollRoutingProvider({ roots = [], children }) {
+export function ScrollRoutingProvider({ roots = [], children, ...props }) {
   const location = useLocation();
   const navigate = useNavigate();
   const root = useMemo(
@@ -82,12 +82,15 @@ export function ScrollRoutingProvider({ roots = [], children }) {
   const mostVisible = useMemo(() => {
     if (!entries.length) return null;
 
-    return entries.reduce((highest, entry) => {
-      return highest == null ||
-        entry.intersectionRatio > highest.intersectionRatio
-        ? entry
-        : highest;
-    }, null);
+    return entries
+      .filter((e) => e.target.dataset.__route.startsWith(root))
+      .reduce((highest, entry) => {
+        return highest == null ||
+          (entry.intersectionRatio > highest.intersectionRatio &&
+            entry.intersectionRatio > 0.2)
+          ? entry
+          : highest;
+      }, null);
   }, [observer, entries]);
 
   const [scrollingTo, setScrollingTo] = useState(null);
@@ -123,10 +126,6 @@ export function ScrollRoutingProvider({ roots = [], children }) {
   }, [scrollingTo]);
 
   useEffect(() => {
-    if (!entries.find((e) => e.target.dataset.__route == location.pathname)) {
-      return;
-    }
-
     if (!mostVisible || scrollingTo) {
       return;
     }
@@ -143,13 +142,19 @@ export function ScrollRoutingProvider({ roots = [], children }) {
 
       return;
     }
+  }, [mostVisible, location.pathname, scrollingTo]);
+
+  useEffect(() => {
+    if (!mostVisible || scrollingTo) {
+      return;
+    }
 
     // If the address is not at the most visible...
     if (location.pathname != mostVisible.target.dataset.__route) {
       // ...navigate to it.
       navigate(mostVisible.target.dataset.__route);
     }
-  }, [mostVisible, location.pathname, scrollingTo]);
+  }, [mostVisible?.target]);
 
   function addSection({ route, ref }) {
     if (ref.current) {

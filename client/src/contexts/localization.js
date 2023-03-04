@@ -282,6 +282,8 @@ function jp(english) {
       return `合計金額`;
     case `INSTALL THE APP`:
       return `アプリをインストールする`;
+    case `Last check-in`:
+      return `最終予約可能時刻`;
   }
 
   return english;

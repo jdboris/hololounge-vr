@@ -1,4 +1,5 @@
 import theme from "@jdboris/css-themes/space-station";
+import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Footer from "./components/footer";
 import Header from "./components/header";
@@ -23,7 +24,7 @@ function App() {
             <Localizationprovider>
               <div className={theme.root}>
                 <ModalProvider>
-                  <ScrollRoutingProvider roots={["/pos", "/"]}>
+                  <ScrollRoutingProvider roots={["/pos", "/games", "/"]}>
                     <Header></Header>
 
                     <Routes>

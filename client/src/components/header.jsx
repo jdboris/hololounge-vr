@@ -37,8 +37,10 @@ function Header() {
       <header>
         <nav className={isMenuOpen ? theme.open : ""}>
           <Link
-            to={root}
-            onClick={(e) => e.preventDefault() || navigate(root)}
+            to={root == "/pos" ? "/pos" : "/"}
+            onClick={(e) =>
+              e.preventDefault() || navigate(root == "/pos" ? "/pos" : "/")
+            }
             className={theme.logo}
           >
             <img src="/logo.svg" />
@@ -63,9 +65,9 @@ function Header() {
                     {isMenuOpen && <FaVrCardboard />}GAMES
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link to="/account">{isMenuOpen && <FaUser />}ACCOUNT</Link>
-                </li>
+                </li> */}
               </>
             )}
 
