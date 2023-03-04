@@ -3,14 +3,11 @@ import {
   addMinutes,
   areIntervalsOverlapping,
   isValid,
+  max as maxDate,
   minutesToMilliseconds,
   parse,
   subMinutes,
   subYears,
-  setHours,
-  setMinutes,
-  setMilliseconds,
-  max as maxDate,
 } from "date-fns";
 import ja from "date-fns/locale/ja";
 import Booking from "dtos/booking";
@@ -35,8 +32,9 @@ import { useScrollRouting } from "../contexts/scroll-routing";
 import "../css/react-datepicker.scss";
 import useTimer from "../hooks/timer";
 import { toLocaleString } from "../utils/dates";
-import { MAINTENANCE_MODE } from "../utils/maintenance";
 import { SANDBOX_BOOKING_DATA, SANDBOX_MODE } from "../utils/sandbox";
+
+const MAINTENANCE_MODE = process.env.REACT_APP_MAINTENANCE_MODE == "true";
 
 registerLocale("ja", ja);
 
@@ -87,7 +85,7 @@ const stationCoords = [
 const CustomInput = forwardRef(({ label, error, ...props }, ref) => (
   <label>
     {error && <InputError message={error} />}
-    <input type="text" ref={ref} placeholder=" " {...props} />
+    <input type="text" ref={ref} placeholder=" " {...props} readOnly />
     {label && <small>{label}</small>}
   </label>
 ));
