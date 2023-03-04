@@ -767,7 +767,8 @@ export default function BookingPage() {
                   <label className={theme.duration}>
                     Duration
                     <span>
-                      {EXPERIENCE_DURATION} (+{interval}) min.
+                      {/* NOTE: Separate "min." for localization */}
+                      {EXPERIENCE_DURATION} (+{interval}) <>min.</>
                     </span>
                   </label>
                   <div className={theme.h3}>Contact</div>
@@ -875,7 +876,7 @@ export default function BookingPage() {
 
                     <InputError message={error?.message} />
                     <button className={theme.blue}>
-                      Continue
+                      CONTINUE
                       <FaArrowRight />
                     </button>
                   </div>
@@ -908,7 +909,8 @@ export default function BookingPage() {
                   <label>
                     Duration
                     <span>
-                      {EXPERIENCE_DURATION} (+{interval}) min.
+                      {/* NOTE: Separate "min." for localization */}
+                      {EXPERIENCE_DURATION} (+{interval}) <>min.</>
                     </span>
                   </label>
                   <label className={theme.row}>
@@ -948,12 +950,13 @@ export default function BookingPage() {
                     onClick={(e) => e.preventDefault() || setPageNumber(1)}
                   >
                     <FaArrowLeft />
-                    Back
+                    BACK
                   </button>
 
                   <InputError message={error?.message} />
                   <button className={theme.blue}>
-                    <FaCreditCard /> PAY WITH CREDIT CARD
+                    <FaCreditCard />
+                    PAY WITH CREDIT CARD
                   </button>
                 </div>
               )}

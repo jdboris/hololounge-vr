@@ -126,14 +126,14 @@ function jp(english) {
       return `予約したいステーションを選んでください（複数可）`;
     case `Station A`:
       return `ステーションA`;
-    case `Details`:
+    case `Summary`:
       return `予約内容`;
     case `Date`:
       return `予約日`;
     case `Start Time`:
       return `開始時間`;
     case `Duration`:
-      return `予約時間`;
+      return `利用時間`;
     case `Contact`:
       return `予約者情報`;
     case `Last Name`:
@@ -286,6 +286,18 @@ function jp(english) {
       return `アプリをインストールする`;
     case `Last check-in`:
       return `最終予約可能時刻`;
+    case `PAY WITH CREDIT CARD`:
+      return `クレジットカードで払う`;
+    case `CONTINUE`:
+      return `確認`;
+    case `Enter your resservation's start date and time.`:
+      return `ご希望の予約開始時間と利用時間を入力して下さい。`;
+    case `BACK`:
+      return `戻る`;
+    case `min.`:
+      return `分`;
+    case ``:
+      return ``;
   }
 
   return english;
