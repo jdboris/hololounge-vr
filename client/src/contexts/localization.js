@@ -296,8 +296,8 @@ function jp(english) {
       return `戻る`;
     case `min.`:
       return `分`;
-    case ``:
-      return ``;
+    case `Explore а bundle of 4 real-life and legendary locations - shot, scanned, and hand-polished into realistic interactive environments. Early Access includes 2 experiences and 2 more will be updated for free.`:
+      return `4 つの実在の伝説的な場所のバンドルを探索してください - 現実的なインタラクティブな環境に撮影、スキャン、手作業で磨かれています。アーリー アクセスには 2 つのエクスペリエンスが含まれており、さらに 2 つが無料でアップデートされます。`;
   }
 
   return english;
