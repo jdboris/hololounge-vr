@@ -102,6 +102,10 @@ function jp(english) {
   switch (english) {
     case `Games`:
       return `ゲーム`;
+    case `Catalog`:
+      return `コレクション`;
+    case `CATALOG`:
+      return `コレクション`;
     case `ACCOUNT`:
       return `アカウント`;
     // case `English`:
@@ -144,8 +148,6 @@ function jp(english) {
       return `予約したいステーションを選択してください。`;
     case `Enter your last name.`:
       return `姓を入力して下さい。`;
-    case `GAMES`:
-      return `ゲーム`;
     case `Station B`:
       return `ステーションB`;
     case `Station C`:

@@ -24,14 +24,14 @@ function App() {
             <Localizationprovider>
               <div className={theme.root}>
                 <ModalProvider>
-                  <ScrollRoutingProvider roots={["/pos", "/games", "/"]}>
+                  <ScrollRoutingProvider roots={["/pos", "/catalog", "/"]}>
                     <Header></Header>
 
                     <Routes>
                       <Route path="/login" element={<LoginPage />}></Route>
                       <Route path="/signup" element={<SignupPage />}></Route>
                       <Route
-                        path="/games"
+                        path="/catalog"
                         element={
                           <main>
                             <GamePage />

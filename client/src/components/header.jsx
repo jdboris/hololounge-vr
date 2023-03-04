@@ -61,8 +61,8 @@ function Header() {
             {!location.pathname.startsWith("/pos") && (
               <>
                 <li>
-                  <Link to="/games">
-                    {isMenuOpen && <FaVrCardboard />}GAMES
+                  <Link to="/catalog">
+                    {isMenuOpen && <FaVrCardboard />}CATALOG
                   </Link>
                 </li>
                 {/* <li>

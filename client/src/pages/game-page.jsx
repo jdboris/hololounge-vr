@@ -51,7 +51,7 @@ function GamePage() {
   return (
     <section className={theme.gamePage}>
       <header>
-        <h1>Games</h1>
+        <h1>Catalog</h1>
       </header>
       <main>
         <ul className={theme.badges}>
