@@ -24,7 +24,9 @@ function App() {
             <Localizationprovider>
               <div className={theme.root}>
                 <ModalProvider>
-                  <ScrollRoutingProvider roots={["/pos", "/catalog", "/"]}>
+                  <ScrollRoutingProvider
+                    roots={["/pos", "/catalog", "/login", "/signup", "/"]}
+                  >
                     <Header></Header>
 
                     <Routes>
