@@ -11,16 +11,19 @@ export function GameProvider({ children }) {
     if (error) console.error(error);
   }, [error]);
 
-  async function getGames(filters = null) {
+  async function getGames(filters = null, onlyFeatured) {
     try {
       const params = new URLSearchParams();
       if (filters) {
         params.set("filters", JSON.stringify(filters));
       }
-      const response = await fetch(`/api/games?` + params, {
-        method: "GET",
-        credentials: "same-origin",
-      });
+      const response = await fetch(
+        `/api/games${onlyFeatured ? "/featured" : ""}?` + params,
+        {
+          method: "GET",
+          credentials: "same-origin",
+        }
+      );
 
       const { error, games } = await response.json();
 

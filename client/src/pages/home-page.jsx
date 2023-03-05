@@ -43,7 +43,7 @@ function HomePage() {
         </button>
       </div>
       <section>
-        <GamePage />
+        <GamePage onlyFeatured={true} />
       </section>
       <section ref={locationSectionRef}>
         <LocationPage />

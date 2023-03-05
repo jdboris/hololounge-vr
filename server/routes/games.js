@@ -3,12 +3,33 @@ import { HttpError } from "../utils/errors.js";
 
 import { getCurrentUser } from "../utils/auth.js";
 import Game from "../models/game.js";
+import { Op } from "sequelize";
 
 const gameRouter = express.Router();
 
 gameRouter.get("/", async (req, res) => {
   res.json({
-    games: await Game.findAll({ order: [["title", "ASC"]], include: "tags" }),
+    games: await Game.findAll({
+      order: [["title", "ASC"]],
+      include: "tags",
+    }),
+  });
+});
+
+gameRouter.get("/featured", async (req, res) => {
+  res.json({
+    games: await Game.findAll({
+      where: {
+        sortOrder: {
+          [Op.ne]: null,
+        },
+      },
+      order: [
+        ["sortOrder", "ASC"],
+        ["title", "ASC"],
+      ],
+      include: "tags",
+    }),
   });
 });
 

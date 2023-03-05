@@ -8,6 +8,7 @@ export default class GameDto {
   playerMaximum = 1;
   hasLocalMultiplayer = false;
   hasOnlineMultiplayer = false;
+  sortOrder = null;
   tags = [];
 
   constructor(data = {}) {
@@ -34,6 +35,14 @@ export default class GameDto {
     if (this.playerMaximum <= 1) {
       this.hasLocalMultiplayer = false;
       this.hasOnlineMultiplayer = false;
+    }
+
+    if (this.sortOrder < 1) {
+      this.sortOrder = null;
+    }
+
+    if (isNaN(this.sortOrder)) {
+      this.sortOrder = null;
     }
 
     Object.freeze(this);

@@ -299,6 +299,14 @@ function GameForm({
                   )
                 </>
               )}
+              {isOpen && (mode == "create" || mode == "update") && (
+                <input
+                  type="number"
+                  placeholder="Sort order (1-XXX)"
+                  value={game.sortOrder}
+                  onChange={(e) => setGame({ sortOrder: e.target.value })}
+                />
+              )}
             </li>
           </ul>
           {mode == "create" || mode == "update" ? (

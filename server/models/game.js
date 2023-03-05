@@ -133,6 +133,10 @@ const Game = sequelize.define("games", {
     allowNull: false,
     defaultValue: false,
   },
+  sortOrder: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
 });
 
 Tag.belongsToMany(Game, {

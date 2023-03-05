@@ -8,7 +8,7 @@ import { useGames } from "../contexts/games";
 import { useTags } from "../contexts/tags";
 import useDebounced from "../hooks/debounced";
 
-function GamePage() {
+function GamePage({ onlyFeatured = false }) {
   const { currentUser } = useAuth();
   const [tags, setTags] = useState([]);
   const [filters, setFilters] = useState({ tagIds: [] });
@@ -25,12 +25,14 @@ function GamePage() {
   } = useGames();
 
   useEffect(() => {
-    (async () => {
-      setTags((await getTags()) || []);
-    })();
+    if (!onlyFeatured) {
+      (async () => {
+        setTags((await getTags()) || []);
+      })();
+    }
 
     (async () => {
-      setGames((await getGames()) || []);
+      setGames((await getGames(null, onlyFeatured)) || []);
     })();
   }, []);
 
