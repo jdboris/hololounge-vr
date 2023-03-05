@@ -53,7 +53,7 @@ function GamePage({ onlyFeatured = false }) {
   return (
     <section className={theme.gamePage}>
       <header>
-        <h1>Catalog</h1>
+        {onlyFeatured ? <h1>Featured Content</h1> : <h1>Catalog</h1>}
       </header>
       <main>
         <ul className={theme.badges}>
@@ -107,7 +107,9 @@ function GamePage({ onlyFeatured = false }) {
                 setError={setGameError}
                 isLoading={isLoadingGames}
                 saveGame={saveGame}
-                onUpdate={async () => setGames((await getGames()) || games)}
+                onUpdate={async () =>
+                  setGames((await getGames(null, onlyFeatured)) || games)
+                }
                 tags={tags}
                 currentUser={currentUser}
               />
@@ -121,7 +123,9 @@ function GamePage({ onlyFeatured = false }) {
                 setError={setGameError}
                 isLoading={isLoadingGames}
                 saveGame={saveGame}
-                onCreate={async () => setGames((await getGames()) || games)}
+                onCreate={async () =>
+                  setGames((await getGames(null, onlyFeatured)) || games)
+                }
                 tags={tags}
               />
             )}
