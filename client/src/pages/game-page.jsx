@@ -84,7 +84,7 @@ function GamePage() {
             </li>
           ))}
         </ul>
-        {currentUser?.isAdmin && (
+        {currentUser?.isAdmin == true && (
           <TagForm
             mode="create"
             error={error}
@@ -112,7 +112,7 @@ function GamePage() {
             </li>
           ))}
           <li>
-            {currentUser?.isAdmin && (
+            {currentUser?.isAdmin == true && (
               <GameForm
                 mode="create"
                 error={gameError}

@@ -317,7 +317,7 @@ function GameForm({
             <p>{game.summary}</p>
           )}
 
-          {mode == "read" && currentUser?.isAdmin && (
+          {mode == "read" && currentUser?.isAdmin == true && (
             <button onClick={(e) => e.preventDefault() || setMode("update")}>
               EDIT
             </button>
