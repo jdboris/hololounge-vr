@@ -12,8 +12,14 @@ import LocationPage from "./location-page";
 function HomePage() {
   const { addSection, navigate } = useScrollRouting();
   const location = useLocation();
+  const featuredSectionRef = useRef();
   const locationSectionRef = useRef();
   const bookingSectionRef = useRef();
+
+  useEffect(
+    () => addSection({ route: "/featured", ref: featuredSectionRef }),
+    []
+  );
   useEffect(
     () => addSection({ route: "/location", ref: locationSectionRef }),
     []
@@ -36,13 +42,13 @@ function HomePage() {
 
         <button
           onClick={(e) => {
-            navigate("/location");
+            navigate("/featured");
           }}
         >
           <FaChevronDown />
         </button>
       </div>
-      <section>
+      <section ref={featuredSectionRef}>
         <GamePage onlyFeatured={true} />
       </section>
       <section ref={locationSectionRef}>
