@@ -76,7 +76,8 @@ function Header() {
               </>
             )}
 
-            {location.pathname != "/pos" &&
+            {root == "/pos" &&
+              location.pathname != "/pos" &&
               location.pathname != "/pos/check-in" && (
                 <li>
                   <Link
@@ -91,8 +92,8 @@ function Header() {
                   </Link>
                 </li>
               )}
-
-            {location.pathname != "/pos" &&
+            {root == "/pos" &&
+              location.pathname != "/pos" &&
               location.pathname != "/pos/booking" && (
                 <li>
                   <Link
@@ -107,7 +108,6 @@ function Header() {
                   </Link>
                 </li>
               )}
-
             <li>
               {language == "EN" ? (
                 <button className={theme.alt} onClick={() => setLanguage("JP")}>
@@ -119,7 +119,6 @@ function Header() {
                 </button>
               )}
             </li>
-
             {!location.pathname.startsWith("/pos") &&
               !isLoading &&
               (currentUser ? (
