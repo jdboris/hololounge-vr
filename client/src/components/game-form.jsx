@@ -1,17 +1,20 @@
 import theme from "@jdboris/css-themes/space-station";
+import Game from "dtos/game";
 import { useEffect, useRef, useState } from "react";
 import {
+  FaImage,
   FaNetworkWired,
-  FaUserAlt,
-  FaWifi,
   FaPlay,
   FaPlus,
-  FaImage,
+  FaQuestionCircle,
+  FaRegQuestionCircle,
+  FaUserAlt,
   FaVideo,
   FaVrCardboard,
+  FaWifi,
 } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
-import Game from "dtos/game";
+import { Link } from "react-router-dom";
 
 function GameForm({
   mode: defaultMode,
@@ -210,16 +213,22 @@ function GameForm({
               ))}
             </ul>
           ) : (
-            <ul className={theme.badges}>
-              {game.tags?.map((tag) => (
-                <li
-                  key={`game-${game.id}-tag-${tag.id}`}
-                  className={theme.badge}
-                >
-                  {tag.name}
-                </li>
-              ))}
-            </ul>
+            <div className={theme.row}>
+              <ul className={theme.badges}>
+                {game.tags?.map((tag) => (
+                  <li
+                    key={`game-${game.id}-tag-${tag.id}`}
+                    className={theme.badge}
+                  >
+                    {tag.name}
+                  </li>
+                ))}
+              </ul>
+              <Link to={`/help/${game.id}`}>
+                <FaRegQuestionCircle />
+                HELP
+              </Link>
+            </div>
           )}
 
           <ul>

@@ -34,7 +34,8 @@ import useTimer from "../hooks/timer";
 import { toLocaleString } from "../utils/dates";
 import { SANDBOX_BOOKING_DATA, SANDBOX_MODE } from "../utils/sandbox";
 
-const MAINTENANCE_MODE = process.env.REACT_APP_MAINTENANCE_MODE == "true";
+const MAINTENANCE_MODE =
+  process.env.REACT_APP_MAINTENANCE_MODE.toLowerCase() == "true";
 
 registerLocale("ja", ja);
 

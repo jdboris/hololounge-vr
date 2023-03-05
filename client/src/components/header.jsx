@@ -3,7 +3,10 @@ import { useEffect, useState } from "react";
 import {
   FaBars,
   FaLocationArrow,
+  FaQuestion,
+  FaQuestionCircle,
   FaRegCalendar,
+  FaRegQuestionCircle,
   FaVrCardboard,
 } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
@@ -68,6 +71,11 @@ function Header() {
                 <li>
                   <Link to="/catalog">
                     {isMenuOpen && <FaVrCardboard />}CATALOG
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/help">
+                    {isMenuOpen && <FaRegQuestionCircle />}HELP
                   </Link>
                 </li>
                 {/* <li>

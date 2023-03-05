@@ -10,6 +10,7 @@ import { ModalProvider } from "./contexts/modal";
 import { ScrollRoutingProvider } from "./contexts/scroll-routing";
 import { TagProvider } from "./contexts/tags";
 import GamePage from "./pages/game-page";
+import HelpPage from "./pages/help-page";
 import HomePage from "./pages/home-page";
 import LoginPage from "./pages/login-page";
 import PosPage from "./pages/pos-page";
@@ -25,7 +26,14 @@ function App() {
               <div className={theme.root}>
                 <ModalProvider>
                   <ScrollRoutingProvider
-                    roots={["/pos", "/catalog", "/login", "/signup", "/"]}
+                    roots={[
+                      "/pos",
+                      "/catalog",
+                      "/help",
+                      "/login",
+                      "/signup",
+                      "/",
+                    ]}
                   >
                     <Header></Header>
 
@@ -40,6 +48,7 @@ function App() {
                           </main>
                         }
                       ></Route>
+                      <Route path="/help/*" element={<HelpPage />}></Route>
 
                       <Route
                         path="/pos/*"
