@@ -26,6 +26,7 @@ import {
 import { useLocation } from "react-router-dom";
 import InputError from "../components/input-error";
 import Overlay from "../components/overlay";
+import { useAuth } from "../contexts/auth";
 import { useLocalization } from "../contexts/localization";
 import { useModal } from "../contexts/modal";
 import { useScrollRouting } from "../contexts/scroll-routing";
@@ -33,9 +34,6 @@ import "../css/react-datepicker.scss";
 import useTimer from "../hooks/timer";
 import { toLocaleString } from "../utils/dates";
 import { SANDBOX_BOOKING_DATA, SANDBOX_MODE } from "../utils/sandbox";
-
-const MAINTENANCE_MODE =
-  process.env.REACT_APP_MAINTENANCE_MODE.toLowerCase() == "true";
 
 registerLocale("ja", ja);
 
@@ -92,6 +90,14 @@ const CustomInput = forwardRef(({ label, error, ...props }, ref) => (
 ));
 
 export default function BookingPage() {
+  const { currentUser } = useAuth();
+
+  const MAINTENANCE_MODE = useMemo(
+    () =>
+      process.env.REACT_APP_MAINTENANCE_MODE.toLowerCase() == "true" &&
+      (!currentUser || currentUser.email != process.env.REACT_APP_ADMIN_EMAIL),
+    [currentUser]
+  );
   const { localize } = useLocalization();
   const { setModalContent } = useModal();
   const [error, setError] = useState();
@@ -243,12 +249,12 @@ export default function BookingPage() {
   }
 
   const openingTime = useMemo(
-    () => new D(formData.startTime).setHours(1, 0, 0, 0),
+    () => new D(formData.startTime).setHours(10, 0, 0, 0),
     [formData.startTime]
   );
 
   const closingTime = useMemo(
-    () => new D(formData.startTime).setHours(24, 0, 0, 0),
+    () => new D(formData.startTime).setHours(23, 0, 0, 0),
     [formData.startTime]
   );
 

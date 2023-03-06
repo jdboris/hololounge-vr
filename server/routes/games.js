@@ -3,28 +3,27 @@ import { HttpError } from "../utils/errors.js";
 
 import { getCurrentUser } from "../utils/auth.js";
 import Game from "../models/game.js";
-import { Op } from "sequelize";
+import { col, fn, Op } from "sequelize";
 
 const gameRouter = express.Router();
 
 gameRouter.get("/", async (req, res) => {
-  res.json({
-    games: await Game.findAll({
-      order: [["title", "ASC"]],
-      include: "tags",
-    }),
-  });
-});
+  const { onlyFeatured, isDisabled } = req.query;
 
-gameRouter.get("/featured", async (req, res) => {
   res.json({
     games: await Game.findAll({
       where: {
-        sortOrder: {
-          [Op.ne]: null,
-        },
+        ...(isDisabled ? {} : { isEnabled: true }),
+        ...(onlyFeatured
+          ? {
+              sortOrder: {
+                [Op.ne]: null,
+              },
+            }
+          : null),
       },
       order: [
+        fn("ISNULL", col("sortOrder")),
         ["sortOrder", "ASC"],
         ["title", "ASC"],
       ],

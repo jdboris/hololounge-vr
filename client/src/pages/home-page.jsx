@@ -4,12 +4,14 @@ import { FaChevronDown, FaRegCalendar } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 import BookNowButton from "../components/book-now-button";
 import PwaInstallButton from "../components/pwa-install-button";
+import { useAuth } from "../contexts/auth";
 import { useScrollRouting } from "../contexts/scroll-routing";
 import BookingPage from "./booking-page";
 import GamePage from "./game-page";
 import LocationPage from "./location-page";
 
 function HomePage() {
+  const { currentUser } = useAuth();
   const { addSection, navigate } = useScrollRouting();
   const location = useLocation();
   const featuredSectionRef = useRef();
@@ -49,7 +51,10 @@ function HomePage() {
         </button>
       </div>
       <section ref={featuredSectionRef}>
-        <GamePage onlyFeatured={true} />
+        <GamePage
+          showDisabled={currentUser && currentUser.isAdmin}
+          onlyFeatured={true}
+        />
       </section>
       <section ref={locationSectionRef}>
         <LocationPage />

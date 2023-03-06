@@ -8,7 +8,7 @@ import { useGames } from "../contexts/games";
 import { useTags } from "../contexts/tags";
 import useDebounced from "../hooks/debounced";
 
-function GamePage({ onlyFeatured = false }) {
+function GamePage({ showDisabled = false, onlyFeatured = false }) {
   const { currentUser } = useAuth();
   const [tags, setTags] = useState([]);
   const [filters, setFilters] = useState({ tagIds: [] });
@@ -32,9 +32,11 @@ function GamePage({ onlyFeatured = false }) {
     }
 
     (async () => {
-      setGames((await getGames(null, onlyFeatured)) || []);
+      setGames(
+        (await getGames(null, { onlyFeatured, isDisabled: showDisabled })) || []
+      );
     })();
-  }, []);
+  }, [showDisabled]);
 
   useEffect(() => {
     // (async () => {
@@ -108,7 +110,12 @@ function GamePage({ onlyFeatured = false }) {
                 isLoading={isLoadingGames}
                 saveGame={saveGame}
                 onUpdate={async () =>
-                  setGames((await getGames(null, onlyFeatured)) || games)
+                  setGames(
+                    (await getGames(null, {
+                      onlyFeatured,
+                      isDisabled: showDisabled,
+                    })) || games
+                  )
                 }
                 tags={tags}
                 currentUser={currentUser}
@@ -124,7 +131,12 @@ function GamePage({ onlyFeatured = false }) {
                 isLoading={isLoadingGames}
                 saveGame={saveGame}
                 onCreate={async () =>
-                  setGames((await getGames(null, onlyFeatured)) || games)
+                  setGames(
+                    (await getGames(null, {
+                      onlyFeatured,
+                      isDisabled: showDisabled,
+                    })) || games
+                  )
                 }
                 tags={tags}
               />

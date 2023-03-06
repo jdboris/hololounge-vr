@@ -11,7 +11,7 @@ function LocationPage() {
         <address>
           <div>
             <div>Hours (every day)</div>
-            <time className={theme.green}>1:00-24:00</time>
+            <time className={theme.green}>10:00-23:00</time>
           </div>
           <div>
             <div>Last check-in</div>

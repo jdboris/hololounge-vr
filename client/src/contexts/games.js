@@ -11,19 +11,22 @@ export function GameProvider({ children }) {
     if (error) console.error(error);
   }, [error]);
 
-  async function getGames(filters = null, onlyFeatured) {
+  async function getGames(filters = null, { onlyFeatured, isDisabled }) {
     try {
       const params = new URLSearchParams();
       if (filters) {
         params.set("filters", JSON.stringify(filters));
       }
-      const response = await fetch(
-        `/api/games${onlyFeatured ? "/featured" : ""}?` + params,
-        {
-          method: "GET",
-          credentials: "same-origin",
-        }
-      );
+      if (onlyFeatured) {
+        params.set("onlyFeatured", 1);
+      }
+      if (isDisabled) {
+        params.set("isDisabled", 1);
+      }
+      const response = await fetch(`/api/games?` + params, {
+        method: "GET",
+        credentials: "same-origin",
+      });
 
       const { error, games } = await response.json();
 
@@ -81,7 +84,7 @@ export function GameProvider({ children }) {
 
 /**
  * @typedef GameContextValue
- * @property {() => Promise<Array | undefined>} getGames
+ * @property {(filters: {}, options: {onlyFeatured: boolean, isDisabled: boolean}) => Promise<Array | undefined>} getGames
  * @property {(game: any) => Promise<void>} saveGame
  */
 
