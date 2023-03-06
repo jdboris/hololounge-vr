@@ -103,12 +103,22 @@ function GameForm({
         }
       }}
     >
-      {!isOpen && (game.posterUrl ? <img src={game.posterUrl} /> : <FaPlus />)}
+      {!isOpen &&
+        (game.posterUrl ? (
+          <img
+            style={{ ...(!game.isEnabled ? { filter: "grayscale(1)" } : {}) }}
+            src={game.posterUrl}
+          />
+        ) : (
+          <FaPlus />
+        ))}
       {isOpen && (
         <>
           <div
             className={theme.overlay}
-            style={{ position: "fixed" }}
+            style={{
+              position: "fixed",
+            }}
             onClick={() => setIsOpen(false)}
           ></div>
           <div
@@ -309,12 +319,15 @@ function GameForm({
                 </>
               )}
               {isOpen && (mode == "create" || mode == "update") && (
-                <input
-                  type="number"
-                  placeholder="Sort order (1-XXX)"
-                  value={game.sortOrder}
-                  onChange={(e) => setGame({ sortOrder: e.target.value })}
-                />
+                <label>
+                  Sort Order:
+                  <input
+                    type="number"
+                    placeholder="Sort order (1-XXX)"
+                    value={game.sortOrder}
+                    onChange={(e) => setGame({ sortOrder: e.target.value })}
+                  />
+                </label>
               )}
             </li>
           </ul>
@@ -341,6 +354,16 @@ function GameForm({
           )}
 
           {(mode == "create" || mode == "update") && <button>SAVE</button>}
+          {(mode == "create" || mode == "update") && (
+            <label className={!game.isEnabled ? theme.red : ""}>
+              <input
+                type="checkbox"
+                checked={game.isEnabled}
+                onChange={(e) => setGame({ isEnabled: e.target.checked })}
+              />
+              Enabled
+            </label>
+          )}
         </main>
       )}
     </form>

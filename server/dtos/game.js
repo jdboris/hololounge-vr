@@ -9,6 +9,7 @@ export default class GameDto {
   hasLocalMultiplayer = false;
   hasOnlineMultiplayer = false;
   sortOrder = null;
+  isEnabled = true;
   tags = [];
 
   constructor(data = {}) {

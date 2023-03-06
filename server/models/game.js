@@ -137,6 +137,11 @@ const Game = sequelize.define("games", {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
+  isEnabled: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  },
 });
 
 Tag.belongsToMany(Game, {
