@@ -33,7 +33,10 @@ function HomePage() {
     <main>
       <div
         className={theme.landingPage}
-        style={{ backgroundImage: `url('landing-page.jpeg')` }}
+        style={{
+          backgroundImage: `url('model-shot-2.jpg')`,
+          backgroundPosition: "right 35% bottom 0%",
+        }}
       >
         <strong>Casual VR Fun</strong>
         <small>Try something new. Stay a while.</small>
