@@ -1,5 +1,5 @@
 import theme from "@jdboris/css-themes/space-station";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useEffect } from "react";
 import GameForm from "../components/game-form";
 import TagForm from "../components/tag-form";
@@ -8,7 +8,7 @@ import { useGames } from "../contexts/games";
 import { useTags } from "../contexts/tags";
 import useDebounced from "../hooks/debounced";
 
-function GamePage({ showDisabled = false, onlyFeatured = false }) {
+function GamePage({ onlyFeatured = false }) {
   const { currentUser } = useAuth();
   const [tags, setTags] = useState([]);
   const [filters, setFilters] = useState({ tagIds: [] });
@@ -23,6 +23,11 @@ function GamePage({ showDisabled = false, onlyFeatured = false }) {
     setError: setGameError,
     isLoading: isLoadingGames,
   } = useGames();
+
+  const showDisabled = useMemo(
+    () => currentUser && currentUser.isAdmin,
+    [currentUser]
+  );
 
   useEffect(() => {
     if (!onlyFeatured) {
