@@ -17,12 +17,43 @@ import PosPage from "./pages/pos-page";
 import SignupPage from "./pages/signup-page";
 
 function App() {
+  if (localStorage.getItem("pos")) {
+    return (
+      <BrowserRouter>
+        <AuthProvider>
+          <Localizationprovider>
+            <div className={theme.root}>
+              <ModalProvider>
+                <ScrollRoutingProvider roots={["/pos", "/"]}>
+                  <Header></Header>
+
+                  <Routes>
+                    <Route path="/help/*" element={<HelpPage />}></Route>
+
+                    <Route
+                      path="/pos/*"
+                      element={<PosPage path="/pos" />}
+                    ></Route>
+
+                    <Route path="/*" element={<PosPage path="/pos" />}></Route>
+                  </Routes>
+
+                  <Footer></Footer>
+                </ScrollRoutingProvider>
+              </ModalProvider>
+            </div>
+          </Localizationprovider>
+        </AuthProvider>
+      </BrowserRouter>
+    );
+  }
+
   return (
     <BrowserRouter>
       <AuthProvider>
-        <TagProvider>
-          <GameProvider>
-            <Localizationprovider>
+        <Localizationprovider>
+          <TagProvider>
+            <GameProvider>
               <div className={theme.root}>
                 <ModalProvider>
                   <ScrollRoutingProvider
@@ -38,7 +69,18 @@ function App() {
                     <Header></Header>
 
                     <Routes>
-                      <Route path="/login" element={<LoginPage />}></Route>
+                      <Route
+                        path="/login"
+                        element={
+                          <LoginPage
+                            onLogin={(user) =>
+                              user &&
+                              user.email == "pos@hololounge.jp" &&
+                              localStorage.setItem("pos", 1)
+                            }
+                          />
+                        }
+                      ></Route>
                       <Route path="/signup" element={<SignupPage />}></Route>
                       <Route
                         path="/catalog"
@@ -62,9 +104,9 @@ function App() {
                   </ScrollRoutingProvider>
                 </ModalProvider>
               </div>
-            </Localizationprovider>
-          </GameProvider>
-        </TagProvider>
+            </GameProvider>
+          </TagProvider>
+        </Localizationprovider>
       </AuthProvider>
     </BrowserRouter>
   );

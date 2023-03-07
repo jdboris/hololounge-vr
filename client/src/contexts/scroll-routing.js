@@ -13,15 +13,6 @@ export function ScrollRoutingProvider({ roots = [], children, ...props }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const isPos = window.location.host.startsWith("pos.");
-    if (isPos) {
-      navigate("/pos");
-    } else if (location.pathname == "/pos") {
-      navigate("/");
-    }
-  }, [location.pathname]);
-
   const root = useMemo(
     () => roots.find((r) => location.pathname.startsWith(r) || ""),
     [roots, location.pathname]

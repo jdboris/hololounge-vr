@@ -5,7 +5,7 @@ import GoogleLoginButton from "../components/google-login-button";
 import UserForm from "../components/user-form";
 import { useAuth } from "../contexts/auth";
 
-function LoginPage() {
+function LoginPage({ onLogin }) {
   const {
     currentUser,
     signup,
@@ -33,6 +33,7 @@ function LoginPage() {
         mode="login"
         signup={signup}
         login={login}
+        onLogin={onLogin}
         error={error}
         setError={setError}
         isLoading={isLoading}

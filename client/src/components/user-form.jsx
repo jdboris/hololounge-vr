@@ -10,6 +10,7 @@ function UserForm({
   user: defaultUser,
   signup,
   login,
+  onLogin,
   error,
   setError,
   isLoading,
@@ -32,7 +33,7 @@ function UserForm({
     <form
       autoComplete="on"
       className={theme.smallForm}
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
 
         setError(null);
@@ -43,7 +44,8 @@ function UserForm({
         }
 
         if (mode === "login") {
-          login(user);
+          onLogin(await login(user));
+
           return;
         }
       }}

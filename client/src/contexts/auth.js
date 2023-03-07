@@ -60,8 +60,9 @@ export function AuthProvider({ children }) {
         throw error;
       }
 
-      setCurrentUser(await getCurrentUser());
-      return true;
+      const user = await getCurrentUser();
+      setCurrentUser(user);
+      return user;
     } catch (error) {
       setError(error);
     } finally {
