@@ -34,7 +34,7 @@ function HomePage() {
       <div
         className={theme.landingPage}
         style={{
-          backgroundImage: `url('model-shot-2.jpg')`,
+          backgroundImage: `url('landing-page.png')`,
           backgroundPosition: "right 35% bottom 0%",
         }}
       >

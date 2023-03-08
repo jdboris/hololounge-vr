@@ -10,12 +10,16 @@ function LocationPage() {
       <main>
         <address>
           <div>
-            <div>Hours (every day)</div>
-            <time className={theme.green}>10:00-23:00</time>
+            <span>Hours (every day)</span>
+            <div>
+              <time className={theme.green}>10:00-23:00</time>
+            </div>
           </div>
           <div>
-            <div>Last check-in</div>
-            <time className={theme.tan}>22:55</time>
+            <span>Last check-in</span>
+            <div>
+              <time className={theme.tan}>21:55</time>
+            </div>
           </div>
           <div className={theme.row}>
             <FaBuilding />
