@@ -1,4 +1,4 @@
-import { subMinutes } from "date-fns";
+import { addMinutes, subMinutes } from "date-fns";
 import express from "express";
 import { col, fn, literal, Op } from "sequelize";
 import Booking from "../models/booking.js";
@@ -15,9 +15,24 @@ const bookingRouter = express.Router();
 bookingRouter.get("/upcoming", async (req, res) => {
   const bookings = await Booking.findAll({
     where: {
+      isCanceled: false,
       [Op.or]: [
         // Either already complete or "pending" (recent)
-        { isComplete: true },
+        {
+          isComplete: true,
+          // startTime: { [Op.gt]: new Date() },
+
+          // // Where duration...
+          "$bookingStations.experiencePrice.duration$": {
+            // ...is less than the time between this booking start and the current time.
+            [Op.gt]: fn(
+              "TIMESTAMPDIFF",
+              literal("MINUTE"),
+              col("startTime"),
+              new Date()
+            ),
+          },
+        },
         { createdAt: { [Op.gt]: subMinutes(new Date(), 5) } },
       ],
     },
@@ -47,6 +62,7 @@ bookingRouter.post("/check-in", async (req, res) => {
     throw new HttpError("Please enter a first and last name.", 400);
   }
 
+  // Bookings that still have time left
   const bookings = await Booking.findAll({
     include: [
       "stations",
@@ -62,10 +78,10 @@ bookingRouter.post("/check-in", async (req, res) => {
       isComplete: true,
       firstName,
       lastName,
-      // If there will still be time left in the reservation
+      // Where duration...
       "$bookingStations.experiencePrice.duration$": {
+        // ...is greater than the time since startTime.
         [Op.gte]: fn(
-          // Time since start
           "TIMESTAMPDIFF",
           literal("MINUTE"),
           col("startTime"),

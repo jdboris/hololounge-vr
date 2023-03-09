@@ -112,7 +112,7 @@ const Booking = sequelize.define("bookings", {
 
   squareOrderId: {
     type: DataTypes.STRING(255),
-    allowNull: false,
+    allowNull: true,
   },
 
   isComplete: {

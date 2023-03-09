@@ -1,11 +1,12 @@
 import express from "express";
+import { col, fn, literal, Op } from "sequelize";
 import BookingDto from "../dtos/booking.js";
+import BookingStation from "../models/booking-station.js";
 import Booking from "../models/booking.js";
 import ExperiencePrice from "../models/experience-price.js";
 import Experience from "../models/experience.js";
 import Location from "../models/location.js";
 import { HttpError } from "../utils/errors.js";
-import { list } from "../utils/localization.js";
 import { createPaymentLink, createTerminalCheckout } from "../utils/square.js";
 
 const checkoutRouter = express.Router();
@@ -58,6 +59,44 @@ checkoutRouter.post("/", async (req, res) => {
     phone,
   } = req.body;
 
+  const sameStationBookings = await Booking.findAll({
+    include: [
+      "stations",
+      {
+        association: "bookingStations",
+        include: [
+          "location",
+          { association: "experiencePrice", include: ["experience"] },
+        ],
+      },
+    ],
+    where: {
+      isCanceled: false,
+      "$stations.id$": {
+        [Op.in]: bookingStations.map((bs) => bs.stationId),
+      },
+      // Where duration...
+      "$bookingStations.experiencePrice.duration$": {
+        // ...is greater than the time between this booking start and the new booking start.
+        [Op.gte]: fn(
+          "TIMESTAMPDIFF",
+          literal("MINUTE"),
+          col("startTime"),
+          startTime
+        ),
+      },
+    },
+  });
+
+  if (sameStationBookings.length) {
+    throw new HttpError(
+      `Selected station(s) already booked at that time.`,
+      400
+    );
+  }
+
+  // return res.json({ success: true });
+
   const location = await Location.findByPk(bookingStations[0].location.id);
   if (!location) {
     throw new Error(`Location with ID "${locationId}" not found.`);
@@ -73,18 +112,8 @@ checkoutRouter.post("/", async (req, res) => {
     throw new Error(`No ExperiencePrices found.`);
   }
 
-  const data = isPos
-    ? await createTerminalCheckout({ bookingStations, experiencePrices })
-    : await createPaymentLink({
-        location,
-        experiencePrices,
-        bookingStations,
-        referrer,
-      });
-  const orderId = isPos ? data.checkout.id : data.payment_link.order_id;
-
   // Creating the bookings in a pending state...
-  await Booking.bulkCreate(
+  const bookings = await Booking.bulkCreate(
     Object.values(
       bookingStations.reduce(
         (byLocation, bs) => ({
@@ -100,7 +129,7 @@ checkoutRouter.post("/", async (req, res) => {
             isComplete: false,
             isCanceled: false,
             isCheckedIn: false,
-            squareOrderId: orderId,
+            squareOrderId: null,
             bookingStations: [
               ...(byLocation[bs.location.id]?.bookingStations || []),
               {
@@ -116,6 +145,27 @@ checkoutRouter.post("/", async (req, res) => {
     ),
     {
       include: ["bookingStations"],
+    }
+  );
+
+  const data = isPos
+    ? await createTerminalCheckout({ bookingStations, experiencePrices })
+    : await createPaymentLink({
+        location,
+        experiencePrices,
+        bookingStations,
+        referrer,
+      });
+  const orderId = isPos ? data.checkout.id : data.payment_link.order_id;
+
+  Booking.update(
+    { squareOrderId: orderId },
+    {
+      where: {
+        id: {
+          [Op.in]: bookings.map((b) => b.id),
+        },
+      },
     }
   );
 

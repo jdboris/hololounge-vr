@@ -249,12 +249,12 @@ export default function BookingPage() {
   }
 
   const openingTime = useMemo(
-    () => new D(formData.startTime).setHours(10, 0, 0, 0),
+    () => new D(formData.startTime).setHours(SANDBOX_MODE ? 0 : 10, 0, 0, 0),
     [formData.startTime]
   );
 
   const closingTime = useMemo(
-    () => new D(formData.startTime).setHours(23, 0, 0, 0),
+    () => new D(formData.startTime).setHours(SANDBOX_MODE ? 23 : 23, 0, 0, 0),
     [formData.startTime]
   );
 
@@ -770,22 +770,6 @@ export default function BookingPage() {
                           closingTime,
                           EXPERIENCE_DURATION + interval
                         )}
-                        // popperModifiers={[
-                        //   {
-                        //     name: "offset",
-                        //     options: {
-                        //       offset: ({ placement, reference, popper }) => {
-                        //         return [0, -popper.height / 2];
-                        //       },
-                        //     },
-                        //   },
-                        //   {
-                        //     name: "flip",
-                        //     options: {
-                        //       fallbackPlacements: [],
-                        //     },
-                        //   },
-                        // ]}
                       />
                     </label>
                   </div>
@@ -972,6 +956,7 @@ export default function BookingPage() {
                     )}
                   </label>
                   <button
+                    disabled={isLoading || MAINTENANCE_MODE}
                     className={theme.red}
                     onClick={(e) => e.preventDefault() || setPageNumber(1)}
                   >
@@ -980,7 +965,10 @@ export default function BookingPage() {
                   </button>
 
                   <InputError message={error?.message} />
-                  <button className={theme.blue}>
+                  <button
+                    disabled={isLoading || MAINTENANCE_MODE}
+                    className={theme.blue}
+                  >
                     <FaCreditCard />
                     PAY WITH CREDIT CARD
                   </button>
