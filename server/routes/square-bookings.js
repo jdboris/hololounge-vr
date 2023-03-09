@@ -11,6 +11,7 @@ dotenv.config();
 const {
   SQUARE_TERMINAL_WEBHOOK_SIGNATURE_KEY,
   SQUARE_PAYMENT_WEBHOOK_SIGNATURE_KEY,
+  ADMIN_EMAIL,
 } = process.env;
 
 const squareBookingRouter = express.Router();
@@ -168,7 +169,8 @@ async function handleRequest(req, res, type) {
               {
                 firstName,
                 lastName,
-                email,
+                // NOTE: Give Springboard the admin email to bypass their booking confirmation emails
+                ADMIN_EMAIL,
                 phone,
               },
             ],
