@@ -1,7 +1,7 @@
+import { subMinutes } from "date-fns";
 import express from "express";
 import { col, fn, literal, Op } from "sequelize";
 import BookingDto from "../dtos/booking.js";
-import BookingStation from "../models/booking-station.js";
 import Booking from "../models/booking.js";
 import ExperiencePrice from "../models/experience-price.js";
 import Experience from "../models/experience.js";
@@ -75,16 +75,25 @@ checkoutRouter.post("/", async (req, res) => {
       "$stations.id$": {
         [Op.in]: bookingStations.map((bs) => bs.stationId),
       },
-      // Where duration...
-      "$bookingStations.experiencePrice.duration$": {
-        // ...is greater than the time between this booking start and the new booking start.
-        [Op.gte]: fn(
-          "TIMESTAMPDIFF",
-          literal("MINUTE"),
-          col("startTime"),
-          startTime
-        ),
-      },
+      [Op.or]: [
+        // Either already complete or "pending" (recent)
+        {
+          isComplete: true,
+
+          // Where duration...
+          "$bookingStations.experiencePrice.duration$": {
+            // ...is greater than the time between this booking start and the new booking start.
+            [Op.gte]: fn(
+              "TIMESTAMPDIFF",
+              literal("MINUTE"),
+              col("startTime"),
+              startTime
+            ),
+          },
+        },
+
+        { createdAt: { [Op.gt]: subMinutes(new Date(), 5) } },
+      ],
     },
   });
 

@@ -20,7 +20,6 @@ bookingRouter.get("/upcoming", async (req, res) => {
         // Either already complete or "pending" (recent)
         {
           isComplete: true,
-          // startTime: { [Op.gt]: new Date() },
 
           // // Where duration...
           "$bookingStations.experiencePrice.duration$": {
