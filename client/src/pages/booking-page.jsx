@@ -633,7 +633,7 @@ export default function BookingPage() {
                     ) : (
                       <>
                         <FaInfoCircle />
-                        Select station(s) to reserve
+                        Select station(s) to reserve.
                       </>
                     )}
                   </em>

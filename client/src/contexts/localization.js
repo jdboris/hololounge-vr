@@ -144,8 +144,6 @@ function jp(english) {
       return `生年月日（西暦）`;
     case `Continue to payment`:
       return `支払いに進む`;
-    case `Select station(s) to reserve.`:
-      return `予約したいステーションを選択してください。`;
     case `Enter your last name.`:
       return `姓を入力して下さい。`;
     case `Station B`:
@@ -170,8 +168,6 @@ function jp(english) {
       return `生年月日（西暦）を入力して下さい。`;
     case `CONTINUE TO PAYMENT`:
       return `支払いに進む`;
-    case `Select station(s) to reserve.`:
-      return `予約したいステーションを選択してください。`;
     case `Please enter a first and last name.`:
       return `予約時に入力した名前を入力して下さい。`;
     case `Last Name`:
@@ -290,7 +286,7 @@ function jp(english) {
       return `クレジットカードで払う`;
     case `CONTINUE`:
       return `確認`;
-    case `Enter your resservation's start date and time.`:
+    case `Enter your reservation's start date and time.`:
       return `ご希望の予約開始時間と利用時間を入力して下さい。`;
     case `BACK`:
       return `戻る`;

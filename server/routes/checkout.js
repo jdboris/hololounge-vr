@@ -28,8 +28,7 @@ checkoutRouter.get("/:id", async (req, res) => {
   } else {
     res.json({
       isComplete: true,
-      message: `Booking complete! You will receive a receipt and booking confirmation via email. 
-                Please check in at the in-store kiosk up to 5 minutes in advance.`,
+      message: `Booking complete! You will receive a receipt and booking confirmation via email. Please check in at the in-store kiosk up to 5 minutes in advance.`,
       bookings,
     });
   }
@@ -103,8 +102,6 @@ checkoutRouter.post("/", async (req, res) => {
       400
     );
   }
-
-  // return res.json({ success: true });
 
   const location = await Location.findByPk(bookingStations[0].location.id);
   if (!location) {

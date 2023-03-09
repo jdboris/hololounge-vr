@@ -109,8 +109,7 @@ bookingRouter.post("/check-in", async (req, res) => {
   }
 
   res.json({
-    message: `Check-in complete! You are now checked in at these stations. Your
-    experience(s) will start automatically.`,
+    message: `Check-in complete! You are now checked in at these stations. Your experience(s) will start automatically.`,
     bookings: soonBookings,
   });
 });
