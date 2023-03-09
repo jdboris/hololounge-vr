@@ -275,8 +275,10 @@ export default function BookingPage() {
             return (
               b.startTime > openingTime &&
               b.startTime < closingTime &&
-              addMinutes(b.startTime, duration + interval) > openingTime &&
-              addMinutes(b.startTime, duration + interval) < closingTime
+              addMinutes(b.startTime, duration + interval + interval) >
+                openingTime &&
+              addMinutes(b.startTime, duration + interval + interval) <
+                closingTime
             );
             // NOTE: Add the startTime to the bookingStation object as a temporary patch
           })
@@ -360,8 +362,11 @@ export default function BookingPage() {
         bs.stationId == station.id &&
         areIntervalsOverlapping(
           {
-            start: formData.startTime,
-            end: addMinutes(formData.startTime, EXPERIENCE_DURATION + interval),
+            start: subMinutes(formData.startTime, interval),
+            end: addMinutes(
+              formData.startTime,
+              EXPERIENCE_DURATION + interval + interval
+            ),
           },
           {
             start: bs.startTime,
