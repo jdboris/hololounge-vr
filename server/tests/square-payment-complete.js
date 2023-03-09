@@ -1,8 +1,8 @@
-const ORDER_ID = "rDcZmDWYqso7QJ4HUazF7H9efSTZY";
+const ORDER_ID = "16tT9ZkmgE3ANSluH3KrHkXEiBfZY";
 
 console.log(
   await (
-    await fetch(`http://localhost:5000/api/square/bookings`, {
+    await fetch(`http://localhost:5000/api/square/payment-updated`, {
       method: "POST",
       body: JSON.stringify({
         merchant_id: "ML6PT9F9F2KE8",
