@@ -39,7 +39,8 @@ export function ScrollRoutingProvider({ roots = [], children, ...props }) {
 
           return {
             target: ref.current,
-            intersectionRatio: entry && entry.intersectionRatio,
+            intersectionRect: entry && entry.intersectionRect,
+            rootBounds: entry && entry.rootBounds,
           };
         })
     );
@@ -69,10 +70,14 @@ export function ScrollRoutingProvider({ roots = [], children, ...props }) {
                 )
             ),
             // NOTE: Must make a copy
-            ...newEntries.map(({ intersectionRatio, target }) => ({
-              intersectionRatio,
-              target,
-            })),
+            ...newEntries.map(
+              ({ intersectionRect, rootBounds, isIntersecting, target }) => ({
+                intersectionRect,
+                rootBounds,
+                isIntersecting,
+                target,
+              })
+            ),
           ]);
         },
         { threshold: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] }
@@ -86,15 +91,24 @@ export function ScrollRoutingProvider({ roots = [], children, ...props }) {
     return entries
       .filter((e) => e.target.dataset.__route.startsWith(root))
       .reduce((highest, entry) => {
-        return highest == null ||
-          (entry.intersectionRatio > highest.intersectionRatio &&
-            entry.intersectionRatio > 0.2)
+        return entryToScreenRatio(entry) > 0.2 &&
+          entry.isIntersecting &&
+          (highest == null ||
+            entryToScreenRatio(entry) > entryToScreenRatio(highest))
           ? entry
           : highest;
       }, null);
   }, [observer, entries]);
 
   const [scrollingTo, setScrollingTo] = useState(null);
+
+  function entryToScreenRatio(entry) {
+    return (
+      entry.intersectionRect &&
+      entry.rootBounds &&
+      entry.intersectionRect.height / entry.rootBounds.height
+    );
+  }
 
   function scrollNavigate(route) {
     if (scrollingTo) return;
@@ -110,7 +124,7 @@ export function ScrollRoutingProvider({ roots = [], children, ...props }) {
       // If the address is at the entry, but it's not visible enough...
       if (
         route == entry.target.dataset.__route &&
-        entry.intersectionRatio < 0.2
+        entryToScreenRatio(entry) < 0.2
       ) {
         setScrollingTo(entry.target);
         setTimeout(() => setScrollingTo(null), 1000);
@@ -127,14 +141,14 @@ export function ScrollRoutingProvider({ roots = [], children, ...props }) {
   }, [scrollingTo]);
 
   useEffect(() => {
-    if (!mostVisible || scrollingTo) {
+    if (scrollingTo) {
       return;
     }
 
     // If the most visible is not visible enough...
     if (
-      mostVisible.intersectionRatio == undefined ||
-      mostVisible.intersectionRatio < 0.2
+      !mostVisible ||
+      (entryToScreenRatio(mostVisible) && entryToScreenRatio(mostVisible) < 0.2)
     ) {
       // ...back to the root.
       if (location.pathname != root) {
@@ -155,7 +169,12 @@ export function ScrollRoutingProvider({ roots = [], children, ...props }) {
       // ...navigate to it.
       navigate(mostVisible.target.dataset.__route);
     }
-  }, [mostVisible?.target, mostVisible?.intersectionRatio]);
+  }, [
+    mostVisible?.target,
+    mostVisible?.intersectionRect,
+    mostVisible?.rootBounds,
+    mostVisible?.isIntersecting,
+  ]);
 
   function addSection({ route, ref }) {
     if (ref.current) {
