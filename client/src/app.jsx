@@ -76,7 +76,8 @@ function App() {
                             onLogin={(user) =>
                               user &&
                               user.email == "pos@hololounge.jp" &&
-                              localStorage.setItem("pos", 1)
+                              localStorage.setItem("pos", 1) &&
+                              window.location.reload()
                             }
                           />
                         }
