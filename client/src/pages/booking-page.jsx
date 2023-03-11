@@ -357,6 +357,10 @@ export default function BookingPage() {
   }
 
   function isStationBooked(station) {
+    if (station.name == "Station A") {
+      return true;
+    }
+
     return bookedStationsOfDay.find((bs) => {
       return (
         bs.stationId == station.id &&
@@ -497,7 +501,10 @@ export default function BookingPage() {
               if (redirectUrl) {
                 setModalContent(message);
                 if (!SANDBOX_MODE) {
-                  window.location.href = redirectUrl;
+                  // NOTE: Required to workaround Square's bug where the link responds with 404 if you redirect too quickly
+                  setTimeout(() => {
+                    window.location.href = redirectUrl;
+                  }, 3000);
                 }
               } else {
                 setModalContent(message, { canClose: false });
