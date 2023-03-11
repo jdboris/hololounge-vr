@@ -58,6 +58,11 @@ checkoutRouter.post("/", async (req, res) => {
     phone,
   } = req.body;
 
+  const experiencePrices = await ExperiencePrice.findAll();
+  if (!experiencePrices || !experiencePrices.length) {
+    throw new Error(`No ExperiencePrices found.`);
+  }
+
   const sameStationBookings = await Booking.findAll({
     include: [
       "stations",
@@ -70,18 +75,22 @@ checkoutRouter.post("/", async (req, res) => {
       },
     ],
     where: {
-      isCanceled: false,
       "$stations.id$": {
         [Op.in]: bookingStations.map((bs) => bs.stationId),
       },
-      [Op.or]: [
-        // Either already complete or "pending" (recent)
-        {
-          isComplete: true,
+      isCanceled: false,
+      // Either already complete or "pending" (recent)
+      [Op.or]: {
+        isComplete: true,
+        createdAt: { [Op.gt]: subMinutes(new Date(), 5) },
+      },
 
-          // Where duration...
+      [Op.and]: [
+        {
+          // BOOKINGS THAT ARE STILL GOING WHEN NEW ONE STARTS:
+          // Where duration (60)...
           "$bookingStations.experiencePrice.duration$": {
-            // ...is greater than the time between this booking start and the new booking start.
+            // ...is greater than the time since (new - this).
             [Op.gte]: fn(
               "TIMESTAMPDIFF",
               literal("MINUTE"),
@@ -91,9 +100,31 @@ checkoutRouter.post("/", async (req, res) => {
           },
         },
 
-        { createdAt: { [Op.gt]: subMinutes(new Date(), 5) } },
+        {
+          // BOOKINGS THAT WILL START DURING THIS NEW ONE:
+          // Where duration (60)...
+          60: {
+            // ...is less than the time until (this - new).
+            [Op.gte]: fn(
+              "TIMESTAMPDIFF",
+              literal("MINUTE"),
+              startTime,
+              col("startTime")
+            ),
+          },
+        },
       ],
     },
+    attributes: [
+      [
+        fn("TIMESTAMPDIFF", literal("MINUTE"), col("startTime"), startTime),
+        "timeSince",
+      ],
+      [
+        fn("TIMESTAMPDIFF", literal("MINUTE"), startTime, col("startTime")),
+        "timeUntil",
+      ],
+    ],
   });
 
   if (sameStationBookings.length) {
@@ -111,11 +142,6 @@ checkoutRouter.post("/", async (req, res) => {
   const experiences = await Experience.findAll();
   if (!experiences || !experiences.length) {
     throw new Error(`No Experiences found.`);
-  }
-
-  const experiencePrices = await ExperiencePrice.findAll();
-  if (!experiencePrices || !experiencePrices.length) {
-    throw new Error(`No ExperiencePrices found.`);
   }
 
   // Creating the bookings in a pending state...
