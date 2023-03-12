@@ -103,7 +103,7 @@ checkoutRouter.post("/", async (req, res) => {
         {
           // BOOKINGS THAT WILL START DURING THIS NEW ONE:
           // Where duration (60)...
-          60: {
+          "$bookingStations.experiencePrice.duration$": {
             // ...is less than the time until (this - new).
             [Op.gte]: fn(
               "TIMESTAMPDIFF",
