@@ -31,9 +31,9 @@ function LocationPage() {
         <iframe
           src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d404.9471929898952!2d139.79782113830157!3d35.71201220979492!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188f33a7b6c1cf%3A0x3774e978c4fb3543!2sHoloLounge%20VR!5e0!3m2!1sen!2sjp!4v1678423330108!5m2!1sen!2sjp"
           style={{ border: 0, width: "100%", height: "600px" }}
-          allowfullscreen=""
+          allowFullscreen=""
           loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
+          referrerPolicy="no-referrer-when-downgrade"
         ></iframe>
       </main>
     </div>
