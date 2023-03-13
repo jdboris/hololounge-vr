@@ -8,13 +8,17 @@ import { useScrollRouting } from "../contexts/scroll-routing";
 import BookingPage from "./booking-page";
 import GamePage from "./game-page";
 import LocationPage from "./location-page";
+import InfoPage from "./info-page";
 
 function HomePage() {
   const { addSection, navigate } = useScrollRouting();
   const location = useLocation();
+  const infoSectionRef = useRef();
   const featuredSectionRef = useRef();
   const locationSectionRef = useRef();
   const bookingSectionRef = useRef();
+
+  useEffect(() => addSection({ route: "/info", ref: infoSectionRef }), []);
 
   useEffect(
     () => addSection({ route: "/featured", ref: featuredSectionRef }),
@@ -51,6 +55,9 @@ function HomePage() {
           <FaChevronDown />
         </button>
       </div>
+      <section ref={infoSectionRef}>
+        <InfoPage />
+      </section>
       <section ref={featuredSectionRef}>
         <GamePage onlyFeatured={true} />
       </section>
