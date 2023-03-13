@@ -165,6 +165,8 @@ export default function BookingPage() {
     setHasSelectedTime(false);
     setPageNumber(1);
 
+    getBookings();
+
     restartTimer();
   }, [url.pathname]);
 
