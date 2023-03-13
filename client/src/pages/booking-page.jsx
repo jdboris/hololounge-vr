@@ -258,11 +258,6 @@ export default function BookingPage() {
     [formData.startTime]
   );
 
-  const value = useMemo(
-    () => toValue(formData.startTime),
-    [formData.startTime]
-  );
-
   const bookedStationsOfDay = useMemo(() => {
     const bookingStations = [];
 
