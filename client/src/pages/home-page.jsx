@@ -49,7 +49,7 @@ function HomePage() {
 
         <button
           onClick={(e) => {
-            navigate("/featured");
+            navigate("/info");
           }}
         >
           <FaChevronDown />
