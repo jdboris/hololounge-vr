@@ -59,7 +59,7 @@ export function ModalProvider({ children }) {
 
 /**
  * @typedef ModalContextValue
- * @property {(content: string | React.ReactElement) => undefined} setModalContent
+ * @property {(content: string | React.ReactElement, {canClose = false} = {}) => undefined} setModalContent
  */
 
 /**

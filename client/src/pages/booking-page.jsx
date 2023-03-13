@@ -499,7 +499,7 @@ export default function BookingPage() {
               }
 
               if (redirectUrl) {
-                setModalContent(message);
+                setModalContent(message, { canClose: SANDBOX_MODE });
                 if (!SANDBOX_MODE) {
                   // NOTE: Required to workaround Square's bug where the link responds with 404 if you redirect too quickly
                   setTimeout(() => {
