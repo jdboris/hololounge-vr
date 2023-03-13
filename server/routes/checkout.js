@@ -1,6 +1,6 @@
-import { subMinutes } from "date-fns";
+import { addMinutes, subMinutes } from "date-fns";
 import express from "express";
-import { col, fn, literal, Op } from "sequelize";
+import { col, fn, Op, where } from "sequelize";
 import BookingDto from "../dtos/booking.js";
 import Booking from "../models/booking.js";
 import ExperiencePrice from "../models/experience-price.js";
@@ -86,45 +86,40 @@ checkoutRouter.post("/", async (req, res) => {
       },
 
       [Op.and]: [
-        {
-          // BOOKINGS THAT ARE STILL GOING WHEN NEW ONE STARTS:
-          // Where duration (60)...
-          "$bookingStations.experiencePrice.duration$": {
-            // ...is greater than the time since (new - this).
-            [Op.gte]: fn(
-              "TIMESTAMPDIFF",
-              literal("MINUTE"),
-              col("startTime"),
-              startTime
-            ),
-          },
-        },
+        // THIS ONE OVERLAPS WITH NEW ONE:
 
-        {
-          // BOOKINGS THAT WILL START DURING THIS NEW ONE:
-          // Where duration (60)...
-          "$bookingStations.experiencePrice.duration$": {
-            // ...is less than the time until (this - new).
-            [Op.gte]: fn(
-              "TIMESTAMPDIFF",
-              literal("MINUTE"),
-              startTime,
-              col("startTime")
-            ),
-          },
-        },
+        where(
+          // this end
+          fn(
+            "ADDTIME",
+            col("startTime"),
+            fn(
+              "SEC_TO_TIME",
+              where(col("bookingStations.experiencePrice.duration"), "*", 60)
+            )
+          ),
+          // >
+          Op.gt,
+          // new start
+          startTime
+        ),
+
+        where(
+          // this start
+          col("startTime"),
+          // <
+          Op.lt,
+          // new end
+          addMinutes(
+            startTime,
+            experiencePrices.find(
+              // NOTE: Assuming that all bookingStations are the same duration
+              (ep) => ep.id == bookingStations[0].experiencePrice.id
+            ).duration
+          )
+        ),
       ],
     },
-    attributes: [
-      [
-        fn("TIMESTAMPDIFF", literal("MINUTE"), col("startTime"), startTime),
-        "timeSince",
-      ],
-      [
-        fn("TIMESTAMPDIFF", literal("MINUTE"), startTime, col("startTime")),
-        "timeUntil",
-      ],
-    ],
   });
 
   if (sameStationBookings.length) {
