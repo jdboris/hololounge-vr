@@ -46,7 +46,8 @@ export function Localizationprovider({ children }) {
 
   function localizeNode(el, language) {
     textNodesUnder(el).forEach((n) => {
-      n.textContent = localize(n.textContent, language);
+      // n.textContent = localize(n.textContent, language);
+      n.nodeValue = localize(n.nodeValue, language);
     });
   }
 
