@@ -2,12 +2,28 @@ import * as dotenv from "dotenv";
 import { v4 as uuid } from "uuid";
 
 dotenv.config();
-const {
-  SQUARE_CREATE_TERMINAL_CHECKOUT_URL,
-  SQUARE_TERMINAL_1_DEVICE_ID,
-  SQUARE_CREATE_PAYMENT_LINK_URL,
-  SQUARE_ACCESS_TOKEN,
-} = process.env;
+
+const { NODE_ENV } = process.env;
+
+const SQUARE_CREATE_TERMINAL_CHECKOUT_URL =
+  NODE_ENV == "production"
+    ? process.env.SQUARE_CREATE_TERMINAL_CHECKOUT_URL
+    : process.env.SANDBOX_SQUARE_CREATE_TERMINAL_CHECKOUT_URL;
+
+const SQUARE_TERMINAL_1_DEVICE_ID =
+  NODE_ENV == "production"
+    ? process.env.SQUARE_TERMINAL_1_DEVICE_ID
+    : process.env.SANDBOX_SQUARE_TERMINAL_1_DEVICE_ID;
+
+const SQUARE_CREATE_PAYMENT_LINK_URL =
+  NODE_ENV == "production"
+    ? process.env.SQUARE_CREATE_PAYMENT_LINK_URL
+    : process.env.SANDBOX_SQUARE_CREATE_PAYMENT_LINK_URL;
+
+const SQUARE_ACCESS_TOKEN =
+  NODE_ENV == "production"
+    ? process.env.SQUARE_ACCESS_TOKEN
+    : process.env.SANDBOX_SQUARE_ACCESS_TOKEN;
 
 export async function createTerminalCheckout({
   bookingStations,
@@ -67,7 +83,10 @@ export async function createPaymentLink({
     },
     body: JSON.stringify({
       order: {
-        location_id: location.idInSquare,
+        location_id:
+          process.env.NODE_ENV == "production"
+            ? location.idInSquare
+            : process.env.SANDBOX_SQUARE_LOCATION_ID,
         // Reduce the bookingStations to an array of line item objects grouped by idInSquare
         line_items: Object.values(
           bookingStations.reduce((items, bs) => {
@@ -78,7 +97,10 @@ export async function createPaymentLink({
             return {
               ...items,
               [idInSquare]: {
-                catalog_object_id: idInSquare,
+                catalog_object_id:
+                  process.env.NODE_ENV == "production"
+                    ? idInSquare
+                    : process.env.SANDBOX_SQUARE_ITEM_ID,
                 quantity: String(
                   (Number(items[idInSquare]?.quantity) || 0) + 1
                 ),
@@ -89,6 +111,7 @@ export async function createPaymentLink({
         ),
       },
       checkout_options: {
+        // NOTE: Square will automatically add "orderId" and "transactionId" to the query string
         redirect_url: referrer.href,
         accepted_payment_methods: {
           apple_pay: true,

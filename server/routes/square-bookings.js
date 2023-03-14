@@ -6,13 +6,21 @@ import BookingDto from "../dtos/booking.js";
 import BookingStation from "../models/booking-station.js";
 import Booking from "../models/booking.js";
 import { HttpError } from "../utils/errors.js";
+import sequelize from "../utils/db.js";
 
 dotenv.config();
-const {
-  SQUARE_TERMINAL_WEBHOOK_SIGNATURE_KEY,
-  SQUARE_PAYMENT_WEBHOOK_SIGNATURE_KEY,
-  ADMIN_EMAIL,
-} = process.env;
+
+const { NODE_ENV, ADMIN_EMAIL } = process.env;
+
+const SQUARE_TERMINAL_WEBHOOK_SIGNATURE_KEY =
+  NODE_ENV == "production"
+    ? process.env.SQUARE_TERMINAL_WEBHOOK_SIGNATURE_KEY
+    : process.env.SANDBOX_SQUARE_TERMINAL_WEBHOOK_SIGNATURE_KEY;
+
+const SQUARE_PAYMENT_WEBHOOK_SIGNATURE_KEY =
+  NODE_ENV == "production"
+    ? process.env.SQUARE_PAYMENT_WEBHOOK_SIGNATURE_KEY
+    : process.env.SANDBOX_SQUARE_PAYMENT_WEBHOOK_SIGNATURE_KEY;
 
 const squareBookingRouter = express.Router();
 
@@ -41,7 +49,10 @@ async function handleRequest(req, res, type) {
   hmac.update(requestUrl + bodyText);
   const hash = hmac.digest("base64");
 
-  if (hash !== req.headers["x-square-signature"]) {
+  if (
+    process.env.NODE_ENV == "production" &&
+    hash !== req.headers["x-square-signature"]
+  ) {
     // We have an invalid webhook event.
     // Logging and stopping processing.
     console.error(
@@ -112,6 +123,11 @@ async function handleRequest(req, res, type) {
       // );
       return;
     }
+
+    /**
+     * @type {{bookings: { id: string, idInSpringboard: string, isComplete: boolean }[], bookingStations: {bookingStationId: number, idInSpringboard: string}[]}}
+     */
+    const updateData = {};
 
     for await (const booking of bookings) {
       if (booking.isComplete) {
@@ -216,21 +232,51 @@ async function handleRequest(req, res, type) {
         }
 
         const data = await response.json();
-        booking.isComplete = true;
-        booking.idInSpringboard = data.id;
-        await booking.save();
 
-        BookingStation.update(
+        // NOTE: Store the data to update all at once later...
+        updateData.bookings = [
+          ...(updateData.bookings || []),
+          { id: booking.id, idInSpringboard: data.id, isComplete: true },
+        ];
+
+        updateData.bookingStations = [
+          ...(updateData.bookingStations || []),
           {
+            bookingStationId,
             idInSpringboard: data.bookingStationTimes.find(
               (bst) =>
                 bst.stationId == stationId &&
                 Date.parse(bst.startTime) == startTime.getTime()
             ).id,
           },
-          { where: { id: bookingStationId } }
-        );
+        ];
       }
+    }
+
+    // NOTE: Update all data at once to avoid partial booking completion
+    const transaction = await sequelize.transaction();
+
+    try {
+      await Promise.all([
+        ...updateData.bookings.map(({ id, idInSpringboard, isComplete }) =>
+          Booking.update({ idInSpringboard, isComplete }, { where: { id } })
+        ),
+
+        ...updateData.bookingStations.map(
+          ({ idInSpringboard, bookingStationId }) =>
+            BookingStation.update(
+              {
+                idInSpringboard,
+              },
+              { where: { id: bookingStationId } }
+            )
+        ),
+      ]);
+
+      await transaction.commit();
+    } catch (error) {
+      console.error(error);
+      await transaction.rollback();
     }
   } catch (error) {
     console.error(error);

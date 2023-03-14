@@ -3,72 +3,74 @@ const { SPRINGBOARD_EMAIL, SPRINGBOARD_PASSWORD } = process.env;
 
 export async function checkIn(bookingId, token) {
   const body = JSON.stringify({
-    query: `mutation storeBooking($booking: BookingInput) {
-  storeBooking(booking: $booking) {
-    id
-    title
-    startTime
-    deletedAt
-    updatedAt
-    checkedInAt
-    numPlayers
-    notifyHost
-    notes
-    host {
-      id
-      firstName
-      lastName
-      phone
-      email
-      birthday
-      cards {
-        id
-        lastFour
+    query: `
+      mutation storeBooking($booking: BookingInput) {
+        storeBooking(booking: $booking) {
+          id
+          title
+          startTime
+          deletedAt
+          updatedAt
+          checkedInAt
+          numPlayers
+          notifyHost
+          notes
+          host {
+            id
+            firstName
+            lastName
+            phone
+            email
+            birthday
+            cards {
+              id
+              lastFour
+            }
+          }
+          location {
+            id
+            waiversRequired
+          }
+          waiverNumSurprisedGuests
+          waiverNumMinors
+          waiverNumSigned
+          waiverReferenceHost
+          createdAt
+          imageUrl
+          bookingStationTimes {
+            id
+            experience {
+              id
+            }
+            station {
+              id
+            }
+            tier {
+              id
+              length
+              price
+            }
+            startedAt
+            endTime
+            amountDue
+            amountPaid
+            pausedAt
+            pausedDuration
+            discount {
+              id
+            }
+            coupon {
+              id
+            }
+            customerCard {
+              id
+              lastFour
+            }
+            createdAt
+          }
+        }
       }
-    }
-    location {
-      id
-      waiversRequired
-    }
-    waiverNumSurprisedGuests
-    waiverNumMinors
-    waiverNumSigned
-    waiverReferenceHost
-    createdAt
-    imageUrl
-    bookingStationTimes {
-      id
-      experience {
-        id
-      }
-      station {
-        id
-      }
-      tier {
-        id
-        length
-        price
-      }
-      startedAt
-      endTime
-      amountDue
-      amountPaid
-      pausedAt
-      pausedDuration
-      discount {
-        id
-      }
-      coupon {
-        id
-      }
-      customerCard {
-        id
-        lastFour
-      }
-      createdAt
-    }
-  }
-}`,
+    `,
     variables: {
       booking: {
         id: bookingId,
@@ -107,14 +109,16 @@ export async function checkIn(bookingId, token) {
     body,
   });
 
-  if (!response.ok) {
-    console.log("response body: ", await response.text());
+  const data = await response.json();
+
+  if (!response.ok || (data.errors && data.errors.length)) {
+    console.error("response body: ", JSON.stringify(data));
     throw new Error(
       `Springboard checkin failed with status ${response.status}`
     );
   }
 
-  return (await response.json()).data.storeBooking;
+  return data.data.storeBooking;
 }
 
 export async function startBookingStationTime(bookingStationTime, token) {

@@ -2,6 +2,7 @@ import { addMinutes, subMinutes } from "date-fns";
 import express from "express";
 import { col, fn, literal, Op } from "sequelize";
 import Booking from "../models/booking.js";
+import sequelize from "../utils/db.js";
 import { HttpError } from "../utils/errors.js";
 import {
   checkIn,
@@ -149,9 +150,6 @@ bookingRouter.post("/start", async (req, res) => {
       );
     }
 
-    booking.isCheckedIn = true;
-    await booking.save();
-
     const { bookingStationTimes } = await checkIn(
       booking.idInSpringboard,
       token
@@ -160,6 +158,22 @@ bookingRouter.post("/start", async (req, res) => {
     for await (const bookingStationTime of bookingStationTimes) {
       await startBookingStationTime(bookingStationTime, token);
     }
+  }
+
+  // NOTE: Update all data at once to avoid partial check-in completion
+  const transaction = await sequelize.transaction();
+
+  try {
+    await Promise.all(
+      bookings.map(({ id }) =>
+        Booking.update({ isComplete: true }, { where: { id } })
+      )
+    );
+
+    await transaction.commit();
+  } catch (error) {
+    console.error(error);
+    await transaction.rollback();
   }
 
   res.json({ success: true });
