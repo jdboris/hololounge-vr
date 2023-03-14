@@ -354,7 +354,10 @@ export default function BookingPage() {
   }
 
   function isStationBooked(station) {
-    if (station.name == "Station A") {
+    if (
+      !SANDBOX_MODE &&
+      (station.name == "Station A" || station.name == "Station C")
+    ) {
       return true;
     }
 
@@ -441,7 +444,9 @@ export default function BookingPage() {
       window.history.replaceState(null, "", url);
 
       setModalContent(
-        "Booking complete! You will receive a receipt and booking confirmation via email."
+        localize(
+          "Booking complete! You will receive a receipt and booking confirmation via email. Please check in at the in-store kiosk up to 5 minutes in advance."
+        )
       );
     }
   }, []);

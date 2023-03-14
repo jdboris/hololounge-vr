@@ -13,7 +13,7 @@ function InfoPage() {
         </figure>
         <aside>
           <div>
-            <h4>Welcome to HoloLounge!</h4>
+            <h4>Welcome!</h4>
             Kick back, relax, and have some fun in virtual reality. Alone or
             with friends, enjoy a casual and comfortable experience at your own
             pace.

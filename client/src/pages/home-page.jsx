@@ -74,7 +74,8 @@ function HomePage() {
           className={[theme.button, theme.fixedButton, theme.blue].join(" ")}
           onClick={(e) => e.preventDefault() || navigate("/booking")}
         >
-          <FaRegCalendar /> BOOK NOW
+          <FaRegCalendar />
+          BOOK NOW
         </Link>
       )}
     </main>

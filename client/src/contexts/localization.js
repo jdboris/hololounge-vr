@@ -145,6 +145,8 @@ function jp(english) {
       return `生年月日（西暦）`;
     case `Continue to payment`:
       return `支払いに進む`;
+    case `Select station(s) to reserve.`:
+      return `予約したいステーションを選択してください。`;
     case `Enter your last name.`:
       return `姓を入力して下さい。`;
     case `Station B`:
@@ -169,6 +171,8 @@ function jp(english) {
       return `生年月日（西暦）を入力して下さい。`;
     case `CONTINUE TO PAYMENT`:
       return `支払いに進む`;
+    case `Select station(s) to reserve.`:
+      return `予約したいステーションを選択してください。`;
     case `Please enter a first and last name.`:
       return `予約時に入力した名前を入力して下さい。`;
     case `Last Name`:
@@ -295,6 +299,48 @@ function jp(english) {
       return `分`;
     case `Explore а bundle of 4 real-life and legendary locations - shot, scanned, and hand-polished into realistic interactive environments. Early Access includes 2 experiences and 2 more will be updated for free.`:
       return `4 つの実在の伝説的な場所のバンドルを探索してください - 現実的なインタラクティブな環境に撮影、スキャン、手作業で磨かれています。アーリー アクセスには 2 つのエクスペリエンスが含まれており、さらに 2 つが無料でアップデートされます。`;
+    case `Grab your safety goggles and set out on a chemical-burning, liquid-stirring, camera-whirring competition in HoloLAB Champions, a virtual reality chemistry game show. EDIT`:
+      return `安全ゴーグルを手に取り、仮想現実の化学ゲーム ショーである HoloLAB Champions で、化学物質を燃焼させ、液体を攪拌し、カメラを回転させる競争に出かけましょう。`;
+    case `Welcome!`:
+      return english;
+    case `Kick back, relax, and have some fun in virtual reality. Alone or with friends, enjoy a casual and comfortable experience at your own pace.`:
+      return english;
+    case `How?`:
+      return english;
+    case `Book a VR station`:
+      return english;
+    case ` online or in-store`:
+      return english;
+    case `Check in when it's time to start`:
+      return english;
+    case `Put on your VR headset and enjoy!`:
+      return english;
+    case `Visit the `:
+      return english;
+    case ` page for more info.`:
+      return english;
+    case `Price`:
+      return english;
+    case `¥2,000/hour per station*`:
+      return english;
+    case `* One headset per station`:
+      return english;
+    case `* Multple guests per station is OK!`:
+      return english;
+    case `Redirecting for checkout...`:
+      return english;
+    case `Selected station(s) already booked at that time.`:
+      return english;
+    case ``:
+      return english;
+    case ``:
+      return english;
+    case ``:
+      return english;
+    case ``:
+      return english;
+    case ``:
+      return english;
   }
 
   return english;
