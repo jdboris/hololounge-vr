@@ -8,6 +8,7 @@ import { useLocalization } from "../contexts/localization";
 import { useModal } from "../contexts/modal";
 import "../css/react-datepicker.scss";
 import { toLocaleString } from "../utils/dates";
+import { SANDBOX_MODE } from "../utils/sandbox";
 
 function CheckInPage() {
   const { localize } = useLocalization();
@@ -30,6 +31,8 @@ function CheckInPage() {
       firstName: "",
       lastName: "",
     });
+
+    setError(null);
   }, [location.pathname]);
 
   const [booking, dtoError] = useMemo(() => {
@@ -122,7 +125,7 @@ function CheckInPage() {
                 throw error;
               }
 
-              if (bookings.length) {
+              if (bookings.length && !SANDBOX_MODE) {
                 setTimeout(async () => {
                   try {
                     const response = await fetch(`/api/bookings/start`, {
