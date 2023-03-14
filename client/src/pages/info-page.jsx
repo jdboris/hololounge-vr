@@ -39,7 +39,15 @@ function InfoPage() {
           </div>
           <div>
             <div className={theme.h4}>Price</div>
-            ¥2,000/hour per station*
+            <span className={theme.price}>
+              <img src="/img/small-sale-sticker.png" />
+              <span className={theme.old}>
+                <small>¥</small>
+                <span>2,000</span>
+              </span>
+              <small>¥</small>1,000<small>/hr</small>
+            </span>{" "}
+            per station
             <small>
               <em>* One headset per station</em>
             </small>
