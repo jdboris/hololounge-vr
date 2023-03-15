@@ -166,7 +166,7 @@ bookingRouter.post("/start", async (req, res) => {
   try {
     await Promise.all(
       bookings.map(({ id }) =>
-        Booking.update({ isComplete: true }, { where: { id } })
+        Booking.update({ isCheckedIn: true }, { where: { id } })
       )
     );
 
