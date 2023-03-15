@@ -175,14 +175,17 @@ checkoutRouter.post("/", async (req, res) => {
     }
   );
 
-  const data = isPos
-    ? await createTerminalCheckout({ bookingStations, experiencePrices })
-    : await createPaymentLink({
-        location,
-        experiencePrices,
-        bookingStations,
-        referrer,
-      });
+  const data =
+    process.env.NODE_ENV == "production"
+      ? isPos
+        ? await createTerminalCheckout({ bookingStations, experiencePrices })
+        : await createPaymentLink({
+            location,
+            experiencePrices,
+            bookingStations,
+            referrer,
+          })
+      : { checkout: { id: "12345" }, payment_link: { order_id: "12345" } };
   const orderId = isPos ? data.checkout.id : data.payment_link.order_id;
 
   Booking.update(

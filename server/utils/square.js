@@ -84,6 +84,7 @@ export async function createPaymentLink({
     body: JSON.stringify({
       order: {
         location_id:
+          // Use a fake ID in development...
           process.env.NODE_ENV == "production"
             ? location.idInSquare
             : process.env.SANDBOX_SQUARE_LOCATION_ID,
@@ -98,6 +99,7 @@ export async function createPaymentLink({
               ...items,
               [idInSquare]: {
                 catalog_object_id:
+                  // Use a fake ID in development...
                   process.env.NODE_ENV == "production"
                     ? idInSquare
                     : process.env.SANDBOX_SQUARE_ITEM_ID,
