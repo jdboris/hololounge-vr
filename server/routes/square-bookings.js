@@ -207,7 +207,7 @@ async function handleRequest(req, res, type) {
               accept: "application/json",
               "accept-encoding": "gzip, deflate, br",
               "accept-language": "en-US,en;q=0.9,ja;q=0.8",
-              "content-length": body.length,
+              "content-length": new Blob([body]).size,
               "content-type": "application/json",
               dnt: "1",
               origin: "https://customer.springboardvr.com",
