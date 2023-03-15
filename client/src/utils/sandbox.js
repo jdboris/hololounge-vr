@@ -4,7 +4,7 @@ export const SANDBOX_BOOKING_DATA = {
   startTime: new Date(),
   birthday: new Date(1990, 1, 1),
   firstName: "John",
-  lastName: "Smith",
+  lastName: "スミス",
   email: "johnsmith@gmail.com",
-  phone: "1234567890",
+  phone: "０８７９７２０１７３４",
 };
