@@ -302,39 +302,39 @@ function jp(english) {
     case `Grab your safety goggles and set out on a chemical-burning, liquid-stirring, camera-whirring competition in HoloLAB Champions, a virtual reality chemistry game show. EDIT`:
       return `安全ゴーグルを手に取り、仮想現実の化学ゲーム ショーである HoloLAB Champions で、化学物質を燃焼させ、液体を攪拌し、カメラを回転させる競争に出かけましょう。`;
     case `Welcome!`:
-      return english;
+      return `ようこそ！`;
     case `Kick back, relax, and have some fun in virtual reality. Alone or with friends, enjoy a casual and comfortable experience at your own pace.`:
-      return english;
+      return `リラックスして、バーチャル リアリティを楽しみましょう。一人でも、友達とでも、自分のペースで気軽に快適に過ごせます。`;
     case `How?`:
-      return english;
+      return `なぜ？`;
     case `Book a VR station`:
-      return english;
-    case ` online or in-store`:
-      return english;
+      return `VRステーションを予約する`;
+    case `online or in-store`:
+      return `オンラインまたは店舗にて`;
     case `Check in when it's time to start`:
-      return english;
+      return `予約時間が始まるときにチェックインして下さい。`;
     case `Put on your VR headset and enjoy!`:
-      return english;
+      return `ヘッドセットを装着してお楽しみください！`;
     case `Visit the `:
-      return english;
+      return `へ行く`;
     case ` page for more info.`:
-      return english;
+      return `詳細については、ページをご覧ください。`;
     case `Price`:
-      return english;
-    case `¥2,000/hour per station*`:
-      return english;
+      return `料金`;
+    case `per station`:
+      return `1ステーションにつき`;
     case `* One headset per station`:
-      return english;
+      return `1ステーションにつき1ヘッドセット`;
     case `* Multple guests per station is OK!`:
-      return english;
+      return `1ステーションを複数人での利用可`;
     case `Redirecting for checkout...`:
-      return english;
+      return `支払いのためリダイレクトしています...`;
     case `Selected station(s) already booked at that time.`:
-      return english;
-    case ``:
-      return english;
-    case ``:
-      return english;
+      return `選択されたステーションは、既に予約が入っているため選択できません。`;
+    case `/hr`:
+      return `/ｈ`;
+    case `Featured Content`:
+      return `おすすめコンテンツ`;
     case ``:
       return english;
     case ``:
