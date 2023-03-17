@@ -2,13 +2,16 @@ import theme from "@jdboris/css-themes/space-station";
 import { useEffect, useState } from "react";
 import {
   FaBars,
+  FaFacebook,
+  FaFacebookSquare,
+  FaInstagram,
   FaLocationArrow,
-  FaQuestion,
-  FaQuestionCircle,
   FaRegCalendar,
   FaRegQuestionCircle,
+  FaTwitter,
   FaVrCardboard,
 } from "react-icons/fa";
+import { TbMap2 } from "react-icons/tb";
 import { IoMdClose } from "react-icons/io";
 import { MdLanguage } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
@@ -68,6 +71,30 @@ function Header() {
           >
             {!location.pathname.startsWith("/pos") && (
               <>
+                <li>
+                  <a
+                    href="https://goo.gl/maps/DENfphT6i7zmz3Z47"
+                    target="_blank"
+                  >
+                    <TbMap2 />
+                  </a>
+                  <a
+                    href="https://www.instagram.com/hololoungevr"
+                    target="_blank"
+                  >
+                    <FaInstagram />
+                  </a>
+                  <a href="https://www.twitter.com/HoloLounge" target="_blank">
+                    <FaTwitter />
+                  </a>
+                  <a
+                    href="https://www.facebook.com/profile?id=100090034414820"
+                    target="_blank"
+                  >
+                    <FaFacebookSquare />
+                  </a>
+                </li>
+
                 <li>
                   <Link to="/catalog">
                     {isMenuOpen && <FaVrCardboard />}CATALOG
