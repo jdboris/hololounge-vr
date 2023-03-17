@@ -165,7 +165,10 @@ export default function BookingPage() {
     setHasSelectedTime(false);
     setPageNumber(1);
 
-    getBookings();
+    if (url.pathname.endsWith("/booking")) {
+      getBookings();
+      setNow(new Date());
+    }
 
     restartTimer();
   }, [url.pathname]);
@@ -719,6 +722,7 @@ export default function BookingPage() {
                         }
                         ref={timeSelectRef}
                         onCalendarOpen={() => {
+                          setNow(new Date());
                           setHasSelectedTime(true);
                           if (hasSelectedDay) hideError("startTime");
                           const newStartTime = roundUp(
