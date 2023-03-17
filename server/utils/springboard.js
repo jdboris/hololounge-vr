@@ -90,7 +90,7 @@ export async function checkIn(bookingId, token) {
       "accept-encoding": "gzip, deflate, br",
       "accept-language": "en-US",
       authorization: `Bearer ${token}`,
-      "content-length": body.length,
+      "content-length": new Blob([body]).size,
       "content-type": "application/json",
       origin: "https://monitor.springboardvr.com",
       referer: "https://monitor.springboardvr.com/",
@@ -176,7 +176,7 @@ export async function startBookingStationTime(bookingStationTime, token) {
       "accept-encoding": "gzip, deflate, br",
       "accept-language": "en-US",
       authorization: `Bearer ${token}`,
-      "content-length": body.length,
+      "content-length": new Blob([body]).size,
       "content-type": "application/json",
       origin: "https://monitor.springboardvr.com",
       referer: "https://monitor.springboardvr.com/",
@@ -207,24 +207,26 @@ export async function startBookingStationTime(bookingStationTime, token) {
 
 async function getToken() {
   const body = JSON.stringify({
-    query: `mutation (
-$email: String
-$password: String
-) {
-  user: authenticateUser (
-    email: $email
-    password: $password
-    ) {
-      id
-      token
-      redirectOnLoginUrl
-      organization {
-        name
-        type
-        tenantId
-      }
-    }
-  }`,
+    query: `
+    mutation (
+      $email: String
+      $password: String
+      ) {
+        user: authenticateUser (
+          email: $email
+          password: $password
+          ) {
+            id
+            token
+            redirectOnLoginUrl
+            organization {
+              name
+              type
+              tenantId
+            }
+          }
+        }
+    `,
     variables: {
       email: SPRINGBOARD_EMAIL,
       password: SPRINGBOARD_PASSWORD,
@@ -241,7 +243,7 @@ $password: String
       accept: "*/*",
       "accept-encoding": "gzip, deflate, br",
       "accept-language": "en-US",
-      "content-length": body.length,
+      "content-length": new Blob([body]).size,
       "content-type": "application/json",
       dnt: "1",
       origin: "https://account.springboardvr.com",
@@ -297,7 +299,7 @@ export async function login() {
       accept: "*/*",
       "accept-encoding": "gzip, deflate, br",
       "accept-language": "en-US,en;q=0.9",
-      "content-length": body.length,
+      "content-length": new Blob([body]).size,
       "content-type": "application/json",
       cookie: cookies,
       dnt: "1",
