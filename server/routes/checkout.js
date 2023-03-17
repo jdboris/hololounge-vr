@@ -21,7 +21,9 @@ checkoutRouter.get("/:id", async (req, res) => {
     include: ["stations"],
   });
 
-  if (bookings.find((b) => b.isCanceled)) {
+  if (!bookings.length) {
+    throw new HttpError(`No bookings found with ID "${id}".`, 404);
+  } else if (bookings.find((b) => b.isCanceled)) {
     res.json({ isCanceled: true });
   } else if (bookings.find((b) => !b.isComplete)) {
     res.json({ isComplete: false });
@@ -185,7 +187,10 @@ checkoutRouter.post("/", async (req, res) => {
             bookingStations,
             referrer,
           })
-      : { checkout: { id: "12345" }, payment_link: { order_id: "12345" } };
+      : {
+          checkout: { id: "12345" },
+          payment_link: { order_id: "12345", url: "#" },
+        };
   const orderId = isPos ? data.checkout.id : data.payment_link.order_id;
 
   Booking.update(

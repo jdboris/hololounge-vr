@@ -7,6 +7,7 @@ import BookingStation from "../models/booking-station.js";
 import Booking from "../models/booking.js";
 import { HttpError } from "../utils/errors.js";
 import sequelize from "../utils/db.js";
+import { createBooking, login } from "../utils/springboard.js";
 
 dotenv.config();
 
@@ -129,6 +130,8 @@ async function handleRequest(req, res, type) {
      */
     const updateData = {};
 
+    const token = await login();
+
     for await (const booking of bookings) {
       if (booking.isComplete) {
         continue;
@@ -153,85 +156,7 @@ async function handleRequest(req, res, type) {
         experiencePrice,
         id: bookingStationId,
       } of bookingStations) {
-        const body = JSON.stringify({
-          widgetId: location.widgetId,
-          booking: {
-            title: "HoloLounge VR Reservation",
-            agree: true,
-            // e.g. "2023-02-08T01:00:00+09:00"
-            startTime: formatISO(startTime),
-            // e.g. "1989-12-31T15:00:00Z"
-            birthday: birthday.toISOString(),
-            location: { id: location.id },
-            bookingStationTimes: [
-              {
-                experience: { id: experiencePrice.experience.id },
-                station: { id: stationId },
-                tier: { id: experiencePrice.id },
-                // NOTE: Set amounts to 0 so emails to customer don't say there's an outstanding balance
-                // NOTE: If you DO provide amounts, you must multiply amounts by 100 because of Springboard bug
-                amountDue: 0,
-                amountPaid: 0,
-                discount: null,
-                coupon: null,
-                startedAt: null,
-                endTime: addMinutes(
-                  new Date(startTime),
-                  experiencePrice.duration
-                ),
-              },
-            ],
-            guests: [
-              {
-                firstName,
-                lastName,
-                // NOTE: Give Springboard the admin email to bypass their booking confirmation emails
-                ADMIN_EMAIL,
-                phone,
-              },
-            ],
-            numberOfPlayers: 1,
-          },
-          payment: { gateway: location.paymentGatewayId },
-        });
-
-        const response = await fetch(
-          `https://api.springboardvr.com/v1/public/booking`,
-          {
-            method: "POST",
-            headers: {
-              authority: "api.springboardvr.com",
-              method: "POST",
-              path: "/v1/public/booking",
-              scheme: "https",
-              accept: "application/json",
-              "accept-encoding": "gzip, deflate, br",
-              "accept-language": "en-US,en;q=0.9,ja;q=0.8",
-              "content-length": new Blob([body]).size,
-              "content-type": "application/json",
-              dnt: "1",
-              origin: "https://customer.springboardvr.com",
-              referer: "https://customer.springboardvr.com/",
-              "sec-ch-ua":
-                '"Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"',
-              "sec-ch-ua-mobile": "?0",
-              "sec-ch-ua-platform": '"Windows"',
-              "sec-fetch-dest": "empty",
-              "sec-fetch-mode": "cors",
-              "sec-fetch-site": "same-site",
-              "user-agent":
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
-            },
-            body,
-          }
-        );
-
-        if (!response.ok) {
-          const { error, code } = await response.json();
-          throw new HttpError(error, code);
-        }
-
-        const data = await response.json();
+        const data = await createBooking(booking, token);
 
         // NOTE: Store the data to update all at once later...
         updateData.bookings = [
@@ -244,9 +169,7 @@ async function handleRequest(req, res, type) {
           {
             bookingStationId,
             idInSpringboard: data.bookingStationTimes.find(
-              (bst) =>
-                bst.stationId == stationId &&
-                Date.parse(bst.startTime) == startTime.getTime()
+              (bst) => bst.station.id == stationId
             ).id,
           },
         ];

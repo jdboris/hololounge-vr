@@ -5,6 +5,6 @@ export const SANDBOX_BOOKING_DATA = {
   birthday: new Date(1990, 1, 1),
   firstName: "John",
   lastName: "スミス",
-  email: "johnsmith@gmail.com",
+  email: "contact@hololounge.jp",
   phone: "０８７９７２０１７３４",
 };

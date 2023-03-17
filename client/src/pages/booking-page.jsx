@@ -525,7 +525,7 @@ export default function BookingPage() {
                         } = await response.json();
                         // NOTE: May receive 304, which is considered "not OK" by response.ok
                         // if (!response.ok) {
-                        if (error) {
+                        if (error && response.status != 404) {
                           setModalContent(error.message);
                           return reject(error);
                         }
