@@ -9,7 +9,9 @@ function InfoPage() {
     <div className={theme.infoPage}>
       <main>
         <figure>
-          <img src="/img/interior-shot.jpg" />
+          <div
+            style={{ backgroundImage: "url('/img/interior-shot.jpg')" }}
+          ></div>
         </figure>
         <aside>
           <div>
