@@ -304,13 +304,13 @@ function jp(english) {
     case `Welcome!`:
       return `ようこそ！`;
     case `Kick back, relax, and have some fun in virtual reality. Alone or with friends, enjoy a casual and comfortable experience at your own pace.`:
-      return `リラックスして、バーチャル リアリティを楽しみましょう。一人でも、友達とでも、自分のペースで気軽に快適に過ごせます。`;
+      return `リラックスしながら、バーチャル リアリティを楽しみましょう。一人でも、グループでも、自分のペースで気軽に快適に過ごせます。`;
     case `How?`:
-      return `なぜ？`;
+      return `遊び方`;
     case `Book a VR station`:
       return `VRステーションを予約する`;
     case `online or in-store`:
-      return `オンラインまたは店舗にて`;
+      return `（オンラインまたは店舗にて）`;
     case `Check in when it's time to start`:
       return `予約時間が始まるときにチェックインして下さい。`;
     case `Put on your VR headset and enjoy!`:
