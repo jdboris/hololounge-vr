@@ -683,6 +683,7 @@ export default function BookingPage() {
                     <label>
                       <FaRegCalendar />
                       <ReactDatePicker
+                        withPortal
                         disabled={isLoading || MAINTENANCE_MODE}
                         customInput={
                           <CustomInput
@@ -756,7 +757,7 @@ export default function BookingPage() {
                             const position =
                               list.scrollTop + list.clientHeight / 2;
 
-                            const newValue = Math.round(
+                            const newValue = Math.floor(
                               position / list.firstElementChild.offsetHeight
                             );
                             if (selectedValue != newValue) {
@@ -836,6 +837,7 @@ export default function BookingPage() {
                   <label>
                     <ReactDatePicker
                       disabled={MAINTENANCE_MODE}
+                      withPortal
                       customInput={
                         <CustomInput
                           className={theme.alt}
