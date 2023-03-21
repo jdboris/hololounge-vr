@@ -1,5 +1,10 @@
 import theme from "@jdboris/css-themes/space-station";
-import { FaBuilding } from "react-icons/fa";
+import {
+  FaBuilding,
+  FaLocationArrow,
+  FaMapPin,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 
 function LocationPage() {
   return (
@@ -12,19 +17,22 @@ function LocationPage() {
           <div>
             <span>Hours (every day)</span>
             <div>
-              <time className={theme.green}>10:00-23:00</time>
+              <time className={theme.green}>24h</time>
             </div>
           </div>
-          <div>
+          {/* <div>
             <span>Last check-in</span>
             <div>
               <time className={theme.tan}>21:55</time>
             </div>
-          </div>
+          </div> */}
           <div className={theme.row}>
-            <FaBuilding />
-            <span> 〒111-0033</span> <span>東京都台東区花川戸1-5-2</span>{" "}
-            <span>サテライトフジビル10階</span>{" "}
+            <a href="https://goo.gl/maps/DENfphT6i7zmz3Z47" target="_blank">
+              <FaMapMarkerAlt className={theme.red} />
+              <span>〒111-0033</span>{" "}
+              <span>Tokyo, Taito City, Hanakawado, 1-5-2</span>{" "}
+              <span>サテライトフジビル 10F</span>
+            </a>
           </div>
         </address>
 

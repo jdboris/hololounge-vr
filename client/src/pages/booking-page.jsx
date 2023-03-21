@@ -254,12 +254,12 @@ export default function BookingPage() {
   }
 
   const openingTime = useMemo(
-    () => new D(formData.startTime).setHours(SANDBOX_MODE ? 0 : 10, 0, 0, 0),
+    () => new D(formData.startTime).setHours(SANDBOX_MODE ? 0 : 0, 0, 0, 0),
     [formData.startTime]
   );
 
   const closingTime = useMemo(
-    () => new D(formData.startTime).setHours(SANDBOX_MODE ? 23 : 23, 0, 0, 0),
+    () => new D(formData.startTime).setHours(SANDBOX_MODE ? 25 : 25, 0, 0, 0),
     [formData.startTime]
   );
 
@@ -753,13 +753,31 @@ export default function BookingPage() {
                             10
                           );
 
+                          let isAtTopOrBottom = false;
+
                           list.onscroll = () => {
+                            // If at the top or bottom
+                            if (
+                              list.scrollTop == 0 ||
+                              list.scrollTop >=
+                                list.scrollHeight - list.clientHeight
+                            ) {
+                              if (isAtTopOrBottom) {
+                                return;
+                              }
+
+                              isAtTopOrBottom = true;
+                            } else {
+                              isAtTopOrBottom = false;
+                            }
+
                             const position =
                               list.scrollTop + list.clientHeight / 2;
 
                             const newValue = Math.floor(
                               position / list.firstElementChild.offsetHeight
                             );
+
                             if (selectedValue != newValue) {
                               selectedValue = newValue;
                               setStartTime(toDatetime(newValue));
@@ -777,6 +795,7 @@ export default function BookingPage() {
                         locale="ja"
                         showTimeSelect
                         showTimeSelectOnly
+                        shouldCloseOnSelect={false}
                         timeFormat="HH:mm"
                         dateFormat="HH:mm"
                         placeholderText="HH:MM"

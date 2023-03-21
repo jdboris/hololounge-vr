@@ -336,10 +336,8 @@ function jp(english) {
       return `/ｈ`;
     case `Featured Content`:
       return `おすすめコンテンツ`;
-    case ``:
-      return english;
-    case ``:
-      return english;
+    case `Tokyo, Taito City, Hanakawado, 1-5-2`:
+      return `東京都台東区花川戸1-5-2`;
     case ``:
       return english;
   }
