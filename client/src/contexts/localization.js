@@ -12,7 +12,7 @@ export const LocalizationContext = createContext();
 
 export function Localizationprovider({ children }) {
   const [language, setLanguage] = useState(
-    localStorage.getItem("language") || "JP"
+    localStorage.getItem("language") || "jp"
   );
   const wrapperRef = useRef();
 
@@ -42,6 +42,7 @@ export function Localizationprovider({ children }) {
 
   useEffect(() => {
     localStorage.setItem("language", language);
+    document.documentElement.lang = language;
   }, [language]);
 
   function localizeNode(el, language) {
@@ -52,14 +53,14 @@ export function Localizationprovider({ children }) {
   }
 
   function localize(text, newLanguage = language) {
-    if (newLanguage == "JP") {
+    if (newLanguage == "jp") {
       const english = text;
       const japanese = jp(text);
       cache.jp.en[japanese] = cache.jp.en[japanese] || english;
       return japanese;
     }
 
-    if (newLanguage == "EN") {
+    if (newLanguage == "en") {
       return cache.jp.en[text] || text;
     }
   }
@@ -79,9 +80,9 @@ export function Localizationprovider({ children }) {
 
 /**
  * @typedef LocalizationContextValue
- * @property {"EN"|"JP"} language
- * @property {(neLanguage: "EN"|"JP") => void} setLanguage
- * @property {(text: string, language: "EN"|"JP") => string} localize
+ * @property {"en"|"jp"} language
+ * @property {(neLanguage: "en"|"jp") => void} setLanguage
+ * @property {(text: string, language: "en"|"jp") => string} localize
  */
 
 /**
