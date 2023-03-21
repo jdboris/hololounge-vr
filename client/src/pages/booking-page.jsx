@@ -850,6 +850,22 @@ export default function BookingPage() {
                       value={formData.phone || ""}
                       placeholder=" "
                       onBlur={(e) => showError(e.target.name)}
+                      onChange={(e) => {
+                        e.stopPropagation();
+
+                        setBooking((old) => ({
+                          ...old,
+                          phone: e.target.value
+                            .replace(
+                              /[０１２３４５６７８９]/g,
+                              (x) =>
+                                "0123456789"[
+                                  "０１２３４５６７８９".indexOf(x)
+                                ] || x
+                            )
+                            .replace(/\D/g, ""),
+                        }));
+                      }}
                     />
                     <small>Phone</small>
                   </label>
