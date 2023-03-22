@@ -3,9 +3,9 @@ import {
   addMinutes,
   areIntervalsOverlapping,
   isValid,
+  parse,
   max as maxDate,
   minutesToMilliseconds,
-  parse,
   subMinutes,
   subYears,
 } from "date-fns";
@@ -33,6 +33,7 @@ import { useScrollRouting } from "../contexts/scroll-routing";
 import "../css/react-datepicker.scss";
 import useTimer from "../hooks/timer";
 import { toLocaleString } from "../utils/dates";
+import { parseInput } from "../utils/parsing";
 import { SANDBOX_BOOKING_DATA, SANDBOX_MODE } from "../utils/sandbox";
 
 registerLocale("ja", ja);
@@ -588,13 +589,9 @@ export default function BookingPage() {
               (hideError(e.target.name) ||
                 setBooking((old) => ({
                   ...old,
-                  [e.target.name]:
-                    e.target.type == "date"
-                      ? e.target.value &&
-                        // NOTE: Add the time to the string so the Date constructor will interpret it as a LOCAL date/time
-                        !isNaN(new Date(`${e.target.value}T00:00`)) &&
-                        new Date(`${e.target.value}T00:00`)
-                      : e.target.value,
+                  [e.target.name]: parseInput(e.target.value, {
+                    type: e.target.type,
+                  }),
                 })));
           }}
         >
@@ -845,27 +842,19 @@ export default function BookingPage() {
                     <InputError message={error?.details?.phone} />
                     <input
                       className={theme.alt}
-                      type="phone"
+                      type="tel"
                       name="phone"
-                      value={formData.phone || ""}
+                      value={parseInput(formData.phone || "", { type: "tel" })}
                       placeholder=" "
-                      onBlur={(e) => showError(e.target.name)}
-                      onChange={(e) => {
-                        e.stopPropagation();
-
+                      onBlur={(e) =>
+                        showError(e.target.name) ||
                         setBooking((old) => ({
                           ...old,
-                          phone: e.target.value
-                            .replace(
-                              /[０１２３４５６７８９]/g,
-                              (x) =>
-                                "0123456789"[
-                                  "０１２３４５６７８９".indexOf(x)
-                                ] || x
-                            )
-                            .replace(/\D/g, ""),
-                        }));
-                      }}
+                          phone: parseInput(e.target.value, {
+                            type: "single-byte-number",
+                          }),
+                        }))
+                      }
                     />
                     <small>Phone</small>
                   </label>

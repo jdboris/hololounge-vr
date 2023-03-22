@@ -56,10 +56,10 @@ bookingRouter.get("/upcoming", async (req, res) => {
 
 // Check if there's a soon upcoming booking under the provided name
 bookingRouter.post("/check-in", async (req, res) => {
-  const { firstName, lastName } = req.body;
+  const { firstName, lastName, phone } = req.body;
 
-  if (!firstName || !lastName) {
-    throw new HttpError("Please enter a first and last name.", 400);
+  if ((!firstName || !lastName) && !phone) {
+    throw new HttpError("Enter your full name or phone number.", 400);
   }
 
   // Bookings that still have time left
@@ -76,8 +76,13 @@ bookingRouter.post("/check-in", async (req, res) => {
     ],
     where: {
       isComplete: true,
-      firstName,
-      lastName,
+      [Op.or]: {
+        [Op.and]: {
+          firstName,
+          lastName,
+        },
+        phone,
+      },
       // Where duration...
       "$bookingStations.experiencePrice.duration$": {
         // ...is greater than the time since startTime.

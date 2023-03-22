@@ -96,6 +96,17 @@ export default class BookingDto {
       this.birthday = new Date(Date.parse(this.birthday));
     }
 
+    if (this.phone) {
+      this.phone = this.phone
+        .replace(
+          /[０-９]/g,
+          (x) => "0123456789"["０１２３４５６７８９".indexOf(x)] || x
+        )
+        .replace(/\D/g, "");
+    }
+
+    // Errors...
+
     if (Object.keys(errors).length) {
       const error = new Error("");
       error.details = errors;

@@ -166,6 +166,8 @@ function jp(english) {
       return `メールアドレスを入力して下さい。`;
     case `Phone`:
       return `電話番号`;
+    case `Phone Number`:
+      return `電話番号`;
     case `Enter your phone number.`:
       return `電話番号を入力して下さい。`;
     case `Enter your date of birth.`:

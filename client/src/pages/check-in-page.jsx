@@ -1,4 +1,5 @@
 import theme from "@jdboris/css-themes/space-station";
+import CheckInBooking from "dtos/check-in-booking";
 import { useEffect, useMemo, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCheck } from "react-icons/fa";
@@ -8,6 +9,7 @@ import { useLocalization } from "../contexts/localization";
 import { useModal } from "../contexts/modal";
 import "../css/react-datepicker.scss";
 import { toLocaleString } from "../utils/dates";
+import { parseInput } from "../utils/parsing";
 import { SANDBOX_MODE } from "../utils/sandbox";
 
 function CheckInPage() {
@@ -20,16 +22,18 @@ function CheckInPage() {
   /**
    * @type {[{firstName: string, lastName: string, email: string}, Function]}
    */
-  const [formData, setBooking] = useState({
+  const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
+    phone: "",
   });
 
   // Reset form after every navigation
   useEffect(() => {
-    setBooking({
+    setFormData({
       firstName: "",
       lastName: "",
+      phone: "",
     });
 
     setError(null);
@@ -37,12 +41,8 @@ function CheckInPage() {
 
   const [booking, dtoError] = useMemo(() => {
     try {
-      return [formData, null];
+      return [new CheckInBooking(formData), null];
     } catch (error) {
-      if (!error.details) {
-        throw error;
-      }
-
       return [null, error];
     }
   }, [formData]);
@@ -83,15 +83,11 @@ function CheckInPage() {
           onChange={(e) => {
             e.target.name &&
               (hideError(e.target.name) ||
-                setBooking((old) => ({
+                setFormData((old) => ({
                   ...old,
-                  [e.target.name]:
-                    e.target.type == "date"
-                      ? e.target.value &&
-                        // NOTE: Add the time to the string so the Date constructor will interpret it as a LOCAL date/time
-                        !isNaN(new Date(`${e.target.value}T00:00`)) &&
-                        new Date(`${e.target.value}T00:00`)
-                      : e.target.value,
+                  [e.target.name]: parseInput(e.target.value, {
+                    type: e.target.type,
+                  }),
                 })));
           }}
           onSubmit={async (e) => {
@@ -165,7 +161,7 @@ function CheckInPage() {
                 </>
               );
 
-              setBooking({
+              setFormData({
                 firstName: "",
                 lastName: "",
               });
@@ -200,6 +196,23 @@ function CheckInPage() {
                 onBlur={(e) => showError(e.target.name)}
               />
               <small>First Name</small>
+            </label>
+          </fieldset>
+
+          <div className={theme.sideLines + " " + theme.h2}>OR</div>
+
+          <fieldset disabled={isLoading}>
+            <label>
+              <InputError message={error?.details?.phone} />
+              <input
+                className={theme.alt}
+                type="tel"
+                name="phone"
+                value={formData.phone || ""}
+                placeholder=" "
+                onBlur={(e) => showError(e.target.name)}
+              />
+              <small>Phone Number</small>
             </label>
           </fieldset>
           <InputError message={error?.message} />
