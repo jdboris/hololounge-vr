@@ -2,7 +2,6 @@ import theme from "@jdboris/css-themes/space-station";
 import { useEffect, useState } from "react";
 import {
   FaBars,
-  FaFacebook,
   FaFacebookSquare,
   FaInstagram,
   FaLocationArrow,
@@ -11,9 +10,9 @@ import {
   FaTwitter,
   FaVrCardboard,
 } from "react-icons/fa";
-import { TbMap2 } from "react-icons/tb";
 import { IoMdClose } from "react-icons/io";
 import { MdLanguage } from "react-icons/md";
+import { TbMap2 } from "react-icons/tb";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/auth";
 import { useLocalization } from "../contexts/localization";
