@@ -30,8 +30,8 @@ function Footer() {
             </a>
           </li>
         </ul>
+        ©{new Date().getFullYear()} 株式会社桜月
       </nav>
-      <div>©{new Date().getFullYear()} 株式会社桜月</div>
     </footer>
   );
 }
