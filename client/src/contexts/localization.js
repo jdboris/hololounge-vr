@@ -30,12 +30,24 @@ export function Localizationprovider({ children }) {
         subtree: true,
         characterData: true,
       });
+
       return () => observer.disconnect();
     }
   }, [language, wrapperRef]);
 
   useEffect(() => {
     if (wrapperRef.current) {
+      document
+        .querySelector("meta[name='description']")
+        ?.setAttribute(
+          "content",
+          localize(
+            document
+              .querySelector("meta[name='description']")
+              ?.getAttribute("content")
+          )
+        );
+
       localizeNode(wrapperRef.current, language);
     }
   }, [language, wrapperRef]);
