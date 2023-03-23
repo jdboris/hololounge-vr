@@ -143,12 +143,18 @@ function Header() {
                 </li>
               )}
             <li>
-              {language == "en" ? (
-                <button className={theme.alt} onClick={() => setLanguage("jp")}>
+              {language == "en-US" ? (
+                <button
+                  className={theme.alt}
+                  onClick={() => setLanguage("ja-JP")}
+                >
                   <MdLanguage /> 日本語
                 </button>
               ) : (
-                <button className={theme.alt} onClick={() => setLanguage("en")}>
+                <button
+                  className={theme.alt}
+                  onClick={() => setLanguage("en-US")}
+                >
                   <MdLanguage /> English
                 </button>
               )}
