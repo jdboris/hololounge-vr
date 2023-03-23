@@ -22,13 +22,21 @@ bookingRouter.get("/upcoming", async (req, res) => {
         {
           isComplete: true,
 
-          // // Where duration...
+          // start      now
+          //   v         v
+          //   [-------------------]
+
+          // duration: 60
+          // now - start: 30
+          // 60 > 30?
+
+          // Where duration...
           "$bookingStations.experiencePrice.duration$": {
-            // ...is less than the time between this booking start and the current time.
+            // ...is greater than (now - start).
             [Op.gt]: fn(
               "TIMESTAMPDIFF",
               literal("MINUTE"),
-              col("startTime"),
+              col("bookings.startTime"),
               new Date()
             ),
           },
