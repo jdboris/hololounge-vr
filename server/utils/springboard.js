@@ -1,8 +1,8 @@
 import { addMinutes } from "date-fns";
 import { v4 as uuid } from "uuid";
-import BookingDto from "../dtos/booking.js";
 
 const { SPRINGBOARD_EMAIL, SPRINGBOARD_PASSWORD } = process.env;
+const BOOKING_MARGIN = Number(process.env.BOOKING_MARGIN);
 
 /**
  * @returns {{
@@ -146,12 +146,12 @@ export async function createBooking(booking, token) {
           tier: {
             id: bs.experiencePrice.id,
             price: bs.experiencePrice.price,
-            length: bs.experiencePrice.duration,
+            length: bs.experiencePrice.duration + BOOKING_MARGIN,
           },
           amountDue: 0,
           endTime: addMinutes(
             new Date(booking.startTime),
-            bs.experiencePrice.duration + 5
+            bs.experiencePrice.duration + BOOKING_MARGIN
           ).toISOString(),
           // TODO: Remove this workaround when Springboard fixes their bug
           // NOTE: Must multiply by 100 to compensate for Springboard bug

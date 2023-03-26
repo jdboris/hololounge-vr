@@ -10,6 +10,11 @@ import {
   startBookingStationTime,
 } from "../utils/springboard.js";
 
+import * as dotenv from "dotenv";
+
+dotenv.config();
+const BOOKING_MARGIN = Number(process.env.BOOKING_MARGIN);
+
 const bookingRouter = express.Router();
 
 // Get all upcoming bookings
@@ -22,26 +27,31 @@ bookingRouter.get("/upcoming", async (req, res) => {
         {
           isComplete: true,
 
-          // start      now
-          //   v         v
-          //   [-------------------]
+          // // start      now
+          // //   v         v
+          // //   [-------------------]
 
-          // duration: 60
-          // now - start: 30
-          // 60 > 30?
+          // // duration: 60
+          // // now - start: 30
+          // // 60 > 30?
 
-          // Where duration...
-          "$bookingStations.experiencePrice.duration$": {
-            // ...is greater than (now - start).
-            [Op.gt]: fn(
-              "TIMESTAMPDIFF",
-              literal("MINUTE"),
-              col("bookings.startTime"),
-              new Date()
-            ),
+          // // Where duration...
+          // "$bookingStations.experiencePrice.duration$": {
+          //   // ...is greater than (now - start).
+          //   [Op.gt]: fn(
+          //     "TIMESTAMPDIFF",
+          //     literal("MINUTE"),
+          //     col("bookings.startTime"),
+          //     new Date()
+          //   ),
+          // },
+
+          // Where it ends in the future...
+          "$bookingStations.endTime$": {
+            [Op.gte]: new Date(),
           },
         },
-        { createdAt: { [Op.gt]: subMinutes(new Date(), 5) } },
+        { createdAt: { [Op.gt]: subMinutes(new Date(), BOOKING_MARGIN) } },
       ],
     },
     include: [
@@ -91,15 +101,21 @@ bookingRouter.post("/check-in", async (req, res) => {
         },
         phone,
       },
-      // Where duration...
-      "$bookingStations.experiencePrice.duration$": {
-        // ...is greater than the time since startTime.
-        [Op.gte]: fn(
-          "TIMESTAMPDIFF",
-          literal("MINUTE"),
-          col("startTime"),
-          new Date()
-        ),
+
+      // // Where duration...
+      // "$bookingStations.experiencePrice.duration$": {
+      //   // ...is greater than (now - start).
+      //   [Op.gte]: fn(
+      //     "TIMESTAMPDIFF",
+      //     literal("MINUTE"),
+      //     col("startTime"),
+      //     new Date()
+      //   ),
+      // },
+
+      // Where it ends in the future...
+      "$bookingStations.endTime$": {
+        [Op.gte]: new Date(),
       },
     },
 
@@ -111,12 +127,12 @@ bookingRouter.post("/check-in", async (req, res) => {
   }
 
   const soonBookings = bookings.filter(
-    (b) => b.startTime < addMinutes(new Date(), 5)
+    (b) => b.startTime < addMinutes(new Date(), BOOKING_MARGIN)
   );
 
   if (!soonBookings.length) {
     throw new HttpError(
-      `You may not check in more than 5 minutes before your reservation. (Your next reservation is at {startTime})`,
+      `You may not check in more than ${BOOKING_MARGIN} minutes before your reservation. (Your next reservation is at {startTime})`,
       400,
       { bookings }
     );

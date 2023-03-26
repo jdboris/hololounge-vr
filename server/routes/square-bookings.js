@@ -1,17 +1,15 @@
 import { createHmac } from "crypto";
-import { addMinutes, formatISO } from "date-fns";
 import * as dotenv from "dotenv";
 import express from "express";
 import BookingDto from "../dtos/booking.js";
 import BookingStation from "../models/booking-station.js";
 import Booking from "../models/booking.js";
-import { HttpError } from "../utils/errors.js";
 import sequelize from "../utils/db.js";
 import { createBooking, login } from "../utils/springboard.js";
 
 dotenv.config();
 
-const { NODE_ENV, ADMIN_EMAIL } = process.env;
+const { NODE_ENV } = process.env;
 
 const SQUARE_TERMINAL_WEBHOOK_SIGNATURE_KEY =
   NODE_ENV == "production"

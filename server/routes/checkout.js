@@ -9,6 +9,11 @@ import Location from "../models/location.js";
 import { HttpError } from "../utils/errors.js";
 import { createPaymentLink, createTerminalCheckout } from "../utils/square.js";
 
+import * as dotenv from "dotenv";
+
+dotenv.config();
+const BOOKING_MARGIN = Number(process.env.BOOKING_MARGIN);
+
 const checkoutRouter = express.Router();
 
 checkoutRouter.get("/:id", async (req, res) => {
@@ -30,7 +35,7 @@ checkoutRouter.get("/:id", async (req, res) => {
   } else {
     res.json({
       isComplete: true,
-      message: `Booking complete! You will receive a receipt and booking confirmation via email. Please check in at the in-store kiosk up to 5 minutes in advance.`,
+      message: `Booking complete! You will receive a receipt and booking confirmation via email. Please check in at the in-store kiosk up to ${BOOKING_MARGIN} minutes in advance.`,
       bookings,
     });
   }
@@ -84,7 +89,7 @@ checkoutRouter.post("/", async (req, res) => {
       // Either already complete or "pending" (recent)
       [Op.or]: {
         isComplete: true,
-        createdAt: { [Op.gt]: subMinutes(new Date(), 5) },
+        createdAt: { [Op.gt]: subMinutes(new Date(), BOOKING_MARGIN) },
       },
 
       [Op.and]: [
@@ -92,14 +97,15 @@ checkoutRouter.post("/", async (req, res) => {
 
         where(
           // this end
-          fn(
-            "ADDTIME",
-            col("startTime"),
-            fn(
-              "SEC_TO_TIME",
-              where(col("bookingStations.experiencePrice.duration"), "*", 60)
-            )
-          ),
+          // fn(
+          //   "ADDTIME",
+          //   col("startTime"),
+          //   fn(
+          //     "SEC_TO_TIME",
+          //     where(col("bookingStations.experiencePrice.duration"), "*", 60)
+          //   )
+          // ),
+          col("bookingStations.endTime"),
           // >
           Op.gt,
           // new start
@@ -108,7 +114,7 @@ checkoutRouter.post("/", async (req, res) => {
 
         where(
           // this start
-          col("startTime"),
+          col("bookingStations.startTime"),
           // <
           Op.lt,
           // new end
@@ -117,7 +123,7 @@ checkoutRouter.post("/", async (req, res) => {
             experiencePrices.find(
               // NOTE: Assuming that all bookingStations are the same duration
               (ep) => ep.id == bookingStations[0].experiencePrice.id
-            ).duration
+            ).duration + BOOKING_MARGIN
           )
         ),
       ],
@@ -165,6 +171,11 @@ checkoutRouter.post("/", async (req, res) => {
                 experiencePriceId: bs.experiencePrice.id,
                 locationId: bs.location.id,
                 stationId: bs.stationId,
+                startTime,
+                endTime: addMinutes(
+                  startTime,
+                  bs.experiencePrice.duration + BOOKING_MARGIN
+                ),
               },
             ],
           },

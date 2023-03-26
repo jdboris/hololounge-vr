@@ -91,6 +91,17 @@ export default class BookingDto {
       this.startTime = new Date(Date.parse(this.startTime));
     }
 
+    this.bookingStations.forEach((bs) => {
+      if (bs.startTime && typeof bs.startTime == "string") {
+        // Parse as ISO
+        bs.startTime = new Date(Date.parse(bs.startTime));
+      }
+      if (bs.endTime && typeof bs.endTime == "string") {
+        // Parse as ISO
+        bs.endTime = new Date(Date.parse(bs.endTime));
+      }
+    });
+
     if (this.birthday && typeof this.birthday == "string") {
       // Parse as ISO
       this.birthday = new Date(Date.parse(this.birthday));

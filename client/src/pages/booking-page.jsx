@@ -269,21 +269,14 @@ export default function BookingPage() {
 
     allBookings.forEach((b) => {
       bookingStations.push(
-        ...b.bookingStations
-          .filter((bs) => {
-            const { duration } = bs.experiencePrice;
-
-            return (
-              b.startTime > openingTime &&
-              b.startTime < closingTime &&
-              addMinutes(b.startTime, duration + interval + interval) >
-                openingTime &&
-              addMinutes(b.startTime, duration + interval + interval) <
-                closingTime
-            );
-            // NOTE: Add the startTime to the bookingStation object as a temporary patch
-          })
-          .map((bs) => ({ ...bs, startTime: b.startTime }))
+        ...b.bookingStations.filter((bs) => {
+          return (
+            bs.startTime > openingTime &&
+            bs.startTime < closingTime &&
+            bs.endTime > openingTime &&
+            bs.endTime < closingTime
+          );
+        })
       );
     });
 
@@ -314,19 +307,6 @@ export default function BookingPage() {
     EXPERIENCE_DURATION,
     // isSliding,
   ]);
-
-  // const min = useMemo(
-  //   () => (openingTime ? toValue(openingTime) : 0),
-  //   [openingTime]
-  // );
-
-  // const max = useMemo(() => {
-  //   return closingTime
-  //     ? toValue(
-  //         closingTime - minutesToMilliseconds(EXPERIENCE_DURATION + interval)
-  //       )
-  //     : 1;
-  // }, [closingTime, EXPERIENCE_DURATION]);
 
   function toValue(datetime) {
     return toIntervals(datetime, interval);
@@ -370,15 +350,13 @@ export default function BookingPage() {
             start: subMinutes(formData.startTime, interval),
             end: addMinutes(
               formData.startTime,
+              // NOTE: Add margin between bookings
               EXPERIENCE_DURATION + interval + interval
             ),
           },
           {
             start: bs.startTime,
-            end: addMinutes(
-              bs.startTime,
-              bs.experiencePrice.duration + interval
-            ),
+            end: bs.endTime,
           }
         )
       );

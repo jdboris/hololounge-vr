@@ -19,6 +19,34 @@ const BookingStation = sequelize.define("booking_stations", {
     type: DataTypes.UUID,
     unique: "unique_booking_station_id_in_springboard",
   },
+
+  startTime: {
+    type: DataTypes.DATE,
+    allowNull: false,
+
+    validate: {
+      notNull: {
+        msg: `End time is a required field.`,
+      },
+      notEmpty: {
+        msg: `End time is a required field.`,
+      },
+    },
+  },
+
+  endTime: {
+    type: DataTypes.DATE,
+    allowNull: false,
+
+    validate: {
+      notNull: {
+        msg: `End time is a required field.`,
+      },
+      notEmpty: {
+        msg: `End time is a required field.`,
+      },
+    },
+  },
 });
 
 BookingStation.belongsTo(ExperiencePrice, {

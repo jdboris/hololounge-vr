@@ -1,7 +1,8 @@
 import theme from "@jdboris/css-themes/space-station";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FaBars,
+  FaCalendarAlt,
   FaFacebookSquare,
   FaInstagram,
   FaLocationArrow,
@@ -24,6 +25,8 @@ function Header() {
   const { navigate, root } = useScrollRouting();
   const { currentUser, logout } = useAuth();
 
+  const headerRef = useRef();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -40,11 +43,11 @@ function Header() {
           style={{ position: "fixed" }}
           onClick={(e) => {
             setIsMenuOpen(false);
-            e.target.closest("header").scrollTo({ top: 0 });
+            headerRef.current && headerRef.current.scrollTo({ top: 0 });
           }}
         ></div>
       )}
-      <header className={root == "/pos" ? theme.minimal : ""}>
+      <header className={root == "/pos" ? theme.minimal : ""} ref={headerRef}>
         <nav className={isMenuOpen ? theme.open : ""}>
           <Link
             to={root == "/pos" ? "/pos" : "/"}
@@ -59,10 +62,11 @@ function Header() {
 
           <ul
             onFocus={(e) => {
-              e.target.closest("header").scrollTo({ top: 0 });
+              headerRef.current && headerRef.current.scrollTo({ top: 0 });
               if (
+                headerRef.current &&
                 e.target.getBoundingClientRect().top + 5 >=
-                e.target.closest("header").getBoundingClientRect().bottom
+                  headerRef.current.getBoundingClientRect().bottom
               ) {
                 setIsMenuOpen(true);
               }
@@ -104,6 +108,13 @@ function Header() {
                     {isMenuOpen && <FaRegQuestionCircle />}HELP
                   </Link>
                 </li>
+                {currentUser && currentUser.isAdmin && (
+                  <li>
+                    <Link to="/bookings">
+                      {isMenuOpen && <FaCalendarAlt />}BOOKINGS
+                    </Link>
+                  </li>
+                )}
                 {/* <li>
                   <Link to="/account">{isMenuOpen && <FaUser />}ACCOUNT</Link>
                 </li> */}
@@ -180,10 +191,10 @@ function Header() {
             <button
               className={theme.alt}
               onFocus={(e) => {
-                e.target.closest("header").scrollTo({ top: 0 });
+                headerRef.current && headerRef.current.scrollTo({ top: 0 });
               }}
               onClick={(e) => {
-                e.target.closest("header").scrollTo({ top: 0 });
+                headerRef.current && headerRef.current.scrollTo({ top: 0 });
                 setIsMenuOpen(!isMenuOpen);
               }}
             >
