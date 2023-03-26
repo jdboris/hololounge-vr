@@ -1,7 +1,8 @@
 import { addMinutes, subMinutes } from "date-fns";
 import express from "express";
-import { col, fn, literal, Op } from "sequelize";
+import { Op } from "sequelize";
 import Booking from "../models/booking.js";
+import BookingStation from "../models/booking-station.js";
 import sequelize from "../utils/db.js";
 import { HttpError } from "../utils/errors.js";
 import {
@@ -11,6 +12,9 @@ import {
 } from "../utils/springboard.js";
 
 import * as dotenv from "dotenv";
+import BookingDto from "../dtos/booking.js";
+import { getCurrentUser } from "../utils/auth.js";
+import BookingStationDto from "../dtos/booking-station.js";
 
 dotenv.config();
 const BOOKING_MARGIN = Number(process.env.BOOKING_MARGIN);
@@ -70,6 +74,29 @@ bookingRouter.get("/upcoming", async (req, res) => {
   });
 
   res.json(bookings);
+});
+
+bookingRouter.put("/booking-stations/:bookingStationId", async (req, res) => {
+  const user = await getCurrentUser(req);
+  if (!user) {
+    throw new HttpError("", 401);
+  }
+  if (!user.isAdmin) {
+    throw new HttpError("", 403);
+  }
+
+  const { bookingStationId } = req.params;
+
+  try {
+    // Instantiate a DTO for parsing/validation
+    req.body = new BookingStationDto(req.body);
+  } catch (error) {
+    throw new HttpError(error.message, 400, error.details);
+  }
+
+  await BookingStation.update(req.body, { where: { id: bookingStationId } });
+
+  res.json({ message: "Booking updated successfully!" });
 });
 
 // Check if there's a soon upcoming booking under the provided name

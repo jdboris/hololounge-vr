@@ -2,11 +2,16 @@ import theme from "@jdboris/css-themes/space-station";
 import Game from "dtos/game";
 import { useEffect, useRef, useState } from "react";
 import {
+  FaCheckCircle,
+  FaCircle,
+  FaCircleNotch,
   FaImage,
   FaNetworkWired,
   FaPlay,
   FaPlus,
   FaQuestionCircle,
+  FaRegCheckCircle,
+  FaRegCircle,
   FaRegQuestionCircle,
   FaUserAlt,
   FaVideo,
@@ -355,12 +360,18 @@ function GameForm({
 
           {(mode == "create" || mode == "update") && <button>SAVE</button>}
           {(mode == "create" || mode == "update") && (
-            <label className={!game.isEnabled ? theme.red : ""}>
+            <label
+              className={
+                (!game.isEnabled ? theme.red : "") + " " + theme.checkboxLabel
+              }
+            >
               <input
                 type="checkbox"
                 checked={game.isEnabled}
                 onChange={(e) => setGame({ isEnabled: e.target.checked })}
               />
+              {!game.isEnabled && <FaRegCircle />}
+              {game.isEnabled && <FaRegCheckCircle />}
               Enabled
             </label>
           )}

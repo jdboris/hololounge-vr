@@ -17,7 +17,7 @@ const BookingStation = sequelize.define("booking_stations", {
 
   experiencePriceId: {
     type: DataTypes.UUID,
-    unique: "unique_booking_station_id_in_springboard",
+    unique: "unique_booking_station_experience_price_id_in_springboard",
   },
 
   startTime: {

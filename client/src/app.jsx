@@ -9,6 +9,7 @@ import { Localizationprovider } from "./contexts/localization";
 import { ModalProvider } from "./contexts/modal";
 import { ScrollRoutingProvider } from "./contexts/scroll-routing";
 import { TagProvider } from "./contexts/tags";
+import BookingsPage from "./pages/bookings-page";
 import GamePage from "./pages/game-page";
 import HelpPage from "./pages/help-page";
 import HomePage from "./pages/home-page";
@@ -63,6 +64,7 @@ function App() {
                       "/help",
                       "/login",
                       "/signup",
+                      "/bookings",
                       "/",
                     ]}
                   >
@@ -96,6 +98,10 @@ function App() {
                       <Route
                         path="/pos/*"
                         element={<PosPage path="/pos" />}
+                      ></Route>
+                      <Route
+                        path="/bookings"
+                        element={<BookingsPage />}
                       ></Route>
 
                       <Route path="/*" element={<HomePage />}></Route>

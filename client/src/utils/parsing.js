@@ -11,6 +11,8 @@ export function parseInput(value, { type } = {}) {
         !isNaN(new Date(`${value}T00:00`)) &&
         new Date(`${value}T00:00`)
       );
+    case "datetime-local":
+      return value && !isNaN(new Date(value)) && new Date(value);
     case "tel":
       return (
         value
