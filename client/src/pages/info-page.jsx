@@ -2,6 +2,8 @@ import theme from "@jdboris/css-themes/space-station";
 import { Link } from "react-router-dom";
 import { useScrollRouting } from "../contexts/scroll-routing";
 
+const GRAND_OPENING_SALE = false;
+
 function InfoPage() {
   const { navigate } = useScrollRouting();
 
@@ -41,14 +43,20 @@ function InfoPage() {
           </div>
           <div>
             <div className={theme.h4}>Price</div>
-            <span className={theme.price}>
-              <img src="/img/small-sale-sticker.png" />
-              <span className={theme.old}>
-                <small>¥</small>
-                <span>2,000</span>
+            {GRAND_OPENING_SALE ? (
+              <span className={theme.price} style={{ marginTop: "0.5em" }}>
+                <img src="/img/small-sale-sticker.png" />
+                <span className={theme.old}>
+                  <small>¥</small>
+                  <span>2,000</span>
+                </span>
+                <small>¥</small>1,000<small>/hr</small>
               </span>
-              <small>¥</small>1,000<small>/hr</small>
-            </span>{" "}
+            ) : (
+              <span className={theme.price}>
+                <small>¥</small>2,000<small>/hr</small>
+              </span>
+            )}{" "}
             per station
             <small>
               <em>* One headset per station</em>
