@@ -203,7 +203,7 @@ function GameForm({
                       )}
                       onChange={(e) =>
                         setGameRaw((old) => {
-                          const copy = new Game(old);
+                          const copy = { ...old };
                           const gameTag = old.tags?.find(
                             (gameTag) => gameTag.id === tag.id
                           );
@@ -218,7 +218,7 @@ function GameForm({
                             );
                           }
 
-                          return copy;
+                          return new Game(copy);
                         })
                       }
                     />
