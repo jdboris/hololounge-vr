@@ -108,12 +108,14 @@ function Header() {
                     {isMenuOpen && <FaRegQuestionCircle />}HELP
                   </Link>
                 </li>
-                {currentUser && currentUser.isAdmin && (
+                {currentUser && currentUser.isAdmin ? (
                   <li>
                     <Link to="/bookings">
                       {isMenuOpen && <FaCalendarAlt />}BOOKINGS
                     </Link>
                   </li>
+                ) : (
+                  ""
                 )}
                 {/* <li>
                   <Link to="/account">{isMenuOpen && <FaUser />}ACCOUNT</Link>
