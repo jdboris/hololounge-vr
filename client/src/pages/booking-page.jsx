@@ -8,6 +8,7 @@ import {
   minutesToMilliseconds,
   subMinutes,
   subYears,
+  differenceInMinutes,
 } from "date-fns";
 import ja from "date-fns/locale/ja";
 import Booking from "dtos/booking";
@@ -510,7 +511,6 @@ export default function BookingPage() {
                           message,
                           isComplete,
                           isCanceled,
-                          startTime,
                           bookings,
                         } = await response.json();
                         // NOTE: May receive 304, which is considered "not OK" by response.ok
@@ -523,9 +523,7 @@ export default function BookingPage() {
                         if (isComplete) {
                           setModalContent(
                             <>
-                              <div style={{ textAlign: "center" }}>
-                                {message}
-                              </div>
+                              <div style={{ margin: "auto" }}>{message}</div>
                               <ul>
                                 {bookings
                                   .map(({ stations, startTime }) =>
@@ -543,27 +541,74 @@ export default function BookingPage() {
                                   )
                                   .flat()}
                               </ul>
-                              <div>
-                                <FaExclamationTriangle
-                                  className={theme.yellow}
-                                />{" "}
-                                Please check in to start your experience!
-                              </div>
-                              <Link
-                                className={[theme.button, theme.orange].join(
-                                  " "
-                                )}
-                                to={root + "/check-in"}
-                                onClick={(e) =>
-                                  e.preventDefault() ||
-                                  navigate(root + "/check-in") ||
-                                  setModalContent(null)
-                                }
-                              >
-                                CHECK IN
-                              </Link>
+
+                              {differenceInMinutes(
+                                new Date(Date.parse(bookings[0].startTime)),
+                                new Date()
+                              ) <= 15 ? (
+                                <div>
+                                  <FaCheck className={theme.green} /> Your
+                                  experience(s) will start automatically. Please
+                                  see the Guidebook at your station for help
+                                  getting started.
+                                </div>
+                              ) : (
+                                <>
+                                  <div>
+                                    <FaExclamationTriangle
+                                      className={theme.yellow}
+                                    />{" "}
+                                    Please check in to start your experience!
+                                  </div>
+                                  <Link
+                                    className={[
+                                      theme.button,
+                                      theme.orange,
+                                    ].join(" ")}
+                                    to={root + "/check-in"}
+                                    onClick={(e) =>
+                                      e.preventDefault() ||
+                                      navigate(root + "/check-in") ||
+                                      setModalContent(null)
+                                    }
+                                  >
+                                    CHECK IN
+                                  </Link>
+                                </>
+                              )}
                             </>
                           );
+
+                          if (
+                            differenceInMinutes(
+                              new Date(Date.parse(bookings[0].startTime)),
+                              new Date()
+                            ) <= 15
+                          ) {
+                            setTimeout(async () => {
+                              try {
+                                const response = await fetch(
+                                  `/api/bookings/start`,
+                                  {
+                                    method: "POST",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify({ bookings }),
+                                  }
+                                );
+
+                                if (!response.ok) {
+                                  throw error;
+                                }
+                              } catch (error) {
+                                console.error(error);
+                              }
+
+                              // NOTE: Assuming all the bookings start at the same time.
+                              //       Add a buffer of 5s to account for differences in client vs server time.
+                            }, Date.parse(bookings[0].startTime) - new Date() + 5000);
+                          }
 
                           return resolve(true);
                         }
