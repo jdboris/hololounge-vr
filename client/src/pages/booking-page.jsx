@@ -156,7 +156,7 @@ export default function BookingPage() {
   const [formData, setBooking] = useState({ ...DEFAULT_FORM_DATA });
 
   // Reset the forms and scroll to top 5 minutes after last navigation...
-  const [isTimeUp, restartTimer] = useTimer(minutesToMilliseconds(5));
+  const [isTimeUp, restartTimer] = useTimer(minutesToMilliseconds(10));
 
   useEffect(() => {
     if (root != "/pos") return;
