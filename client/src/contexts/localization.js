@@ -227,7 +227,7 @@ function localizeRaw(english, newLanguage) {
         return `チェックインが完了しました！あなたはこちらのステーションにチェックインしました。それではVR体験をお楽しみください。`;
       case `Booking complete! You will receive a receipt and booking confirmation via email. Please check in at the in-store kiosk up to 5 minutes in advance.`:
         return `予約が完了しました！予約時に入力いただいたメールアドレスに予約詳細とレシートを送信しました。ご予約開始時間の5分前に店舗の受付カウンターにてチェックインをして下さい。`;
-      case `Please continue to the payment terminal to complete your order…`:
+      case `Please continue to the payment terminal to complete your order...`:
         return `注文を完了するには、支払い端末に進んでください…`;
       case `Redirecting for checkout…`:
         return `お支払情報入力ページへ移動します…`;
@@ -373,6 +373,14 @@ function localizeRaw(english, newLanguage) {
         return `おすすめコンテンツ`;
       case `Tokyo, Taito City, Hanakawado, 1-5-2`:
         return `東京都台東区花川戸1-5-2`;
+      case `Booking complete!`:
+        return `予約が完了しました！`;
+      case `Please check in to start your experience!`:
+        return `ステーションを始動させるためには、チェックインをして下さい！`;
+      case `Reserved`:
+        return `予約スペース`;
+      case ` Please check in at the in-store kiosk when it's time to start (up to 5 minutes in advance).`:
+        return `開始時間の５分前に、店内受付のタブレットにてチェックインを行ってください。`;
       case ``:
         return english;
     }

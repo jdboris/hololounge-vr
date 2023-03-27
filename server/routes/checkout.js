@@ -35,7 +35,7 @@ checkoutRouter.get("/:id", async (req, res) => {
   } else {
     res.json({
       isComplete: true,
-      message: `Booking complete! You will receive a receipt and booking confirmation via email. Please check in at the in-store kiosk up to ${BOOKING_MARGIN} minutes in advance.`,
+      message: `Booking complete!`,
       bookings,
     });
   }

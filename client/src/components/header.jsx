@@ -76,21 +76,28 @@ function Header() {
               <>
                 <li>
                   <a
+                    className={theme.small}
                     href="https://goo.gl/maps/DENfphT6i7zmz3Z47"
                     target="_blank"
                   >
                     <TbMap2 />
                   </a>
                   <a
+                    className={theme.small}
                     href="https://www.instagram.com/hololoungevr"
                     target="_blank"
                   >
                     <FaInstagram />
                   </a>
-                  <a href="https://www.twitter.com/HoloLounge" target="_blank">
+                  <a
+                    className={theme.small}
+                    href="https://www.twitter.com/HoloLounge"
+                    target="_blank"
+                  >
                     <FaTwitter />
                   </a>
                   <a
+                    className={theme.small}
                     href="https://www.facebook.com/profile?id=100090034414820"
                     target="_blank"
                   >
@@ -135,7 +142,7 @@ function Header() {
                     }
                   >
                     <FaLocationArrow />
-                    CHECK IN NOW
+                    CHECK IN
                   </Link>
                 </li>
               )}
@@ -168,7 +175,7 @@ function Header() {
                   className={theme.alt}
                   onClick={() => setLanguage("en-US")}
                 >
-                  <MdLanguage /> English
+                  <MdLanguage /> EN
                 </button>
               )}
             </li>

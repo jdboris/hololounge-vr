@@ -19,11 +19,14 @@ import {
   FaArrowRight,
   FaCheck,
   FaCreditCard,
+  FaCross,
+  FaExclamationTriangle,
   FaInfoCircle,
   FaRegCalendar,
   FaRegClock,
 } from "react-icons/fa";
-import { useLocation } from "react-router-dom";
+import { IoMdClose } from "react-icons/io";
+import { Link, useLocation } from "react-router-dom";
 import InputError from "../components/input-error";
 import Overlay from "../components/overlay";
 import { useAuth } from "../contexts/auth";
@@ -423,9 +426,14 @@ export default function BookingPage() {
       window.history.replaceState(null, "", url);
 
       setModalContent(
-        localize(
-          "Booking complete! You will receive a receipt and booking confirmation via email. Please check in at the in-store kiosk up to 5 minutes in advance."
-        )
+        <>
+          <div>Booking complete!</div>
+          <div>
+            <FaExclamationTriangle className={theme.yellow} /> Please check in
+            at the in-store kiosk when it's time to start (up to 5 minutes in
+            advance).
+          </div>
+        </>
       );
     }
   }, []);
@@ -515,22 +523,45 @@ export default function BookingPage() {
                         if (isComplete) {
                           setModalContent(
                             <>
-                              {message}
-
-                              <div>
+                              <div style={{ textAlign: "center" }}>
+                                {message}
+                              </div>
+                              <ul>
                                 {bookings
                                   .map(({ stations, startTime }) =>
                                     stations.map((s, i) => (
-                                      <div
+                                      <li
                                         key={"booking-confirmation-time-" + i}
                                       >
-                                        <FaCheck className={theme.green} />{" "}
+                                        <small>
+                                          <FaCheck className={theme.green} />{" "}
+                                          Reserved
+                                        </small>
                                         {s.name} ({toLocaleString(startTime)})
-                                      </div>
+                                      </li>
                                     ))
                                   )
                                   .flat()}
+                              </ul>
+                              <div>
+                                <FaExclamationTriangle
+                                  className={theme.yellow}
+                                />{" "}
+                                Please check in to start your experience!
                               </div>
+                              <Link
+                                className={[theme.button, theme.orange].join(
+                                  " "
+                                )}
+                                to={root + "/check-in"}
+                                onClick={(e) =>
+                                  e.preventDefault() ||
+                                  navigate(root + "/check-in") ||
+                                  setModalContent(null)
+                                }
+                              >
+                                CHECK IN
+                              </Link>
                             </>
                           );
 
