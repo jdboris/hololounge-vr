@@ -2,7 +2,7 @@ import theme from "@jdboris/css-themes/space-station";
 import { Link } from "react-router-dom";
 import { useScrollRouting } from "../contexts/scroll-routing";
 
-const GRAND_OPENING_SALE = true;
+const GRAND_OPENING_SALE = false;
 
 function InfoPage() {
   const { navigate } = useScrollRouting();
