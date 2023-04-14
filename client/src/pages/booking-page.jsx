@@ -26,7 +26,9 @@ import {
   FaRegCalendar,
   FaRegClock,
 } from "react-icons/fa";
-import { IoMdClose } from "react-icons/io";
+import PhoneInput from "../components/phone-input";
+import "react-phone-input-2/lib/style.css";
+import "../css/react-phone-input-2.scss";
 import { Link, useLocation } from "react-router-dom";
 import InputError from "../components/input-error";
 import Overlay from "../components/overlay";
@@ -342,6 +344,7 @@ export default function BookingPage() {
   }
 
   function isStationBooked(station) {
+    // TODO: Establish a better way to do this (without refreshing kiosk)
     if (!SANDBOX_MODE && station.name == "Station A") {
       return true;
     }
@@ -640,6 +643,8 @@ export default function BookingPage() {
           }}
           onChange={(e) => {
             e.target.name &&
+              e.target.name != "phoneCountry" &&
+              e.target.type != "tel" &&
               (hideError(e.target.name) ||
                 setBooking((old) => ({
                   ...old,
@@ -892,26 +897,26 @@ export default function BookingPage() {
                     <small>First Name</small>
                   </label>
 
-                  <label>
-                    <InputError message={error?.details?.phone} />
-                    <input
-                      className={theme.alt}
-                      type="tel"
-                      name="phone"
-                      value={parseInput(formData.phone || "", { type: "tel" })}
-                      placeholder=" "
-                      onBlur={(e) =>
-                        showError(e.target.name) ||
-                        setBooking((old) => ({
-                          ...old,
-                          phone: parseInput(e.target.value, {
-                            type: "single-byte-number",
-                          }),
-                        }))
-                      }
-                    />
-                    <small>Phone</small>
-                  </label>
+                  <PhoneInput
+                    country={"jp"}
+                    preferredCountries={["jp", "us", "ca", "cn", "kr", "in"]}
+                    countryCodeEditable={false}
+                    inputClass={theme.alt}
+                    containerClass={theme.label}
+                    specialLabel={"Phone"}
+                    name="phone"
+                    placeholder=" "
+                    value={parseInput(formData.phone || "", { type: "tel" })}
+                    onChange={(value, c, e, formattedValue) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setBooking((old) => ({
+                        ...old,
+                        phone: parseInput(value || "", { type: "tel" }),
+                      }));
+                    }}
+                  />
+
                   <label>
                     <ReactDatePicker
                       disabled={MAINTENANCE_MODE}

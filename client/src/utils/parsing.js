@@ -14,19 +14,19 @@ export function parseInput(value, { type } = {}) {
     case "datetime-local":
       return value && !isNaN(new Date(value)) && new Date(value);
     case "tel":
+        if(!value) return value;
+
       return (
         value
-          // NOTE: Can't convert to single-byte numbers here because of some bug that causes duplicate numbers
-          // .replace(
-          //   /[０-９]/g,
-          //   (x) => "0123456789"["０１２３４５６７８９".indexOf(x)] || x
-          // )
-          .replace(/[^０-９\d]/g, "")
+          .replace(
+            /[０-９]/g,
+            (x) => "0123456789"["０１２３４５６７８９".indexOf(x)] || x
+          )
+          .replace(/[^０-９\d\+]/g, "")
       );
     case "single-byte-number":
       return (
         value
-          // NOTE: Can't convert to single-byte numbers because of some bug that causes duplicate numbers
           .replace(
             /[０-９]/g,
             (x) => "0123456789"["０１２３４５６７８９".indexOf(x)] || x
