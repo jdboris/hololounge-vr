@@ -342,12 +342,9 @@ export default function BookingPage() {
   }
 
   function isStationBooked(station) {
-    // if (
-    //   !SANDBOX_MODE &&
-    //   (station.name == "Station D" || station.name == "Station E")
-    // ) {
-    //   return true;
-    // }
+    if (!SANDBOX_MODE && station.name == "Station A") {
+      return true;
+    }
 
     return bookedStationsOfDay.find((bs) => {
       return (
