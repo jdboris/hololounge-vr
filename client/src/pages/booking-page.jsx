@@ -111,7 +111,8 @@ export default function BookingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { navigate, root } = useScrollRouting();
   const url = useLocation();
-  const timeSelectRef = useRef();
+  const startTimeInputRef = useRef();
+  const startDayInputRef = useRef();
 
   const [now, setNow] = useState(new Date());
   /**
@@ -158,7 +159,7 @@ export default function BookingPage() {
    */
   const [formData, setBooking] = useState({ ...DEFAULT_FORM_DATA });
 
-  // Reset the forms and scroll to top 5 minutes after last navigation...
+  // Reset the forms and scroll to top 10 minutes after last navigation...
   const [isTimeUp, restartTimer] = useTimer(minutesToMilliseconds(10));
 
   useEffect(() => {
@@ -171,6 +172,7 @@ export default function BookingPage() {
     setHasSelectedDay(false);
     setHasSelectedTime(false);
     setPageNumber(1);
+    setIsLoading(false);
 
     if (url.pathname.endsWith("/booking")) {
       getBookings();
@@ -184,7 +186,14 @@ export default function BookingPage() {
     if (root != "/pos") return;
 
     if (url.pathname != root) {
-      navigate(root);
+      startDayInputRef.current.setOpen(false);
+      startTimeInputRef.current.setOpen(false);
+
+      // NOTE: Timeout to workaround setOpen caneling the nav scrolling
+      setTimeout(() => {
+        navigate(root);
+        setModalContent(null);
+      }, 100);
     }
   }, [isTimeUp]);
 
@@ -345,9 +354,9 @@ export default function BookingPage() {
 
   function isStationBooked(station) {
     // TODO: Establish a better way to do this (without refreshing kiosk)
-    if (!SANDBOX_MODE && station.name == "Station A") {
-      return true;
-    }
+    // if (!SANDBOX_MODE && station.name == "Station A") {
+    //   return true;
+    // }
 
     return bookedStationsOfDay.find((bs) => {
       return (
@@ -739,6 +748,7 @@ export default function BookingPage() {
                     <label>
                       <FaRegCalendar />
                       <ReactDatePicker
+                        ref={startDayInputRef}
                         withPortal
                         disabled={isLoading || MAINTENANCE_MODE}
                         customInput={
@@ -777,7 +787,7 @@ export default function BookingPage() {
                             className={[theme.small, theme.alt].join(" ")}
                           />
                         }
-                        ref={timeSelectRef}
+                        ref={startTimeInputRef}
                         onCalendarOpen={() => {
                           setNow(new Date());
                           setHasSelectedTime(true);
@@ -790,7 +800,7 @@ export default function BookingPage() {
 
                           // WARNING: HACKS
                           const list =
-                            timeSelectRef?.current?.calendar?.componentNode?.querySelector(
+                            startTimeInputRef?.current?.calendar?.componentNode?.querySelector(
                               ".react-datepicker__time-list"
                             );
                           if (!list) return;
