@@ -1,10 +1,5 @@
 import theme from "@jdboris/css-themes/space-station";
-import {
-  FaBuilding,
-  FaLocationArrow,
-  FaMapPin,
-  FaMapMarkerAlt,
-} from "react-icons/fa";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 function LocationPage() {
   return (

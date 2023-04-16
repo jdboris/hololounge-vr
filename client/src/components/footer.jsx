@@ -1,11 +1,7 @@
-import theme from "@jdboris/css-themes/space-station";
 import {
   FaFacebookSquare,
   FaHome,
   FaInstagram,
-  FaMapMarker,
-  FaMapMarkerAlt,
-  FaMapPin,
   FaPhoneAlt,
   FaRegEnvelope,
   FaTwitter,

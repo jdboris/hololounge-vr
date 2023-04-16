@@ -7,6 +7,7 @@ import { AuthProvider } from "./contexts/auth";
 import { GameProvider } from "./contexts/games";
 import { Localizationprovider } from "./contexts/localization";
 import { ModalProvider } from "./contexts/modal";
+import { DebugContext, DebugProvider } from "./contexts/debug";
 import { ScrollRoutingProvider } from "./contexts/scroll-routing";
 import { TagProvider } from "./contexts/tags";
 import BookingsPage from "./pages/bookings-page";
@@ -24,24 +25,29 @@ function App() {
         <AuthProvider>
           <Localizationprovider>
             <div className={theme.root}>
-              <ModalProvider>
-                <ScrollRoutingProvider roots={["/pos", "/"]}>
-                  <Header></Header>
+              <DebugProvider>
+                <ModalProvider>
+                  <ScrollRoutingProvider roots={["/pos", "/"]}>
+                    <Header></Header>
 
-                  <Routes>
-                    <Route path="/help/*" element={<HelpPage />}></Route>
+                    <Routes>
+                      <Route path="/help/*" element={<HelpPage />}></Route>
 
-                    <Route
-                      path="/pos/*"
-                      element={<PosPage path="/pos" />}
-                    ></Route>
+                      <Route
+                        path="/pos/*"
+                        element={<PosPage path="/pos" />}
+                      ></Route>
 
-                    <Route path="/*" element={<PosPage path="/pos" />}></Route>
-                  </Routes>
+                      <Route
+                        path="/*"
+                        element={<PosPage path="/pos" />}
+                      ></Route>
+                    </Routes>
 
-                  <Footer></Footer>
-                </ScrollRoutingProvider>
-              </ModalProvider>
+                    <Footer></Footer>
+                  </ScrollRoutingProvider>
+                </ModalProvider>
+              </DebugProvider>
             </div>
           </Localizationprovider>
         </AuthProvider>
@@ -56,60 +62,62 @@ function App() {
           <TagProvider>
             <GameProvider>
               <div className={theme.root}>
-                <ModalProvider>
-                  <ScrollRoutingProvider
-                    roots={[
-                      "/pos",
-                      "/catalog",
-                      "/help",
-                      "/login",
-                      "/signup",
-                      "/bookings",
-                      "/",
-                    ]}
-                  >
-                    <Header></Header>
+                <DebugProvider>
+                  <ModalProvider>
+                    <ScrollRoutingProvider
+                      roots={[
+                        "/pos",
+                        "/catalog",
+                        "/help",
+                        "/login",
+                        "/signup",
+                        "/bookings",
+                        "/",
+                      ]}
+                    >
+                      <Header></Header>
 
-                    <Routes>
-                      <Route
-                        path="/login"
-                        element={
-                          <LoginPage
-                            onLogin={(user) =>
-                              user &&
-                              user.email == "pos@hololounge.jp" &&
-                              localStorage.setItem("pos", 1) &&
-                              window.location.reload()
-                            }
-                          />
-                        }
-                      ></Route>
-                      <Route path="/signup" element={<SignupPage />}></Route>
-                      <Route
-                        path="/catalog"
-                        element={
-                          <main>
-                            <GamePage />
-                          </main>
-                        }
-                      ></Route>
-                      <Route path="/help/*" element={<HelpPage />}></Route>
+                      <Routes>
+                        <Route
+                          path="/login"
+                          element={
+                            <LoginPage
+                              onLogin={(user) =>
+                                user &&
+                                user.email == "pos@hololounge.jp" &&
+                                localStorage.setItem("pos", 1) &&
+                                window.location.reload()
+                              }
+                            />
+                          }
+                        ></Route>
+                        <Route path="/signup" element={<SignupPage />}></Route>
+                        <Route
+                          path="/catalog"
+                          element={
+                            <main>
+                              <GamePage />
+                            </main>
+                          }
+                        ></Route>
+                        <Route path="/help/*" element={<HelpPage />}></Route>
 
-                      <Route
-                        path="/pos/*"
-                        element={<PosPage path="/pos" />}
-                      ></Route>
-                      <Route
-                        path="/bookings"
-                        element={<BookingsPage />}
-                      ></Route>
+                        <Route
+                          path="/pos/*"
+                          element={<PosPage path="/pos" />}
+                        ></Route>
+                        <Route
+                          path="/bookings"
+                          element={<BookingsPage />}
+                        ></Route>
 
-                      <Route path="/*" element={<HomePage />}></Route>
-                    </Routes>
+                        <Route path="/*" element={<HomePage />}></Route>
+                      </Routes>
 
-                    <Footer></Footer>
-                  </ScrollRoutingProvider>
-                </ModalProvider>
+                      <Footer></Footer>
+                    </ScrollRoutingProvider>
+                  </ModalProvider>
+                </DebugProvider>
               </div>
             </GameProvider>
           </TagProvider>

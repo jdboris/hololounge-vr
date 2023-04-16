@@ -35,6 +35,7 @@ import Overlay from "../components/overlay";
 import { useAuth } from "../contexts/auth";
 import { useLocalization } from "../contexts/localization";
 import { useModal } from "../contexts/modal";
+import { useDebug } from "../contexts/debug";
 import { useScrollRouting } from "../contexts/scroll-routing";
 import "../css/react-datepicker.scss";
 import useTimer from "../hooks/timer";
@@ -97,6 +98,7 @@ const CustomInput = forwardRef(({ label, error, ...props }, ref) => (
 ));
 
 export default function BookingPage() {
+  const { setDebugContent } = useDebug();
   const { currentUser } = useAuth();
 
   const MAINTENANCE_MODE = useMemo(
@@ -843,6 +845,12 @@ export default function BookingPage() {
                             const newValue = Math.floor(
                               position / list.firstElementChild.offsetHeight
                             );
+
+                            if (window.location.pathname == "/pos/booking") {
+                              setDebugContent(
+                                `${position}: ${list.scrollTop}, ${list.clientHeight}; ${newValue}: ${list.firstElementChild.offsetHeight}`
+                              );
+                            }
 
                             if (selectedValue != newValue) {
                               selectedValue = newValue;
