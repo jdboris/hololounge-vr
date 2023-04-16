@@ -35,7 +35,6 @@ import Overlay from "../components/overlay";
 import { useAuth } from "../contexts/auth";
 import { useLocalization } from "../contexts/localization";
 import { useModal } from "../contexts/modal";
-import { useDebug } from "../contexts/debug";
 import { useScrollRouting } from "../contexts/scroll-routing";
 import "../css/react-datepicker.scss";
 import useTimer from "../hooks/timer";
@@ -98,7 +97,6 @@ const CustomInput = forwardRef(({ label, error, ...props }, ref) => (
 ));
 
 export default function BookingPage() {
-  const { setDebugContent } = useDebug();
   const { currentUser } = useAuth();
 
   const MAINTENANCE_MODE = useMemo(
@@ -161,8 +159,8 @@ export default function BookingPage() {
    */
   const [formData, setBooking] = useState({ ...DEFAULT_FORM_DATA });
 
-  // Reset the forms and scroll to top 10 minutes after last navigation...
-  const [isTimeUp, restartTimer] = useTimer(minutesToMilliseconds(10));
+  // Reset the forms and scroll to top 15 minutes after last navigation...
+  const [isTimeUp, restartTimer] = useTimer(minutesToMilliseconds(15));
 
   useEffect(() => {
     if (root != "/pos") return;
@@ -839,18 +837,26 @@ export default function BookingPage() {
                               isAtTopOrBottom = false;
                             }
 
-                            const position =
-                              list.scrollTop + list.clientHeight / 2;
-
-                            const newValue = Math.floor(
-                              position / list.firstElementChild.offsetHeight
-                            );
-
-                            if (window.location.pathname == "/pos/booking") {
-                              setDebugContent(
-                                `${position}: ${list.scrollTop}, ${list.clientHeight}; ${newValue}: ${list.firstElementChild.offsetHeight}`
+                            // Get the <li> in the center of the list
+                            const { top, left, width, height } =
+                              list.getBoundingClientRect();
+                            const li = document
+                              .elementsFromPoint(
+                                left + width / 2,
+                                top + height / 2
+                              )
+                              .find((x) =>
+                                x.classList.contains(
+                                  "react-datepicker__time-list-item"
+                                )
                               );
+                            if (!li) {
+                              return;
                             }
+
+                            const newValue = toValue(
+                              parse(li.textContent, "HH:mm", new Date())
+                            );
 
                             if (selectedValue != newValue) {
                               selectedValue = newValue;
