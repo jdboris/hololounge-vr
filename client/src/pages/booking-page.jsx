@@ -2,13 +2,14 @@ import theme from "@jdboris/css-themes/space-station";
 import {
   addMinutes,
   areIntervalsOverlapping,
+  differenceInMinutes,
   isValid,
-  parse,
   max as maxDate,
   minutesToMilliseconds,
+  parse,
   subMinutes,
   subYears,
-  differenceInMinutes,
+  set,
 } from "date-fns";
 import ja from "date-fns/locale/ja";
 import Booking from "dtos/booking";
@@ -20,39 +21,28 @@ import {
   FaArrowRight,
   FaCheck,
   FaCreditCard,
-  FaCross,
   FaExclamationTriangle,
   FaInfoCircle,
   FaRegCalendar,
   FaRegClock,
 } from "react-icons/fa";
-import PhoneInput from "../components/phone-input";
 import "react-phone-input-2/lib/style.css";
-import "../css/react-phone-input-2.scss";
 import { Link, useLocation } from "react-router-dom";
 import InputError from "../components/input-error";
 import Overlay from "../components/overlay";
+import PhoneInput from "../components/phone-input";
 import { useAuth } from "../contexts/auth";
 import { useLocalization } from "../contexts/localization";
 import { useModal } from "../contexts/modal";
 import { useScrollRouting } from "../contexts/scroll-routing";
 import "../css/react-datepicker.scss";
+import "../css/react-phone-input-2.scss";
 import useTimer from "../hooks/timer";
 import { toLocaleString } from "../utils/dates";
 import { parseInput } from "../utils/parsing";
 import { SANDBOX_BOOKING_DATA, SANDBOX_MODE } from "../utils/sandbox";
 
 registerLocale("ja", ja);
-
-class D extends Date {
-  constructor(...args) {
-    super(...args);
-  }
-  setHours(...args) {
-    super.setHours(...args);
-    return this;
-  }
-}
 
 /**
  * Represents the duration of the currently "selected" (hard-coded) experience.
@@ -270,12 +260,24 @@ export default function BookingPage() {
   }
 
   const openingTime = useMemo(
-    () => new D(formData.startTime).setHours(SANDBOX_MODE ? 0 : 0, 0, 0, 0),
+    () =>
+      set(new Date(formData.startTime), {
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+        milliseconds: 0,
+      }),
     [formData.startTime]
   );
 
   const closingTime = useMemo(
-    () => new D(formData.startTime).setHours(SANDBOX_MODE ? 25 : 25, 0, 0, 0),
+    () =>
+      set(new Date(formData.startTime), {
+        hours: 25,
+        minutes: 0,
+        seconds: 0,
+        milliseconds: 0,
+      }),
     [formData.startTime]
   );
 
@@ -328,28 +330,33 @@ export default function BookingPage() {
   }
 
   function toIntervals(datetime, i) {
-    const midnight = new D(openingTime).setHours(0, 0, 0, 0);
+    const midnight = set(new Date(openingTime), {
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      milliseconds: 0,
+    });
     return Math.ceil((datetime - midnight) / 1000 / 60 / i);
   }
 
   function toDatetime(value) {
     if (!value) return null;
 
-    return new D(formData.startTime).setHours(
-      value / (60 / interval),
-      (value % (60 / interval)) * interval,
-      0,
-      0
-    );
+    return set(new Date(formData.startTime), {
+      hours: value / (60 / interval),
+      minutes: (value % (60 / interval)) * interval,
+      seconds: 0,
+      milliseconds: 0,
+    });
   }
 
   function roundUp(datetime, interval) {
-    return new D(datetime).setHours(
-      datetime.getHours(),
-      Math.ceil(datetime.getMinutes() / interval) * interval,
-      0,
-      0
-    );
+    return set(new Date(datetime), {
+      hours: datetime.getHours(),
+      minutes: Math.ceil(datetime.getMinutes() / interval) * interval,
+      seconds: 0,
+      milliseconds: 0,
+    });
   }
 
   function isStationBooked(station) {
