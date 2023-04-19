@@ -18,6 +18,8 @@
     "react-phone-input-2": "^2.15.1",
     "react-router-dom": "^6.4.3",
     "react-scripts": "5.0.1",
+    "react-simple-keyboard": "^3.5.57",
+    "simple-keyboard-layouts": "^3.1.308",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {

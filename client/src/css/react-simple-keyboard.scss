@@ -1,0 +1,65 @@
+.simple-keyboard {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  color: black;
+  z-index: 1;
+
+  transition: translate 0.2s 0s;
+
+  .hg-button-shift {
+    font-size: 2em;
+  }
+
+  .hg-button-abc,
+  .hg-button-other,
+  .hg-button-backspace {
+    max-width: 80px;
+  }
+
+  .hg-button-tenten,
+  .hg-button-tenten-disabled,
+  .hg-button-dakuten,
+  .hg-button-dakuten-disabled {
+    font-size: 2.7em;
+
+    span {
+      height: 0.8em;
+      width: 0.5em;
+    }
+  }
+
+  .hg-button-dakuten,
+  .hg-button-dakuten-disabled,
+  .hg-button-tenten,
+  .hg-button-tenten-disabled,
+  .hg-button-size,
+  .hg-button-size-disabled {
+    max-width: 80px;
+  }
+
+  .hg-button-dakuten-disabled,
+  .hg-button-tenten-disabled,
+  .hg-button-size-disabled {
+    color: #d1d1d1;
+
+    &:hover {
+      cursor: initial;
+    }
+
+    &:active {
+      background-color: white;
+    }
+  }
+
+  [data-skbtn=""] {
+    visibility: hidden;
+  }
+}
+
+.hidden {
+  .simple-keyboard:not(:focus),
+  .simple-keyboard:not(:focus-within) {
+    translate: 0 100%;
+  }
+}

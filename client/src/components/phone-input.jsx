@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import ReactPhoneInput2 from "react-phone-input-2";
 
-export default function PhoneInput({ onChange, ...props }) {
+export default function PhoneInput({ onChange, name, inputMode, ...props }) {
   const componentRef = useRef();
 
   useEffect(() => {
@@ -32,6 +32,7 @@ export default function PhoneInput({ onChange, ...props }) {
       {...props}
       // NOTE: autoFormat breaks IME composition
       autoFormat={false}
+      inputProps={{ name, inputMode }}
     />
   );
 }

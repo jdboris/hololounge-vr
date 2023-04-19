@@ -41,6 +41,7 @@ import useTimer from "../hooks/timer";
 import { toLocaleString } from "../utils/dates";
 import { parseInput } from "../utils/parsing";
 import { SANDBOX_BOOKING_DATA, SANDBOX_MODE } from "../utils/sandbox";
+import Keyboard from "../components/keyboard";
 
 registerLocale("ja", ja);
 
@@ -78,14 +79,6 @@ const stationCoords = [
   { top: "67.6%", left: "67.1%", width: "31.6%", height: "31%" },
 ];
 
-const CustomInput = forwardRef(({ label, error, ...props }, ref) => (
-  <label>
-    {error && <InputError message={error} />}
-    <input type="text" ref={ref} placeholder=" " {...props} readOnly />
-    {label && <small>{label}</small>}
-  </label>
-));
-
 export default function BookingPage() {
   const { currentUser } = useAuth();
 
@@ -103,6 +96,21 @@ export default function BookingPage() {
   const url = useLocation();
   const startTimeInputRef = useRef();
   const startDayInputRef = useRef();
+
+  const CustomInput = forwardRef(({ label, error, ...props }, ref) => (
+    <label>
+      {error && <InputError message={error} />}
+      <input
+        inputMode={root == "/pos" ? "none" : "text"}
+        type="text"
+        ref={ref}
+        placeholder=" "
+        {...props}
+        readOnly
+      />
+      {label && <small>{label}</small>}
+    </label>
+  ));
 
   const [now, setNow] = useState(new Date());
   /**
@@ -466,245 +474,225 @@ export default function BookingPage() {
         <h1>Booking</h1>
       </header>
       <main>
-        <form
-          onSubmit={async (e) => {
-            e.preventDefault();
-            setError(null);
-            try {
-              if (dtoError) {
-                throw dtoError;
-              }
+        <Keyboard
+          onChange={(value, { name, type }) => {
+            console.log("name: ", name);
 
-              if (pageNumber == 1) {
-                setPageNumber(2);
-                return;
-              }
-
-              setIsLoading(true);
-
-              const response = await fetch(`/api/checkout`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  // NOTE: In case the browser doesn't set it automatically...
-                  referer: window.location.origin + window.location.pathname,
-                },
-                body: JSON.stringify(booking),
-              });
-
-              const { error, id, message, redirectUrl } = await response.json();
-
-              if (!response.ok) {
-                throw error;
-              }
-
-              if (!SANDBOX_MODE) {
-                setBooking({ ...DEFAULT_FORM_DATA });
-                // NOTE: Call the setter to clamp/round
-                setStartTime(now);
-                setHasSelectedDay(false);
-                setHasSelectedTime(false);
-                setPageNumber(1);
-              }
-
-              if (redirectUrl) {
-                setModalContent(message, { canClose: SANDBOX_MODE });
-                if (!SANDBOX_MODE) {
-                  // NOTE: Required to workaround Square's bug where the link responds with 404 if you redirect too quickly
-                  setTimeout(() => {
-                    window.location.href = redirectUrl;
-                  }, 3000);
-                }
-              } else {
-                setModalContent(message, { canClose: false });
-
-                // TODO: Clear these timeouts in a useEffect cleanup
-                const result = await (async () => {
-                  const LIMIT = 40;
-                  for (let i = 0; i < LIMIT; i++) {
-                    const result = await new Promise((resolve, reject) => {
-                      setTimeout(async () => {
-                        const response = await fetch(`/api/checkout/${id}`);
-                        const {
-                          error,
-                          message,
-                          isComplete,
-                          isCanceled,
-                          bookings,
-                        } = await response.json();
-                        // NOTE: May receive 304, which is considered "not OK" by response.ok
-                        // if (!response.ok) {
-                        if (error && response.status != 404) {
-                          setModalContent(error.message);
-                          return reject(error);
-                        }
-
-                        if (isComplete) {
-                          setModalContent(
-                            <>
-                              <div style={{ margin: "auto" }}>{message}</div>
-                              <ul>
-                                {bookings
-                                  .map(({ stations, startTime }) =>
-                                    stations.map((s, i) => (
-                                      <li
-                                        key={"booking-confirmation-time-" + i}
-                                      >
-                                        <small>
-                                          <FaCheck className={theme.green} />{" "}
-                                          Reserved
-                                        </small>
-                                        {s.name} ({toLocaleString(startTime)})
-                                      </li>
-                                    ))
-                                  )
-                                  .flat()}
-                              </ul>
-
-                              {differenceInMinutes(
-                                new Date(Date.parse(bookings[0].startTime)),
-                                new Date()
-                              ) <= 15 ? (
-                                <div>
-                                  <FaCheck className={theme.green} /> Your
-                                  experience(s) will start automatically. Please
-                                  see the Guidebook at your station for help
-                                  getting started.
-                                </div>
-                              ) : (
-                                <>
-                                  <div>
-                                    <FaExclamationTriangle
-                                      className={theme.yellow}
-                                    />{" "}
-                                    Please check in to start your experience!
-                                  </div>
-                                  <Link
-                                    className={[
-                                      theme.button,
-                                      theme.orange,
-                                    ].join(" ")}
-                                    to={root + "/check-in"}
-                                    onClick={(e) =>
-                                      e.preventDefault() ||
-                                      navigate(root + "/check-in") ||
-                                      setModalContent(null)
-                                    }
-                                  >
-                                    CHECK IN
-                                  </Link>
-                                </>
-                              )}
-                            </>
-                          );
-
-                          if (
-                            differenceInMinutes(
-                              new Date(Date.parse(bookings[0].startTime)),
-                              new Date()
-                            ) <= 15
-                          ) {
-                            setTimeout(async () => {
-                              try {
-                                const response = await fetch(
-                                  `/api/bookings/start`,
-                                  {
-                                    method: "POST",
-                                    headers: {
-                                      "Content-Type": "application/json",
-                                    },
-                                    body: JSON.stringify({ bookings }),
-                                  }
-                                );
-
-                                if (!response.ok) {
-                                  throw error;
-                                }
-                              } catch (error) {
-                                console.error(error);
-                              }
-
-                              // NOTE: Assuming all the bookings start at the same time.
-                              //       Add a buffer of 5s to account for differences in client vs server time.
-                            }, Date.parse(bookings[0].startTime) - new Date() + 5000);
-                          }
-
-                          return resolve(true);
-                        }
-
-                        if (isCanceled) {
-                          return resolve(false);
-                        }
-
-                        resolve(null);
-                      }, 3000);
-                    });
-
-                    if (result !== null) return result;
-                  }
-                })();
-
-                if (!result) {
-                  setModalContent(null);
-                }
-
-                navigate(root);
-              }
-            } catch (error) {
-              setError(error);
-            }
-
-            getBookings();
-            setIsLoading(false);
-          }}
-          onChange={(e) => {
-            e.target.name &&
-              e.target.name != "phoneCountry" &&
-              e.target.type != "tel" &&
-              (hideError(e.target.name) ||
+            name &&
+              (hideError(name) ||
                 setBooking((old) => ({
                   ...old,
-                  [e.target.name]: parseInput(e.target.value, {
-                    type: e.target.type,
+                  [name]: parseInput(value, {
+                    type,
                   }),
                 })));
           }}
         >
-          <header>
-            {/* <input
-              disabled={isLoading || MAINTENANCE_MODE}
-              className={theme.timeSlider}
-              onMouseDown={() => setIsSliding(true)}
-              onTouchStart={() => setIsSliding(true)}
-              onMouseUp={() => setIsSliding(false)}
-              onTouchEnd={() => setIsSliding(false)}
-              type="range"
-              min={min}
-              max={max}
-              step={1}
-              value={value}
-              onChange={(e) => {
-                setStartTime(toDatetime(e.target.value));
-              }}
-            />
-            <datalist
-              className={theme.scale}
-              onClick={(e) => e.preventDefault()}
-            >
-              {Array(max + 1 - min)
-                .fill(null)
-                .map((x, i, array) => (
-                  <option value={i + min} key={`time-marker-${i + min}`}>
-                    {(i == 0 || i == array.length - 1) &&
-                      toDatetime(i + min).toLocaleTimeString("ja-JP", {
-                        timeStyle: "short",
-                        hourCycle: "h23",
-                      })}
-                  </option>
-                ))}
-            </datalist> */}
-          </header>
-          <main>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              setError(null);
+              try {
+                if (dtoError) {
+                  throw dtoError;
+                }
+
+                if (pageNumber == 1) {
+                  setPageNumber(2);
+                  return;
+                }
+
+                setIsLoading(true);
+
+                const response = await fetch(`/api/checkout`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    // NOTE: In case the browser doesn't set it automatically...
+                    referer: window.location.origin + window.location.pathname,
+                  },
+                  body: JSON.stringify(booking),
+                });
+
+                const { error, id, message, redirectUrl } =
+                  await response.json();
+
+                if (!response.ok) {
+                  throw error;
+                }
+
+                if (!SANDBOX_MODE) {
+                  setBooking({ ...DEFAULT_FORM_DATA });
+                  // NOTE: Call the setter to clamp/round
+                  setStartTime(now);
+                  setHasSelectedDay(false);
+                  setHasSelectedTime(false);
+                  setPageNumber(1);
+                }
+
+                if (redirectUrl) {
+                  setModalContent(message, { canClose: SANDBOX_MODE });
+                  if (!SANDBOX_MODE) {
+                    // NOTE: Required to workaround Square's bug where the link responds with 404 if you redirect too quickly
+                    setTimeout(() => {
+                      window.location.href = redirectUrl;
+                    }, 3000);
+                  }
+                } else {
+                  setModalContent(message, { canClose: false });
+
+                  // TODO: Clear these timeouts in a useEffect cleanup
+                  const result = await (async () => {
+                    const LIMIT = 40;
+                    for (let i = 0; i < LIMIT; i++) {
+                      const result = await new Promise((resolve, reject) => {
+                        setTimeout(async () => {
+                          const response = await fetch(`/api/checkout/${id}`);
+                          const {
+                            error,
+                            message,
+                            isComplete,
+                            isCanceled,
+                            bookings,
+                          } = await response.json();
+                          // NOTE: May receive 304, which is considered "not OK" by response.ok
+                          // if (!response.ok) {
+                          if (error && response.status != 404) {
+                            setModalContent(error.message);
+                            return reject(error);
+                          }
+
+                          if (isComplete) {
+                            setModalContent(
+                              <>
+                                <div style={{ margin: "auto" }}>{message}</div>
+                                <ul>
+                                  {bookings
+                                    .map(({ stations, startTime }) =>
+                                      stations.map((s, i) => (
+                                        <li
+                                          key={"booking-confirmation-time-" + i}
+                                        >
+                                          <small>
+                                            <FaCheck className={theme.green} />{" "}
+                                            Reserved
+                                          </small>
+                                          {s.name} ({toLocaleString(startTime)})
+                                        </li>
+                                      ))
+                                    )
+                                    .flat()}
+                                </ul>
+
+                                {differenceInMinutes(
+                                  new Date(Date.parse(bookings[0].startTime)),
+                                  new Date()
+                                ) <= 15 ? (
+                                  <div>
+                                    <FaCheck className={theme.green} /> Your
+                                    experience(s) will start automatically.
+                                    Please see the Guidebook at your station for
+                                    help getting started.
+                                  </div>
+                                ) : (
+                                  <>
+                                    <div>
+                                      <FaExclamationTriangle
+                                        className={theme.yellow}
+                                      />{" "}
+                                      Please check in to start your experience!
+                                    </div>
+                                    <Link
+                                      className={[
+                                        theme.button,
+                                        theme.orange,
+                                      ].join(" ")}
+                                      to={root + "/check-in"}
+                                      onClick={(e) =>
+                                        e.preventDefault() ||
+                                        navigate(root + "/check-in") ||
+                                        setModalContent(null)
+                                      }
+                                    >
+                                      CHECK IN
+                                    </Link>
+                                  </>
+                                )}
+                              </>
+                            );
+
+                            if (
+                              differenceInMinutes(
+                                new Date(Date.parse(bookings[0].startTime)),
+                                new Date()
+                              ) <= 15
+                            ) {
+                              setTimeout(async () => {
+                                try {
+                                  const response = await fetch(
+                                    `/api/bookings/start`,
+                                    {
+                                      method: "POST",
+                                      headers: {
+                                        "Content-Type": "application/json",
+                                      },
+                                      body: JSON.stringify({ bookings }),
+                                    }
+                                  );
+
+                                  if (!response.ok) {
+                                    throw error;
+                                  }
+                                } catch (error) {
+                                  console.error(error);
+                                }
+
+                                // NOTE: Assuming all the bookings start at the same time.
+                                //       Add a buffer of 5s to account for differences in client vs server time.
+                              }, Date.parse(bookings[0].startTime) - new Date() + 5000);
+                            }
+
+                            return resolve(true);
+                          }
+
+                          if (isCanceled) {
+                            return resolve(false);
+                          }
+
+                          resolve(null);
+                        }, 3000);
+                      });
+
+                      if (result !== null) return result;
+                    }
+                  })();
+
+                  if (!result) {
+                    setModalContent(null);
+                  }
+
+                  navigate(root);
+                }
+              } catch (error) {
+                setError(error);
+              }
+
+              getBookings();
+              setIsLoading(false);
+            }}
+            onChange={(e) => {
+              e.target.name &&
+                e.target.name != "phoneCountry" &&
+                e.target.type != "tel" &&
+                (hideError(e.target.name) ||
+                  setBooking((old) => ({
+                    ...old,
+                    [e.target.name]: parseInput(e.target.value, {
+                      type: e.target.type,
+                    }),
+                  })));
+            }}
+          >
             {pageNumber == 1 && (
               <figure className={theme.map}>
                 <figcaption>
@@ -779,6 +767,8 @@ export default function BookingPage() {
 
                           setStartTime(date);
                         }}
+                        // Prevent virtual keyboard
+                        onFocus={(e) => e.stopPropagation()}
                         locale="ja"
                         dateFormat="yyyy/MM/dd"
                         placeholderText="YYYY/MM/DD"
@@ -879,6 +869,8 @@ export default function BookingPage() {
 
                           setStartTime(date);
                         }}
+                        // Prevent virtual keyboard
+                        onFocus={(e) => e.stopPropagation()}
                         locale="ja"
                         showTimeSelect
                         showTimeSelectOnly
@@ -909,6 +901,7 @@ export default function BookingPage() {
                       className={theme.alt}
                       type="text"
                       name="lastName"
+                      inputMode={root == "/pos" ? "none" : "text"}
                       value={formData.lastName || ""}
                       placeholder=" "
                       onBlur={(e) => showError(e.target.name)}
@@ -921,6 +914,7 @@ export default function BookingPage() {
                       className={theme.alt}
                       type="text"
                       name="firstName"
+                      inputMode={root == "/pos" ? "none" : "text"}
                       value={formData.firstName || ""}
                       placeholder=" "
                       onBlur={(e) => showError(e.target.name)}
@@ -936,6 +930,7 @@ export default function BookingPage() {
                     containerClass={theme.label}
                     specialLabel={"Phone"}
                     name="phone"
+                    inputMode={root == "/pos" ? "none" : "text"}
                     placeholder=" "
                     value={parseInput(formData.phone || "", { type: "tel" })}
                     onChange={(value, c, e, formattedValue) => {
@@ -989,6 +984,8 @@ export default function BookingPage() {
                           birthday: value,
                         }));
                       }}
+                      // Prevent virtual keyboard
+                      onFocus={(e) => e.stopPropagation()}
                       onBlur={(e) => showError(e.target.name)}
                       locale="ja"
                       dateFormat="yyyy/MM/dd"
@@ -1005,6 +1002,7 @@ export default function BookingPage() {
                       className={theme.alt}
                       type="email"
                       name="email"
+                      inputMode={root == "/pos" ? "none" : "text"}
                       value={formData.email || ""}
                       placeholder=" "
                       onBlur={(e) => showError(e.target.name)}
@@ -1106,9 +1104,9 @@ export default function BookingPage() {
                 </div>
               )}
             </aside>
-          </main>
-          {MAINTENANCE_MODE && <Overlay>COMING SOON!</Overlay>}
-        </form>
+            {MAINTENANCE_MODE && <Overlay>COMING SOON!</Overlay>}
+          </form>
+        </Keyboard>
       </main>
     </div>
   );
