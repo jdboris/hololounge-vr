@@ -183,6 +183,16 @@ export default function Keyboard({ children, className, onChange, ...props }) {
         onFocus={() => setIsHidden(false)}
         // NOTE: Required to focus event
         tabIndex={"100"}
+        onTouchStart={() => {
+          // Refocus the textbox ASAP
+          if (target) {
+            target.focus();
+            target.setSelectionRange(
+              keyboardRef.current.getCaretPosition(),
+              keyboardRef.current.getCaretPositionEnd()
+            );
+          }
+        }}
       >
         <ReactSimpleKeyboard
           keyboardRef={(x) => (keyboardRef.current = x)}
