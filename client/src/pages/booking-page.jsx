@@ -171,6 +171,8 @@ export default function BookingPage() {
     setHasSelectedTime(false);
     setPageNumber(1);
     setIsLoading(false);
+    // Close virtual keyboard
+    document.activeElement.blur();
 
     if (url.pathname.endsWith("/booking")) {
       getBookings();
@@ -187,7 +189,7 @@ export default function BookingPage() {
       startDayInputRef.current.setOpen(false);
       startTimeInputRef.current.setOpen(false);
 
-      // NOTE: Timeout to workaround setOpen caneling the nav scrolling
+      // NOTE: Timeout to workaround setOpen canceling the nav scrolling
       setTimeout(() => {
         navigate(root);
         setModalContent(null);
