@@ -181,10 +181,13 @@ export default function Keyboard({ children, className, onChange, ...props }) {
   const [isHidden, setIsHidden] = useState(true);
   const [target, setTarget] = useState(null);
   const { language } = useLocalization();
-  const [layout, setLayout] = useState(language == "en-US" ? en : jp());
+  const [layout, setLayout] = useState(language == "en-US" ? en() : jp());
 
   useEffect(() => {
-    setLayout(language == "en-US" ? en : jp());
+    keyboardRef.current.setOptions({
+      layoutName: "default",
+    });
+    setLayout(language == "en-US" ? en() : jp());
   }, [language]);
 
   const onselectionchange = useCallback(() => {
