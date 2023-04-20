@@ -62,8 +62,29 @@ function jp({ size = false, contraction = false } = {}) {
           !contraction ? "-disabled" : ""
         }} {space} {abc} {other} {backspace}`,
       ],
+      other: [
+        "1 2 3 4 5 6 7 8 9 0",
+        "! @ # $ % ^ & * ( )",
+        "' \" = _ ` : ; ? ~ |",
+        "+ - \\ / [ ] { } < >",
+        ". , 、 。 ・ ー 「 」 ¥ ",
+        `{default} {space} {abc} {backspace}`,
+      ],
+      abc: [
+        "q w e r t y u i o p",
+        "a s d f g h j k l",
+        "{shift} z x c v b n m",
+        `{default} {space} {other} {backspace}`,
+      ],
+      shift: [
+        "Q W E R T Y U I O P",
+        "A S D F G H J K L",
+        "{shift} Z X C V B N M",
+        `{default} {space} {other} {backspace}`,
+      ],
     },
     display: {
+      "{default}": "あ",
       "{other}": "1?#",
       "{backspace}": "⌫",
       "{shift}": "⇧",
@@ -76,6 +97,25 @@ function jp({ size = false, contraction = false } = {}) {
     },
   };
 }
+
+// {
+//   "layout": {
+//       "default": [
+//           "1 2 3 4 5 6 7 8 9 0 - ^ ¥ {bksp}",
+//           "{tab} た て い す か ん な に ら せ ゛ ゜ む",
+//           "{lock} ち と し は き く ま の り れ け {enter}",
+//           "{shift} つ さ そ ひ こ み も ね る め {shift}",
+//           ".com @ {space}"
+//       ],
+//       "shift": [
+//           "! \" # $ % & ' ( ) ́ = ~ | {bksp}",
+//           "{tab} た て ぃ す か ん な に ら せ 「 」 む",
+//           "{lock} ち と し は き く ま の り れ け {enter}",
+//           "{shift} っ さ そ ひ こ み も 、 。 ・ {shift}",
+//           ".com @ {space}"
+//       ]
+//   }
+// }
 
 // `
 // わらやまはなたさかあ
@@ -207,16 +247,42 @@ export default function Keyboard({ children, className, onChange, ...props }) {
                 value.substring(start);
 
               keyboardRef.current.setInput(newValue);
+              return;
             }
 
-            if (button === "{shift}" || button === "{lock}") {
+            if (button === "{default}") {
+              keyboardRef.current.setOptions({
+                layoutName: "default",
+              });
+              return;
+            }
+
+            if (button === "{other}") {
+              keyboardRef.current.setOptions({
+                layoutName: "other",
+              });
+              return;
+            }
+
+            if (button === "{abc}") {
               const currentLayout = keyboardRef.current.options.layoutName;
-              const shiftToggle =
-                currentLayout === "default" ? "shift" : "default";
+
+              if (currentLayout != "shift") {
+                keyboardRef.current.setOptions({
+                  layoutName: "abc",
+                });
+              }
+              return;
+            }
+
+            if (button === "{shift}") {
+              const currentLayout = keyboardRef.current.options.layoutName;
+              const newLayoutName = currentLayout === "abc" ? "shift" : "abc";
 
               keyboardRef.current.setOptions({
-                layoutName: shiftToggle,
+                layoutName: newLayoutName,
               });
+              return;
             }
           }}
           onChange={(value, e) => {

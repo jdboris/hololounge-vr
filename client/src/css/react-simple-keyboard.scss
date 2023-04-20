@@ -7,10 +7,7 @@
 
   transition: translate 0.2s 0s;
 
-  .hg-button-shift {
-    font-size: 2em;
-  }
-
+  .hg-button-default,
   .hg-button-abc,
   .hg-button-other,
   .hg-button-backspace {
@@ -57,4 +54,8 @@
   .simple-keyboard:not(:focus-within) {
     translate: 0 100%;
   }
+}
+
+.hg-theme-default .hg-button.hg-standardBtn[data-skbtn="@"] {
+  max-width: initial;
 }
