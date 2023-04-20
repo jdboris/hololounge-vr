@@ -17,29 +17,24 @@
     max-width: 80px;
   }
 
-  .hg-button-tenten,
-  .hg-button-tenten-disabled,
-  .hg-button-dakuten,
-  .hg-button-dakuten-disabled {
-    font-size: 2.7em;
+  .hg-button-contraction,
+  .hg-button-contraction-disabled {
+    font-size: 1.7em;
 
     span {
       height: 0.8em;
-      width: 0.5em;
+      width: 1.5em;
     }
   }
 
-  .hg-button-dakuten,
-  .hg-button-dakuten-disabled,
-  .hg-button-tenten,
-  .hg-button-tenten-disabled,
+  .hg-button-contraction,
+  .hg-button-contraction-disabled,
   .hg-button-size,
   .hg-button-size-disabled {
     max-width: 80px;
   }
 
-  .hg-button-dakuten-disabled,
-  .hg-button-tenten-disabled,
+  .hg-button-contraction-disabled,
   .hg-button-size-disabled {
     color: #d1d1d1;
 

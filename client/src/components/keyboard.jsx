@@ -36,14 +36,20 @@ const DAKUTENS = {
 };
 
 const TENTENS = {
-  は: "ぱ",
-  ひ: "ぴ",
-  ふ: "ぷ",
+  ば: "ぱ",
+  び: "ぴ",
+  ぶ: "ぷ",
   へ: "ぺ",
-  ほ: "ぽ",
+  ぼ: "ぽ",
+
+  ぱ: "は",
+  ぴ: "ひ",
+  ぷ: "ふ",
+  ぺ: "へ",
+  ぽ: "ほ",
 };
 
-function jp({ size = false, dakuten = false, tenten = false } = {}) {
+function jp({ size = false, contraction = false } = {}) {
   return {
     layout: {
       default: [
@@ -52,10 +58,8 @@ function jp({ size = false, dakuten = false, tenten = false } = {}) {
         "ん る ゆ む ふ ぬ つ す く う",
         " れ  め へ ね て せ け え",
         " ろ よ も ほ の と そ こ お",
-        `{size${!size ? "-disabled" : ""}} {dakuten${
-          !dakuten ? "-disabled" : ""
-        }} {tenten${
-          !tenten ? "-disabled" : ""
+        `{size${!size ? "-disabled" : ""}} {contraction${
+          !contraction ? "-disabled" : ""
         }} {space} {abc} {other} {backspace}`,
       ],
     },
@@ -63,10 +67,8 @@ function jp({ size = false, dakuten = false, tenten = false } = {}) {
       "{other}": "1?#",
       "{backspace}": "⌫",
       "{shift}": "⇧",
-      "{dakuten}": "゛",
-      "{dakuten-disabled}": "゛",
-      "{tenten}": "゜",
-      "{tenten-disabled}": "゜",
+      "{contraction}": "゛゜",
+      "{contraction-disabled}": "゛゜",
       "{size}": "大/小",
       "{size-disabled}": "大/小",
       "{abc}": "ABC",
@@ -95,23 +97,13 @@ function toggle(string, button) {
     return temp[string] || string;
   }
 
-  if (button == "{dakuten}") {
+  if (button == "{contraction}") {
     const temp = {
       ...DAKUTENS,
       ...Object.fromEntries(
         Object.entries(DAKUTENS).map(([key, value]) => [value, key])
       ),
-    };
-
-    return temp[string] || string;
-  }
-
-  if (button === "{tenten}") {
-    const temp = {
       ...TENTENS,
-      ...Object.fromEntries(
-        Object.entries(TENTENS).map(([key, value]) => [value, key])
-      ),
     };
 
     return temp[string] || string;
@@ -144,18 +136,15 @@ export default function Keyboard({ children, className, onChange, ...props }) {
 
         if (
           target.value[target.selectionStart - 1].match(
-            new RegExp(`[${Object.entries(DAKUTENS).flat().join()}]`)
+            new RegExp(
+              `[${
+                Object.entries(DAKUTENS).flat().join() +
+                Object.entries(TENTENS).flat().join()
+              }]`
+            )
           )
         ) {
-          options.dakuten = true;
-        }
-
-        if (
-          target.value[target.selectionStart - 1].match(
-            new RegExp(`[${Object.entries(TENTENS).flat().join()}]`)
-          )
-        ) {
-          options.tenten = true;
+          options.contraction = true;
         }
 
         setLayout(jp(options));
@@ -199,11 +188,7 @@ export default function Keyboard({ children, className, onChange, ...props }) {
           keyboardRef={(x) => (keyboardRef.current = x)}
           {...layout}
           onKeyPress={(button) => {
-            if (
-              button === "{size}" ||
-              button === "{dakuten}" ||
-              button === "{tenten}"
-            ) {
+            if (button === "{size}" || button === "{contraction}") {
               const value = keyboardRef.current.getInput(target.name);
               const start = keyboardRef.current.getCaretPosition();
               const newValue =
