@@ -59,3 +59,7 @@
 .hg-theme-default .hg-button.hg-standardBtn[data-skbtn="@"] {
   max-width: initial;
 }
+
+.en-US > .hg-theme-default .hg-button.hg-standardBtn[data-skbtn="@"] {
+  max-width: 80px;
+}

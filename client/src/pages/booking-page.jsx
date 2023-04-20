@@ -478,8 +478,6 @@ export default function BookingPage() {
       <main>
         <Keyboard
           onChange={(value, { name, type }) => {
-            console.log("name: ", name);
-
             name &&
               (hideError(name) ||
                 setBooking((old) => ({

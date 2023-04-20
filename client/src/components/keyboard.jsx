@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import ReactSimpleKeyboard from "react-simple-keyboard";
 import "react-simple-keyboard/build/css/index.css";
-import en from "simple-keyboard-layouts/build/layouts/english";
+// import en from "simple-keyboard-layouts/build/layouts/english";
 // import jp from "simple-keyboard-layouts/build/layouts/japanese";
 import { useLocalization } from "../contexts/localization";
 import "../css/react-simple-keyboard.scss";
@@ -48,6 +48,32 @@ const TENTENS = {
   ぺ: "へ",
   ぽ: "ほ",
 };
+
+function en() {
+  return {
+    layout: {
+      default: [
+        "` 1 2 3 4 5 6 7 8 9 0 - =",
+        "q w e r t y u i o p [ ] \\",
+        "a s d f g h j k l ; '",
+        "{shift} z x c v b n m , . /",
+        ".com @ {space} {backspace}",
+      ],
+      shift: [
+        "~ ! @ # $ % ^ & * ( ) _ +",
+        "Q W E R T Y U I O P { } |",
+        'A S D F G H J K L : "',
+        "{shift} Z X C V B N M < > ?",
+        ".com @ {space} {backspace}",
+      ],
+    },
+    display: {
+      "{backspace}": "⌫",
+      "{shift}": "⇧",
+      "{space}": " ",
+    },
+  };
+}
 
 function jp({ size = false, contraction = false } = {}) {
   return {
@@ -238,51 +264,66 @@ export default function Keyboard({ children, className, onChange, ...props }) {
           keyboardRef={(x) => (keyboardRef.current = x)}
           {...layout}
           onKeyPress={(button) => {
-            if (button === "{size}" || button === "{contraction}") {
-              const value = keyboardRef.current.getInput(target.name);
-              const start = keyboardRef.current.getCaretPosition();
-              const newValue =
-                value.substring(0, start - 1) +
-                toggle(value[start - 1], button) +
-                value.substring(start);
+            if (language == "en-US") {
+              if (button === "{shift}") {
+                const currentLayout = keyboardRef.current.options.layoutName;
+                const newLayoutName =
+                  currentLayout === "default" ? "shift" : "default";
 
-              keyboardRef.current.setInput(newValue);
-              return;
-            }
-
-            if (button === "{default}") {
-              keyboardRef.current.setOptions({
-                layoutName: "default",
-              });
-              return;
-            }
-
-            if (button === "{other}") {
-              keyboardRef.current.setOptions({
-                layoutName: "other",
-              });
-              return;
-            }
-
-            if (button === "{abc}") {
-              const currentLayout = keyboardRef.current.options.layoutName;
-
-              if (currentLayout != "shift") {
                 keyboardRef.current.setOptions({
-                  layoutName: "abc",
+                  layoutName: newLayoutName,
                 });
+                return;
               }
-              return;
             }
 
-            if (button === "{shift}") {
-              const currentLayout = keyboardRef.current.options.layoutName;
-              const newLayoutName = currentLayout === "abc" ? "shift" : "abc";
+            if (language == "ja-JP") {
+              if (button === "{size}" || button === "{contraction}") {
+                const value = keyboardRef.current.getInput(target.name);
+                const start = keyboardRef.current.getCaretPosition();
+                const newValue =
+                  value.substring(0, start - 1) +
+                  toggle(value[start - 1], button) +
+                  value.substring(start);
 
-              keyboardRef.current.setOptions({
-                layoutName: newLayoutName,
-              });
-              return;
+                keyboardRef.current.setInput(newValue);
+                return;
+              }
+
+              if (button === "{default}") {
+                keyboardRef.current.setOptions({
+                  layoutName: "default",
+                });
+                return;
+              }
+
+              if (button === "{other}") {
+                keyboardRef.current.setOptions({
+                  layoutName: "other",
+                });
+                return;
+              }
+
+              if (button === "{abc}") {
+                const currentLayout = keyboardRef.current.options.layoutName;
+
+                if (currentLayout != "shift") {
+                  keyboardRef.current.setOptions({
+                    layoutName: "abc",
+                  });
+                }
+                return;
+              }
+
+              if (button === "{shift}") {
+                const currentLayout = keyboardRef.current.options.layoutName;
+                const newLayoutName = currentLayout === "abc" ? "shift" : "abc";
+
+                keyboardRef.current.setOptions({
+                  layoutName: newLayoutName,
+                });
+                return;
+              }
             }
           }}
           onChange={(value, e) => {
