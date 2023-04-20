@@ -66,7 +66,7 @@ function GamePage({ onlyFeatured = false }) {
         <ul className={theme.badges}>
           {tags?.map((tag) => (
             <li key={`tag-${tag.id}`}>
-              <label className={theme.checkboxLabel + " " + theme.badge}>
+              <label className={theme.checkboxLabel}>
                 <input
                   type="checkbox"
                   checked={Boolean(filters.tagIds?.find((id) => id === tag.id))}
@@ -88,7 +88,7 @@ function GamePage({ onlyFeatured = false }) {
                     })
                   }
                 />
-                <span>{tag.name}</span>
+                <span className={theme.badge}>{tag.name}</span>
               </label>
             </li>
           ))}
