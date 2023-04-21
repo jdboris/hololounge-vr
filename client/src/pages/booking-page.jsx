@@ -925,7 +925,6 @@ export default function BookingPage() {
                   <PhoneInput
                     country={"jp"}
                     preferredCountries={["jp", "us", "ca", "cn", "kr", "in"]}
-                    countryCodeEditable={false}
                     inputClass={theme.alt}
                     containerClass={theme.label}
                     specialLabel={"Phone"}
@@ -934,12 +933,12 @@ export default function BookingPage() {
                     placeholder=" "
                     value={parseInput(formData.phone || "", { type: "tel" })}
                     onChange={(value, c, e, formattedValue) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setBooking((old) => ({
-                        ...old,
-                        phone: parseInput(value || "", { type: "tel" }),
-                      }));
+                      setBooking((old) => {
+                        return {
+                          ...old,
+                          phone: parseInput(value || "", { type: "tel" }),
+                        };
+                      });
                     }}
                   />
 
