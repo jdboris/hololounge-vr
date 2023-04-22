@@ -1,11 +1,15 @@
-.simple-keyboard {
+.keyboard-wrapper {
   position: fixed;
   bottom: 0;
   left: 0;
-  color: black;
+  right: 0;
   z-index: 1;
 
   transition: translate 0.2s 0s;
+}
+
+.simple-keyboard {
+  color: black;
 
   .hg-button-default,
   .hg-button-abc,
@@ -47,19 +51,29 @@
   [data-skbtn=""] {
     visibility: hidden;
   }
+
+  &.hg-layout-tel {
+    .hg-row {
+      justify-content: center;
+    }
+
+    .hg-button {
+      max-width: 200px;
+    }
+  }
 }
 
-.hidden {
-  .simple-keyboard:not(:focus),
-  .simple-keyboard:not(:focus-within) {
-    translate: 0 100%;
-  }
+.keyboard-wrapper.hidden:not(:focus),
+.keyboard-wrapper.hidden:not(:focus-within) {
+  translate: 0 100%;
 }
 
 .hg-theme-default .hg-button.hg-standardBtn[data-skbtn="@"] {
   max-width: initial;
 }
 
-.en-US > .hg-theme-default .hg-button.hg-standardBtn[data-skbtn="@"] {
+.keyboard-wrapper.en-US
+  .hg-theme-default
+  .hg-button.hg-standardBtn[data-skbtn="@"] {
   max-width: 80px;
 }

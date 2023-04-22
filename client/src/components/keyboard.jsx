@@ -66,6 +66,7 @@ function en() {
         "{shift} Z X C V B N M < > ?",
         ".com @ {space} {backspace}",
       ],
+      tel: ["1 2 3", "4 5 6", "7 8 9", " 0 {backspace}"],
     },
     display: {
       "{backspace}": "⌫",
@@ -108,6 +109,7 @@ function jp({ size = false, contraction = false } = {}) {
         "{shift} Z X C V B N M",
         `{default} {space} {other} {backspace}`,
       ],
+      tel: ["1 2 3", "4 5 6", "7 8 9", " 0 {backspace}"],
     },
     display: {
       "{default}": "あ",
@@ -123,33 +125,6 @@ function jp({ size = false, contraction = false } = {}) {
     },
   };
 }
-
-// {
-//   "layout": {
-//       "default": [
-//           "1 2 3 4 5 6 7 8 9 0 - ^ ¥ {bksp}",
-//           "{tab} た て い す か ん な に ら せ ゛ ゜ む",
-//           "{lock} ち と し は き く ま の り れ け {enter}",
-//           "{shift} つ さ そ ひ こ み も ね る め {shift}",
-//           ".com @ {space}"
-//       ],
-//       "shift": [
-//           "! \" # $ % & ' ( ) ́ = ~ | {bksp}",
-//           "{tab} た て ぃ す か ん な に ら せ 「 」 む",
-//           "{lock} ち と し は き く ま の り れ け {enter}",
-//           "{shift} っ さ そ ひ こ み も 、 。 ・ {shift}",
-//           ".com @ {space}"
-//       ]
-//   }
-// }
-
-// `
-// わらやまはなたさかあ
-// をり みひにちしきい
-// んるゆむふぬつすくう
-// ーれ めへねてせけえ
-//  ろよもほのとそこお
-// `;
 
 function toggle(string, button) {
   if (button == "{size}") {
@@ -179,6 +154,7 @@ function toggle(string, button) {
 export default function Keyboard({ children, className, onChange, ...props }) {
   const keyboardRef = useRef();
   const [isHidden, setIsHidden] = useState(true);
+  // NOTE: target is guaranteed to be a valid target
   const [target, setTarget] = useState(null);
   const { language } = useLocalization();
   const [layout, setLayout] = useState(language == "en-US" ? en() : jp());
@@ -202,7 +178,6 @@ export default function Keyboard({ children, className, onChange, ...props }) {
         ) {
           options.size = true;
         }
-
         if (
           target.value[target.selectionStart - 1].match(
             new RegExp(
@@ -233,9 +208,20 @@ export default function Keyboard({ children, className, onChange, ...props }) {
     <div
       onFocus={(e) => {
         if (e.target.inputMode == "none") {
+          e.preventDefault();
           setIsHidden(false);
           setTarget(e.target);
           keyboardRef.current.setInput(e.target.value, e.target.name);
+
+          if (e.target.inputMode == "tel") {
+            keyboardRef.current.setOptions({
+              layoutName: "tel",
+            });
+          } else if (keyboardRef.current.options.layoutName == "tel") {
+            keyboardRef.current.setOptions({
+              layoutName: "default",
+            });
+          }
 
           e.target.style.scrollMargin = `calc(100vh - ${keyboardRef.current.keyboardDOM.scrollHeight}px - 4em)`;
           e.target.scrollIntoView({ behavior: "smooth" });
@@ -248,18 +234,23 @@ export default function Keyboard({ children, className, onChange, ...props }) {
     >
       {children}
       <div
-        className={`${className} ${isHidden && "hidden"} ${language}`}
-        onFocus={() => setIsHidden(false)}
+        className={`${className} ${
+          isHidden && "hidden"
+        } ${language} keyboard-wrapper`}
+        onFocus={() => {
+          if (target) {
+            setIsHidden(false);
+          }
+        }}
         // NOTE: Required to focus event
         tabIndex={"100"}
         onTouchStart={() => {
           // Refocus the textbox ASAP
           if (target) {
+            const start = keyboardRef.current.getCaretPosition();
+            const end = keyboardRef.current.getCaretPositionEnd();
             target.focus();
-            target.setSelectionRange(
-              keyboardRef.current.getCaretPosition(),
-              keyboardRef.current.getCaretPositionEnd()
-            );
+            target.setSelectionRange(start, end);
           }
         }}
       >
@@ -331,18 +322,18 @@ export default function Keyboard({ children, className, onChange, ...props }) {
           }}
           onChange={(value, e) => {
             onChange(value, target);
+
+            if (target) {
+              setTimeout(() => {
+                target.focus();
+                target.setSelectionRange(
+                  keyboardRef.current.getCaretPosition(),
+                  keyboardRef.current.getCaretPositionEnd()
+                );
+              }, 200);
+            }
           }}
           inputName={target ? target.name : "default"}
-          onKeyReleased={() => {
-            setTimeout(() => {
-              target.focus();
-              target.setSelectionRange(
-                keyboardRef.current.getCaretPosition(),
-                keyboardRef.current.getCaretPositionEnd()
-              );
-              onselectionchange();
-            }, 200);
-          }}
           {...props}
         />
       </div>

@@ -101,8 +101,8 @@ export default function BookingPage() {
     <label>
       {error && <InputError message={error} />}
       <input
-        inputMode={root == "/pos" ? "none" : "text"}
         type="text"
+        inputMode={root == "/pos" ? "none" : "text"}
         ref={ref}
         placeholder=" "
         {...props}
@@ -477,15 +477,18 @@ export default function BookingPage() {
       </header>
       <main>
         <Keyboard
+          baseClass="booking-keyboard"
+          disabled={root != "/pos"}
           onChange={(value, { name, type }) => {
-            name &&
-              (hideError(name) ||
-                setBooking((old) => ({
-                  ...old,
-                  [name]: parseInput(value, {
-                    type,
-                  }),
-                })));
+            if (name) {
+              hideError(name);
+              setBooking((old) => ({
+                ...old,
+                [name]: parseInput(value, {
+                  type,
+                }),
+              }));
+            }
           }}
         >
           <form
@@ -590,9 +593,9 @@ export default function BookingPage() {
                                 ) <= 15 ? (
                                   <div>
                                     <FaCheck className={theme.green} /> Your
-                                    experience(s) will start automatically.
-                                    Please see the Guidebook at your station for
-                                    help getting started.
+                                    experience(s) will start automatically. See
+                                    the Help video and Guidebook at your station
+                                    to get started.
                                   </div>
                                 ) : (
                                   <>
@@ -900,8 +903,8 @@ export default function BookingPage() {
                     <input
                       className={theme.alt}
                       type="text"
-                      name="lastName"
                       inputMode={root == "/pos" ? "none" : "text"}
+                      name="lastName"
                       value={formData.lastName || ""}
                       placeholder=" "
                       onBlur={(e) => showError(e.target.name)}
@@ -913,8 +916,8 @@ export default function BookingPage() {
                     <input
                       className={theme.alt}
                       type="text"
-                      name="firstName"
                       inputMode={root == "/pos" ? "none" : "text"}
+                      name="firstName"
                       value={formData.firstName || ""}
                       placeholder=" "
                       onBlur={(e) => showError(e.target.name)}
@@ -929,7 +932,8 @@ export default function BookingPage() {
                     containerClass={theme.label}
                     specialLabel={"Phone"}
                     name="phone"
-                    inputMode={root == "/pos" ? "none" : "text"}
+                    type="tel"
+                    inputMode={root == "/pos" ? "none" : "tel"}
                     placeholder=" "
                     value={parseInput(formData.phone || "", { type: "tel" })}
                     onChange={(value, c, e, formattedValue) => {
@@ -999,9 +1003,10 @@ export default function BookingPage() {
                     <InputError message={error?.details?.email} />
                     <input
                       className={theme.alt}
-                      type="email"
+                      // NOTE: Must use type="text" for keyboard component to work
+                      type="text"
+                      inputMode={root == "/pos" ? "none" : "email"}
                       name="email"
-                      inputMode={root == "/pos" ? "none" : "text"}
                       value={formData.email || ""}
                       placeholder=" "
                       onBlur={(e) => showError(e.target.name)}

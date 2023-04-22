@@ -8,6 +8,7 @@ export default function PhoneInput({
   onTouchStart,
   onTouchEnd,
   value,
+  type,
   ...props
 }) {
   const componentRef = useRef();
@@ -35,7 +36,7 @@ export default function PhoneInput({
       inputProps={{
         name,
         inputMode,
-        type: "text",
+        type,
 
         onChange: (e) => {
           e.preventDefault();
