@@ -1,7 +1,4 @@
-import { subMinutes } from "date-fns";
 import express from "express";
-import { Op } from "sequelize";
-import Booking from "../models/booking.js";
 import Location from "../models/location.js";
 
 const locationRouter = express.Router();

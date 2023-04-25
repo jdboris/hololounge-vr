@@ -26,6 +26,7 @@ import "./models/location.js";
 import "./models/station.js";
 import "./models/tag.js";
 import "./models/user.js";
+import languageRouter from "./routes/language.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 dotenv.config();
@@ -82,6 +83,7 @@ app.use("/api/checkout", checkoutRouter);
 app.use("/api/games", gameRouter);
 app.use("/api/locations", locationRouter);
 app.use("/api/bookings", bookingRouter);
+app.use("/api/language", languageRouter);
 
 app.use(nocache());
 

@@ -6,10 +6,28 @@
   z-index: 1;
 
   transition: translate 0.2s 0s;
+
+  .kanjis {
+    display: flex;
+    white-space: nowrap;
+    overflow-x: auto;
+    background: #ececec;
+    gap: 1px;
+    padding: 1px;
+
+    button {
+      background: white;
+      color: black;
+      font-weight: inherit;
+      border-radius: 0;
+      padding: 0.3em 1.5em;
+    }
+  }
 }
 
 .simple-keyboard {
   color: black;
+  border-radius: 0;
 
   .hg-button-default,
   .hg-button-abc,

@@ -1,10 +1,17 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import ReactSimpleKeyboard from "react-simple-keyboard";
 import "react-simple-keyboard/build/css/index.css";
 // import en from "simple-keyboard-layouts/build/layouts/english";
 // import jp from "simple-keyboard-layouts/build/layouts/japanese";
 import { useLocalization } from "../contexts/localization";
 import "../css/react-simple-keyboard.scss";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const SIZES = {
   や: "ゃ",
@@ -158,6 +165,57 @@ export default function Keyboard({ children, className, onChange, ...props }) {
   const [target, setTarget] = useState(null);
   const { language } = useLocalization();
   const [layout, setLayout] = useState(language == "en-US" ? en() : jp());
+  const [compStart, setCompStart] = useState(null);
+  const [compEnd, setCompEnd] = useState(null);
+  const [composition, setComposition] = useState(null);
+  const [kanjis, setKanjis] = useState([]);
+  const [kanjiPage, setKanjiPage] = useState(1);
+
+  useEffect(() => {
+    if (compStart === null) {
+      return;
+    }
+
+    if (compStart >= compEnd) {
+      setCompStart(null);
+      setCompEnd(null);
+      setComposition(null);
+      setKanjis([]);
+      setKanjiPage(1);
+      return;
+    }
+
+    const composition = target.value.substring(compStart, compEnd);
+    setComposition(composition);
+
+    // setup AbortController
+    const controller = new AbortController();
+    // signal to pass to fetch
+    const signal = controller.signal;
+
+    (async () => {
+      try {
+        const response = await fetch(`/api/language/kanji/${composition}`, {
+          signal,
+        });
+
+        if (!response.ok) {
+          console.error("API fetch error: ");
+          console.error(await response.text());
+          return;
+        }
+        setKanjis(await response.json());
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          throw error;
+        }
+      }
+    })();
+
+    return () => {
+      controller.abort();
+    };
+  }, [compStart, compEnd, target && target.value]);
 
   useEffect(() => {
     keyboardRef.current.setOptions({
@@ -168,33 +226,42 @@ export default function Keyboard({ children, className, onChange, ...props }) {
 
   const onselectionchange = useCallback(() => {
     if (document.activeElement == target) {
-      if (language == "ja-JP" && target.selectionStart) {
-        const options = {};
+      if (compEnd != target.selectionEnd) {
+        setCompStart(null);
+        setCompEnd(null);
+        setKanjis([]);
+        setKanjiPage(1);
+      }
 
-        if (
-          target.value[target.selectionStart - 1].match(
-            new RegExp(`[${Object.entries(SIZES).flat().join()}]`)
-          )
-        ) {
-          options.size = true;
-        }
-        if (
-          target.value[target.selectionStart - 1].match(
-            new RegExp(
-              `[${
-                Object.entries(DAKUTENS).flat().join() +
-                Object.entries(TENTENS).flat().join()
-              }]`
+      if (language == "ja-JP") {
+        if (target.selectionStart) {
+          const options = {};
+
+          if (
+            target.value[target.selectionStart - 1].match(
+              new RegExp(`[${Object.entries(SIZES).flat().join()}]`)
             )
-          )
-        ) {
-          options.contraction = true;
-        }
+          ) {
+            options.size = true;
+          }
+          if (
+            target.value[target.selectionStart - 1].match(
+              new RegExp(
+                `[${
+                  Object.entries(DAKUTENS).flat().join() +
+                  Object.entries(TENTENS).flat().join()
+                }]`
+              )
+            )
+          ) {
+            options.contraction = true;
+          }
 
-        setLayout(jp(options));
+          setLayout(jp(options));
+        }
       }
     }
-  }, [language, target, setLayout, jp]);
+  }, [language, target, setLayout, jp, compEnd]);
 
   useEffect(() => {
     document.addEventListener("selectionchange", onselectionchange);
@@ -207,9 +274,10 @@ export default function Keyboard({ children, className, onChange, ...props }) {
   return (
     <div
       onFocus={(e) => {
+        setIsHidden(false);
+
         if (e.target.inputMode == "none") {
           e.preventDefault();
-          setIsHidden(false);
           setTarget(e.target);
           keyboardRef.current.setInput(e.target.value, e.target.name);
 
@@ -223,7 +291,7 @@ export default function Keyboard({ children, className, onChange, ...props }) {
             });
           }
 
-          e.target.style.scrollMargin = `calc(100vh - ${keyboardRef.current.keyboardDOM.scrollHeight}px - 4em)`;
+          e.target.style.scrollMargin = `calc(100vh - ${keyboardRef.current.keyboardDOM.scrollHeight}px - 4.5em)`;
           e.target.scrollIntoView({ behavior: "smooth" });
           e.target.style.removeProperty("scroll-margin");
         }
@@ -254,6 +322,34 @@ export default function Keyboard({ children, className, onChange, ...props }) {
           }
         }}
       >
+        {kanjis.length > 0 && (
+          <div className="kanjis">
+            {kanjis.map((kanji, i) => (
+              <button
+                key={"kanji-" + i}
+                onTouchStart={(e) => {
+                  e.stopPropagation();
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onChange(
+                    target.value.substring(0, compStart) +
+                      kanji +
+                      target.value.substring(compEnd),
+                    target
+                  );
+                  setCompStart(null);
+                  setCompEnd(null);
+                  setKanjis([]);
+                  setKanjiPage(1);
+                }}
+              >
+                {kanji}
+              </button>
+            ))}
+          </div>
+        )}
         <ReactSimpleKeyboard
           keyboardRef={(x) => (keyboardRef.current = x)}
           {...layout}
@@ -319,6 +415,20 @@ export default function Keyboard({ children, className, onChange, ...props }) {
                 return;
               }
             }
+
+            const offset = button === "{backspace}" ? -1 : 1;
+
+            if (
+              compStart === null ||
+              target.selectionStart < compStart ||
+              target.selectionEnd + offset > compEnd + offset
+            ) {
+              setCompStart(target.selectionStart);
+            }
+
+            setCompEnd((old) =>
+              Math.max(old + offset, target.selectionStart + offset)
+            );
           }}
           onChange={(value, e) => {
             onChange(value, target);
