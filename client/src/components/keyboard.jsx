@@ -175,6 +175,10 @@ export default function Keyboard({
   const selectedKanjiRef = useRef();
 
   useEffect(() => {
+    resetComposition();
+  }, [target]);
+
+  useEffect(() => {
     if (language == "ja-JP") {
       setLayoutOptions({ ...layoutOptions, kanjiChoices: kanjis.length > 0 });
     }
