@@ -20,7 +20,13 @@
       color: black;
       font-weight: inherit;
       border-radius: 0;
-      padding: 0.3em 1.5em;
+      padding: 0.2em 1.5em;
+      border-top: 3px solid white;
+    }
+
+    .selected {
+      border-top: 0;
+      border-bottom: 3px solid gray;
     }
   }
 }

@@ -1,17 +1,8 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import ReactSimpleKeyboard from "react-simple-keyboard";
 import "react-simple-keyboard/build/css/index.css";
-// import en from "simple-keyboard-layouts/build/layouts/english";
-// import jp from "simple-keyboard-layouts/build/layouts/japanese";
 import { useLocalization } from "../contexts/localization";
 import "../css/react-simple-keyboard.scss";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const SIZES = {
   や: "ゃ",
@@ -83,7 +74,7 @@ function en() {
   };
 }
 
-function jp({ size = false, contraction = false } = {}) {
+function jp({ size = false, contraction = false, kanjiChoices = false } = {}) {
   return {
     layout: {
       default: [
@@ -94,7 +85,7 @@ function jp({ size = false, contraction = false } = {}) {
         " ろ よ も ほ の と そ こ お",
         `{size${!size ? "-disabled" : ""}} {contraction${
           !contraction ? "-disabled" : ""
-        }} {space} {abc} {other} {backspace}`,
+        }} ${kanjiChoices ? "{select}" : "{space}"} {abc} {other} {backspace}`,
       ],
       other: [
         "1 2 3 4 5 6 7 8 9 0",
@@ -102,19 +93,23 @@ function jp({ size = false, contraction = false } = {}) {
         "' \" = _ ` : ; ? ~ |",
         "+ - \\ / [ ] { } < >",
         ". , 、 。 ・ ー 「 」 ¥ ",
-        `{default} {space} {abc} {backspace}`,
+        `{default} ${kanjiChoices ? "{select}" : "{space}"} {abc} {backspace}`,
       ],
       abc: [
         "q w e r t y u i o p",
         "a s d f g h j k l",
         "{shift} z x c v b n m",
-        `{default} {space} {other} {backspace}`,
+        `{default} ${
+          kanjiChoices ? "{select}" : "{space}"
+        } {other} {backspace}`,
       ],
       shift: [
         "Q W E R T Y U I O P",
         "A S D F G H J K L",
         "{shift} Z X C V B N M",
-        `{default} {space} {other} {backspace}`,
+        `{default} ${
+          kanjiChoices ? "{select}" : "{space}"
+        } {other} {backspace}`,
       ],
       tel: ["1 2 3", "4 5 6", "7 8 9", " 0 {backspace}"],
     },
@@ -129,6 +124,7 @@ function jp({ size = false, contraction = false } = {}) {
       "{size-disabled}": "大/小",
       "{abc}": "ABC",
       "{space}": " ",
+      "{select}": "変換",
     },
   };
 }
@@ -158,7 +154,13 @@ function toggle(string, button) {
   }
 }
 
-export default function Keyboard({ children, className, onChange, ...props }) {
+export default function Keyboard({
+  children,
+  className,
+
+  onChange,
+  ...props
+}) {
   const keyboardRef = useRef();
   const [isHidden, setIsHidden] = useState(true);
   // NOTE: target is guaranteed to be a valid target
@@ -167,26 +169,46 @@ export default function Keyboard({ children, className, onChange, ...props }) {
   const [layout, setLayout] = useState(language == "en-US" ? en() : jp());
   const [compStart, setCompStart] = useState(null);
   const [compEnd, setCompEnd] = useState(null);
-  const [composition, setComposition] = useState(null);
   const [kanjis, setKanjis] = useState([]);
-  const [kanjiPage, setKanjiPage] = useState(1);
+  const [layoutOptions, setLayoutOptions] = useState({});
+  const [kanjiIndex, setKanjiIndex] = useState(null);
+  const selectedKanjiRef = useRef();
 
   useEffect(() => {
-    if (compStart === null) {
+    if (language == "ja-JP") {
+      setLayoutOptions({ ...layoutOptions, kanjiChoices: kanjis.length > 0 });
+    }
+  }, [kanjis.length > 0]);
+
+  useEffect(() => {
+    if (selectedKanjiRef.current) {
+      selectedKanjiRef.current.scrollIntoView();
+    }
+  }, [kanjiIndex, selectedKanjiRef.current]);
+
+  useEffect(() => {
+    setLayout(language == "en-US" ? en(layoutOptions) : jp(layoutOptions));
+  }, [layoutOptions]);
+
+  useEffect(() => {
+    if (!target) {
       return;
     }
 
     if (compStart >= compEnd) {
-      setCompStart(null);
-      setCompEnd(null);
-      setComposition(null);
-      setKanjis([]);
-      setKanjiPage(1);
+      resetComposition();
+      return;
+    }
+
+    if (
+      compStart === null ||
+      target.selectionStart < compStart ||
+      target.selectionEnd > compEnd
+    ) {
       return;
     }
 
     const composition = target.value.substring(compStart, compEnd);
-    setComposition(composition);
 
     // setup AbortController
     const controller = new AbortController();
@@ -215,53 +237,48 @@ export default function Keyboard({ children, className, onChange, ...props }) {
     return () => {
       controller.abort();
     };
-  }, [compStart, compEnd, target && target.value]);
+  }, [compStart, compEnd, target, target && target.value]);
 
   useEffect(() => {
     keyboardRef.current.setOptions({
       layoutName: "default",
     });
     setLayout(language == "en-US" ? en() : jp());
+    resetComposition();
   }, [language]);
 
   const onselectionchange = useCallback(() => {
     if (document.activeElement == target) {
-      if (compEnd != target.selectionEnd) {
-        setCompStart(null);
-        setCompEnd(null);
-        setKanjis([]);
-        setKanjiPage(1);
-      }
-
       if (language == "ja-JP") {
-        if (target.selectionStart) {
-          const options = {};
+        setLayoutOptions((old) => {
+          const options = { ...old };
 
-          if (
-            target.value[target.selectionStart - 1].match(
-              new RegExp(`[${Object.entries(SIZES).flat().join()}]`)
-            )
-          ) {
-            options.size = true;
-          }
-          if (
-            target.value[target.selectionStart - 1].match(
-              new RegExp(
-                `[${
-                  Object.entries(DAKUTENS).flat().join() +
-                  Object.entries(TENTENS).flat().join()
-                }]`
-              )
-            )
-          ) {
-            options.contraction = true;
-          }
+          options.size = target.value[target.selectionStart - 1]?.match(
+            new RegExp(`[${Object.entries(SIZES).flat().join()}]`)
+          );
 
-          setLayout(jp(options));
-        }
+          options.contraction = target.value[target.selectionStart - 1]?.match(
+            new RegExp(
+              `[${
+                Object.entries(DAKUTENS).flat().join() +
+                Object.entries(TENTENS).flat().join()
+              }]`
+            )
+          );
+
+          return options;
+        });
       }
     }
-  }, [language, target, setLayout, jp, compEnd]);
+  }, [
+    language,
+    target,
+    target && target.value,
+    setLayout,
+    jp,
+    compStart,
+    compEnd,
+  ]);
 
   useEffect(() => {
     document.addEventListener("selectionchange", onselectionchange);
@@ -271,6 +288,48 @@ export default function Keyboard({ children, className, onChange, ...props }) {
     };
   }, [onselectionchange]);
 
+  const resetComposition = useCallback(() => {
+    setCompStart(null);
+    setCompEnd(null);
+    setKanjis([]);
+    setKanjiIndex(null);
+  });
+
+  useEffect(() => {
+    if (!target) {
+      return;
+    }
+
+    target.focus();
+    target.setSelectionRange(
+      keyboardRef.current.getCaretPosition(),
+      keyboardRef.current.getCaretPositionEnd()
+    );
+  }, [target && target.value]);
+
+  const selectKanji = useCallback(
+    (kanji) => {
+      const newValue =
+        target.value.substring(0, compStart) +
+        kanji +
+        target.value.substring(compEnd);
+      const caretPos = (target.value.substring(0, compStart) + kanji).length;
+
+      keyboardRef.current.setInput(newValue, target.name);
+      keyboardRef.current.setCaretPosition(caretPos, caretPos);
+
+      onChange(newValue, target);
+    },
+    [
+      onChange,
+      target,
+      target && target.value,
+      target && target.name,
+      compStart,
+      compEnd,
+    ]
+  );
+
   return (
     <div
       onFocus={(e) => {
@@ -279,6 +338,7 @@ export default function Keyboard({ children, className, onChange, ...props }) {
         if (e.target.inputMode == "none") {
           e.preventDefault();
           setTarget(e.target);
+
           keyboardRef.current.setInput(e.target.value, e.target.name);
 
           if (e.target.inputMode == "tel") {
@@ -327,22 +387,16 @@ export default function Keyboard({ children, className, onChange, ...props }) {
             {kanjis.map((kanji, i) => (
               <button
                 key={"kanji-" + i}
+                {...(kanjiIndex === i ? { ref: selectedKanjiRef } : {})}
+                className={i === kanjiIndex ? "selected" : ""}
                 onTouchStart={(e) => {
                   e.stopPropagation();
                 }}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  onChange(
-                    target.value.substring(0, compStart) +
-                      kanji +
-                      target.value.substring(compEnd),
-                    target
-                  );
-                  setCompStart(null);
-                  setCompEnd(null);
-                  setKanjis([]);
-                  setKanjiPage(1);
+                  selectKanji(kanji);
+                  resetComposition();
                 }}
               >
                 {kanji}
@@ -414,21 +468,41 @@ export default function Keyboard({ children, className, onChange, ...props }) {
                 });
                 return;
               }
+
+              if (button === "{select}") {
+                setKanjiIndex((old) =>
+                  old === null ? 0 : (old + 1) % kanjis.length
+                );
+                return;
+              }
+
+              const offset = button === "{backspace}" ? -1 : 1;
+
+              if (offset > 0 && kanjiIndex !== null) {
+                selectKanji(kanjis[kanjiIndex]);
+                resetComposition();
+
+                setCompStart(keyboardRef.current.getCaretPosition());
+                setCompEnd(keyboardRef.current.getCaretPositionEnd() + offset);
+                return;
+              }
+
+              setCompStart((compStart) => {
+                if (
+                  compStart === null ||
+                  target.selectionStart < compStart ||
+                  target.selectionEnd > compEnd
+                ) {
+                  return target.selectionStart;
+                }
+
+                return compStart;
+              });
+
+              setCompEnd((compEnd) => {
+                return Math.max(target.selectionEnd, compEnd) + offset;
+              });
             }
-
-            const offset = button === "{backspace}" ? -1 : 1;
-
-            if (
-              compStart === null ||
-              target.selectionStart < compStart ||
-              target.selectionEnd + offset > compEnd + offset
-            ) {
-              setCompStart(target.selectionStart);
-            }
-
-            setCompEnd((old) =>
-              Math.max(old + offset, target.selectionStart + offset)
-            );
           }}
           onChange={(value, e) => {
             onChange(value, target);

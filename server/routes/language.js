@@ -47,6 +47,12 @@ languageRouter.get("/kanji/:kana", async (req, res) => {
   }
 
   const { result } = await response.json();
+
+  if (!result) {
+    res.json([]);
+    return;
+  }
+
   const kanjis = result.segment.reduce((kanjis, segment) => {
     return [...kanjis, ...segment.candidate];
   }, []);
