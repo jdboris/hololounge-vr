@@ -157,7 +157,7 @@ function toggle(string, button) {
 export default function Keyboard({
   children,
   className,
-
+  disabled,
   onChange,
   ...props
 }) {
@@ -175,26 +175,31 @@ export default function Keyboard({
   const selectedKanjiRef = useRef();
 
   useEffect(() => {
+    if (disabled) return;
     resetComposition();
   }, [target]);
 
   useEffect(() => {
+    if (disabled) return;
     if (language == "ja-JP") {
       setLayoutOptions({ ...layoutOptions, kanjiChoices: kanjis.length > 0 });
     }
   }, [kanjis.length > 0]);
 
   useEffect(() => {
+    if (disabled) return;
     if (selectedKanjiRef.current) {
       selectedKanjiRef.current.scrollIntoView();
     }
   }, [kanjiIndex, selectedKanjiRef.current]);
 
   useEffect(() => {
+    if (disabled) return;
     setLayout(language == "en-US" ? en(layoutOptions) : jp(layoutOptions));
   }, [layoutOptions]);
 
   useEffect(() => {
+    if (disabled) return;
     if (!target) {
       return;
     }
@@ -244,6 +249,7 @@ export default function Keyboard({
   }, [compStart, compEnd, target, target && target.value]);
 
   useEffect(() => {
+    if (disabled) return;
     keyboardRef.current.setOptions({
       layoutName: "default",
     });
@@ -285,6 +291,7 @@ export default function Keyboard({
   ]);
 
   useEffect(() => {
+    if (disabled) return;
     document.addEventListener("selectionchange", onselectionchange);
 
     return () => {
@@ -300,6 +307,7 @@ export default function Keyboard({
   });
 
   useEffect(() => {
+    if (disabled) return;
     if (!target) {
       return;
     }
@@ -333,6 +341,10 @@ export default function Keyboard({
       compEnd,
     ]
   );
+
+  if (disabled) {
+    return <div>{children}</div>;
+  }
 
   return (
     <div
@@ -413,8 +425,9 @@ export default function Keyboard({
           {...layout}
           onKeyPress={(button) => {
             if (language == "en-US") {
+              const currentLayout = keyboardRef.current.options.layoutName;
+
               if (button === "{shift}") {
-                const currentLayout = keyboardRef.current.options.layoutName;
                 const newLayoutName =
                   currentLayout === "default" ? "shift" : "default";
 
@@ -422,6 +435,12 @@ export default function Keyboard({
                   layoutName: newLayoutName,
                 });
                 return;
+              } else {
+                if (currentLayout == "shift") {
+                  keyboardRef.current.setOptions({
+                    layoutName: "default",
+                  });
+                }
               }
             }
 
