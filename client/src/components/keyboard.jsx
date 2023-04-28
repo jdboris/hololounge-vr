@@ -393,9 +393,8 @@ export default function Keyboard({
     <div
       ref={wrapperRef}
       onFocus={(e) => {
-        setIsHidden(false);
-
         if (e.target.inputMode == "none") {
+          setIsHidden(false);
           e.preventDefault();
           setTarget(e.target);
 
@@ -405,15 +404,15 @@ export default function Keyboard({
 
           keyboardRef.current.setInput(e.target.value, e.target.name);
 
-          if (e.target.inputMode == "tel") {
-            keyboardRef.current.setOptions({
-              layoutName: "tel",
-            });
-          } else if (keyboardRef.current.options.layoutName == "tel") {
-            keyboardRef.current.setOptions({
-              layoutName: "default",
-            });
-          }
+          // if (e.target.inputMode == "tel") {
+          //   keyboardRef.current.setOptions({
+          //     layoutName: "tel",
+          //   });
+          // } else if (keyboardRef.current.options.layoutName == "tel") {
+          //   keyboardRef.current.setOptions({
+          //     layoutName: "default",
+          //   });
+          // }
 
           e.target.style.scrollMargin = `calc(100vh - ${keyboardRef.current.keyboardDOM.scrollHeight}px - 4.5em)`;
           e.target.scrollIntoView({ behavior: "smooth" });

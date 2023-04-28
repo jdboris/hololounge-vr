@@ -931,7 +931,8 @@ export default function BookingPage() {
                     specialLabel={"Phone"}
                     name="phone"
                     type="tel"
-                    inputMode={root == "/pos" ? "none" : "tel"}
+                    // inputMode={root == "/pos" ? "none" : "tel"}
+                    inputMode={"tel"}
                     placeholder=" "
                     value={parseInput(formData.phone || "", { type: "tel" })}
                     onChange={(value, c, e, formattedValue) => {
