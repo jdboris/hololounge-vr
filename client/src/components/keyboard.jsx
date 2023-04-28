@@ -355,6 +355,10 @@ export default function Keyboard({
           e.preventDefault();
           setTarget(e.target);
 
+          if (keyboardRef.current.getInput(e.target.name) != e.target.value) {
+            resetComposition();
+          }
+
           keyboardRef.current.setInput(e.target.value, e.target.name);
 
           if (e.target.inputMode == "tel") {
