@@ -161,6 +161,7 @@ export default function Keyboard({
   onChange,
   ...props
 }) {
+  const wrapperRef = useRef();
   const keyboardRef = useRef();
   const [isHidden, setIsHidden] = useState(true);
   // NOTE: target is guaranteed to be a valid target
@@ -173,6 +174,22 @@ export default function Keyboard({
   const [layoutOptions, setLayoutOptions] = useState({});
   const [kanjiIndex, setKanjiIndex] = useState(null);
   const selectedKanjiRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) {
+          setIsHidden(true);
+        }
+      });
+    });
+
+    if (wrapperRef.current) {
+      observer.observe(wrapperRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [wrapperRef.current]);
 
   useEffect(() => {
     if (disabled) return;
@@ -348,6 +365,7 @@ export default function Keyboard({
 
   return (
     <div
+      ref={wrapperRef}
       onFocus={(e) => {
         setIsHidden(false);
 
