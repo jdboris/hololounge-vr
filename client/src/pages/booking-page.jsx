@@ -171,8 +171,6 @@ export default function BookingPage() {
     setHasSelectedTime(false);
     setPageNumber(1);
     setIsLoading(false);
-    // Close virtual keyboard
-    document.activeElement.blur();
 
     if (url.pathname.endsWith("/booking")) {
       getBookings();
@@ -371,9 +369,9 @@ export default function BookingPage() {
 
   function isStationBooked(station) {
     // TODO: Establish a better way to do this (without refreshing kiosk)
-    // if (!SANDBOX_MODE && station.name == "Station A") {
-    //   return true;
-    // }
+    if (!SANDBOX_MODE && station.name == "Station A") {
+      return true;
+    }
 
     return bookedStationsOfDay.find((bs) => {
       return (

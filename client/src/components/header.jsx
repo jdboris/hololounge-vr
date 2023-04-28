@@ -50,9 +50,10 @@ function Header() {
       <header className={root == "/pos" ? theme.minimal : ""} ref={headerRef}>
         <nav className={isMenuOpen ? theme.open : ""}>
           <Link
-            to={root == "/pos" ? "/pos" : "/"}
+            to={root == "/pos" ? "/pos/language" : "/"}
             onClick={(e) =>
-              e.preventDefault() || navigate(root == "/pos" ? "/pos" : "/")
+              e.preventDefault() ||
+              navigate(root == "/pos" ? "/pos/language" : "/")
             }
             className={theme.logo}
           >
@@ -132,6 +133,8 @@ function Header() {
 
             {root == "/pos" &&
               location.pathname != "/pos" &&
+              location.pathname != "/pos/language" &&
+              location.pathname != "/pos/landing" &&
               location.pathname != "/pos/check-in" && (
                 <li>
                   <Link
@@ -148,6 +151,8 @@ function Header() {
               )}
             {root == "/pos" &&
               location.pathname != "/pos" &&
+              location.pathname != "/pos/language" &&
+              location.pathname != "/pos/landing" &&
               location.pathname != "/pos/booking" && (
                 <li>
                   <Link
@@ -162,23 +167,27 @@ function Header() {
                   </Link>
                 </li>
               )}
-            <li>
-              {language == "en-US" ? (
-                <button
-                  className={theme.alt}
-                  onClick={() => setLanguage("ja-JP")}
-                >
-                  <MdLanguage /> 日本語
-                </button>
-              ) : (
-                <button
-                  className={theme.alt}
-                  onClick={() => setLanguage("en-US")}
-                >
-                  <MdLanguage /> EN
-                </button>
+            {location.pathname != "/pos" &&
+              location.pathname != "/pos/language" && (
+                <li>
+                  {language == "en-US" ? (
+                    <button
+                      className={theme.alt}
+                      onClick={() => setLanguage("ja-JP")}
+                    >
+                      <MdLanguage /> 日本語
+                    </button>
+                  ) : (
+                    <button
+                      className={theme.alt}
+                      onClick={() => setLanguage("en-US")}
+                    >
+                      <MdLanguage /> EN
+                    </button>
+                  )}
+                </li>
               )}
-            </li>
+
             {!location.pathname.startsWith("/pos") &&
               !isLoading &&
               (currentUser ? (
