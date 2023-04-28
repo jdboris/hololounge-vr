@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import ReactSimpleKeyboard from "react-simple-keyboard";
 import "react-simple-keyboard/build/css/index.css";
 import { useLocalization } from "../contexts/localization";
@@ -170,6 +176,7 @@ export default function Keyboard({
   const [layout, setLayout] = useState(language == "en-US" ? en() : jp());
   const [compStart, setCompStart] = useState(null);
   const [compEnd, setCompEnd] = useState(null);
+  const [composition, setComposition] = useState(null);
   const [kanjis, setKanjis] = useState([]);
   const [layoutOptions, setLayoutOptions] = useState({});
   const [kanjiIndex, setKanjiIndex] = useState(null);
@@ -193,6 +200,7 @@ export default function Keyboard({
 
   useEffect(() => {
     if (disabled) return;
+
     resetComposition();
   }, [target]);
 
@@ -204,11 +212,23 @@ export default function Keyboard({
   }, [kanjis.length > 0]);
 
   useEffect(() => {
+    if (kanjiIndex !== null) {
+      selectKanji(kanjis[kanjiIndex]);
+    }
+  }, [kanjis, kanjiIndex]);
+
+  useEffect(() => {
     if (disabled) return;
     if (selectedKanjiRef.current) {
       selectedKanjiRef.current.scrollIntoView();
     }
   }, [kanjiIndex, selectedKanjiRef.current]);
+
+  useEffect(() => {
+    if (kanjiIndex === null && target) {
+      setComposition(target.value.substring(compStart, compEnd));
+    }
+  }, [compStart, compEnd, kanjiIndex, target && target.value]);
 
   useEffect(() => {
     if (disabled) return;
@@ -218,6 +238,9 @@ export default function Keyboard({
   useEffect(() => {
     if (disabled) return;
     if (!target) {
+      return;
+    }
+    if (!composition) {
       return;
     }
 
@@ -233,8 +256,6 @@ export default function Keyboard({
     ) {
       return;
     }
-
-    const composition = target.value.substring(compStart, compEnd);
 
     // setup AbortController
     const controller = new AbortController();
@@ -263,7 +284,7 @@ export default function Keyboard({
     return () => {
       controller.abort();
     };
-  }, [compStart, compEnd, target, target && target.value]);
+  }, [compStart, compEnd, composition, target, target && target.value]);
 
   useEffect(() => {
     if (disabled) return;
@@ -319,6 +340,7 @@ export default function Keyboard({
   const resetComposition = useCallback(() => {
     setCompStart(null);
     setCompEnd(null);
+    setComposition(null);
     setKanjis([]);
     setKanjiIndex(null);
   });
@@ -344,8 +366,12 @@ export default function Keyboard({
         target.value.substring(compEnd);
       const caretPos = (target.value.substring(0, compStart) + kanji).length;
 
+      // WARNING: HACK
+      target.value = newValue;
       keyboardRef.current.setInput(newValue, target.name);
       keyboardRef.current.setCaretPosition(caretPos, caretPos);
+
+      setCompEnd(caretPos);
 
       onChange(newValue, target);
     },
@@ -515,22 +541,29 @@ export default function Keyboard({
               }
 
               if (button === "{select}") {
-                setKanjiIndex((old) =>
-                  old === null ? 0 : (old + 1) % kanjis.length
-                );
+                setKanjiIndex((old) => {
+                  const kanjiIndex =
+                    old === null ? 0 : (old + 1) % kanjis.length;
+                  return kanjiIndex;
+                });
                 return;
               }
 
               const offset = button === "{backspace}" ? -1 : 1;
 
-              if (offset > 0 && kanjiIndex !== null) {
-                selectKanji(kanjis[kanjiIndex]);
+              if (kanjiIndex !== null) {
                 resetComposition();
 
                 setCompStart(keyboardRef.current.getCaretPosition());
                 setCompEnd(keyboardRef.current.getCaretPositionEnd() + offset);
                 return;
               }
+
+              // if (offset > 0 && kanjiIndex !== null) {
+              //   setCompStart(keyboardRef.current.getCaretPosition());
+              //   setCompEnd(keyboardRef.current.getCaretPositionEnd() + offset);
+              //   return;
+              // }
 
               setCompStart((compStart) => {
                 if (
