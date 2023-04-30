@@ -207,7 +207,8 @@ export default function Keyboard({
   useEffect(() => {
     if (disabled) return;
     if (language == "ja-JP") {
-      setLayoutOptions({ ...layoutOptions, kanjiChoices: kanjis.length > 0 });
+      // setLayoutOptions({ ...layoutOptions, kanjiChoices: kanjis.length > 0 });
+      setLayoutOptions({ ...layoutOptions, kanjiChoices: false });
     }
   }, [kanjis.length > 0]);
 
@@ -525,6 +526,12 @@ export default function Keyboard({
                   keyboardRef.current.setOptions({
                     layoutName: "abc",
                   });
+                } else {
+                  if (currentLayout == "shift") {
+                    keyboardRef.current.setOptions({
+                      layoutName: "abc",
+                    });
+                  }
                 }
                 return;
               }
@@ -539,14 +546,14 @@ export default function Keyboard({
                 return;
               }
 
-              if (button === "{select}") {
-                setKanjiIndex((old) => {
-                  const kanjiIndex =
-                    old === null ? 0 : (old + 1) % kanjis.length;
-                  return kanjiIndex;
-                });
-                return;
-              }
+              // if (button === "{select}") {
+              //   setKanjiIndex((old) => {
+              //     const kanjiIndex =
+              //       old === null ? 0 : (old + 1) % kanjis.length;
+              //     return kanjiIndex;
+              //   });
+              //   return;
+              // }
 
               const offset = button === "{backspace}" ? -1 : 1;
 

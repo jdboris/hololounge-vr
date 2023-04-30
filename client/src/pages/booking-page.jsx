@@ -177,6 +177,9 @@ export default function BookingPage() {
       setNow(new Date());
     }
 
+    // Close keyboard
+    document.activeElement.blur();
+
     restartTimer();
   }, [url.pathname]);
 
@@ -1015,8 +1018,10 @@ export default function BookingPage() {
 
                   <div className={theme.row}>
                     <InputError message={error?.details?.bookingStations} />
+                    <InputError message={error?.details?.phone} />
 
                     <InputError message={error?.message} />
+
                     <button className={theme.blue}>
                       CONTINUE
                       <FaArrowRight />
