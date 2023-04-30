@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useScrollRouting } from "../contexts/scroll-routing";
 
 const GRAND_OPENING_SALE = false;
+const GOLDEN_WEEK_SALE = true;
 
 function InfoPage() {
   const { navigate } = useScrollRouting();
@@ -45,12 +46,21 @@ function InfoPage() {
             <div className={theme.h4}>Price</div>
             {GRAND_OPENING_SALE ? (
               <span className={theme.price} style={{ marginTop: "0.5em" }}>
-                <img src="/img/small-sale-sticker.png" />
+                <img src="/img/small-50-percent-sale-sticker.png" />
                 <span className={theme.old}>
                   <small>¥</small>
                   <span>2,000</span>
                 </span>
                 <small>¥</small>1,000<small>/hr</small>
+              </span>
+            ) : GOLDEN_WEEK_SALE ? (
+              <span className={theme.price} style={{ marginTop: "0.5em" }}>
+                <img src="/img/small-25-percent-sale-sticker.png" />
+                <span className={theme.old}>
+                  <small>¥</small>
+                  <span>2,000</span>
+                </span>
+                <small>¥</small>1,500<small>/hr</small>
               </span>
             ) : (
               <span className={theme.price}>
