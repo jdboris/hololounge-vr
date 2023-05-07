@@ -372,7 +372,10 @@ export default function BookingPage() {
 
   function isStationBooked(station) {
     // TODO: Establish a better way to do this (without refreshing kiosk)
-    if (!SANDBOX_MODE && station.name == "Station A") {
+    if (
+      !SANDBOX_MODE &&
+      (station.name == "Station A" || station.name == "Station C")
+    ) {
       return true;
     }
 

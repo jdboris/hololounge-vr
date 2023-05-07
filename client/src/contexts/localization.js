@@ -63,6 +63,17 @@ export function Localizationprovider({ children }) {
           )
         );
 
+      document
+        .querySelector("meta[name='keywords']")
+        ?.setAttribute(
+          "content",
+          localize(
+            document
+              .querySelector("meta[name='keywords']")
+              ?.getAttribute("content")
+          )
+        );
+
       localizeNode(wrapperRef.current, language);
     }
   }, [language, wrapperRef]);
