@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useScrollRouting } from "../contexts/scroll-routing";
 
 const GRAND_OPENING_SALE = false;
-const GOLDEN_WEEK_SALE = true;
+const GOLDEN_WEEK_SALE = false;
 
 function InfoPage() {
   const { navigate } = useScrollRouting();

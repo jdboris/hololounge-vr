@@ -66,3 +66,11 @@
     }
   }
 }
+
+.error.react-tel-input .flag-dropdown {
+  border-bottom: 2px solid red !important;
+
+  input {
+    color: red !important;
+  }
+}

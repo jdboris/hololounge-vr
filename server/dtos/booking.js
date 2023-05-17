@@ -76,8 +76,24 @@ export default class BookingDto {
       errors.lastName = "Enter your last name.";
     }
 
+    if (
+      !this.email.match(
+        /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/
+      )
+    ) {
+      errors.email = "Enter a valid email address.";
+    }
+
     if (!this.email) {
       errors.email = "Enter your email address.";
+    }
+
+    if (
+      !this.phone.match(
+        /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/
+      )
+    ) {
+      errors.phone = "Enter a valid phone number.";
     }
 
     if (!this.phone) {

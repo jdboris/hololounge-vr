@@ -392,10 +392,10 @@ function localizeRaw(english, newLanguage) {
         return `予約スペース`;
       case ` Please check in at the in-store kiosk when it's time to start (up to 5 minutes in advance).`:
         return `開始時間の５分前に、店内受付のタブレットにてチェックインを行ってください。`;
-      case ` Please check in at the in-store kiosk when it's time to start (up to 5 minutes in advance).`:
-        return `開始時間の５分前に、店内受付のタブレットにてチェックインを行ってください。`;
       case ` Your experience(s) will start automatically. See the Help video and Guidebook at your station to get started.`:
         return `ステーションは自動で起動します。開始する前に、ステーションでヘルプビデオとガイドブックを確認しましょう。`;
+      case `HoloLounge, HoloLounge VR, VR, virtual reality, Asakusa, HoloLounge Asakusa, Tokyo, game, game center, arcade, entertainment, fun, attraction, experience, wifi, free wifi`:
+        return ``;
     }
   }
   return english;

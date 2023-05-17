@@ -933,7 +933,11 @@ export default function BookingPage() {
                     country={"jp"}
                     preferredCountries={["jp", "us", "ca", "cn", "kr", "in"]}
                     inputClass={theme.alt}
-                    containerClass={theme.label}
+                    containerClass={
+                      theme.label +
+                      " " +
+                      (error?.details?.phone ? theme.error + " error" : "")
+                    }
                     specialLabel={"Phone"}
                     name="phone"
                     type="tel"
