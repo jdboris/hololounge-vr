@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import ReactSimpleKeyboard from "react-simple-keyboard";
 import "react-simple-keyboard/build/css/index.css";
 import { useLocalization } from "../contexts/localization";
@@ -182,6 +176,9 @@ export default function Keyboard({
   const [kanjiIndex, setKanjiIndex] = useState(null);
   const selectedKanjiRef = useRef();
 
+  const keyboardValue =
+    keyboardRef.current && target && keyboardRef.current.getInput(target.name);
+
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -207,8 +204,8 @@ export default function Keyboard({
   useEffect(() => {
     if (disabled) return;
     if (language == "ja-JP") {
-      // setLayoutOptions({ ...layoutOptions, kanjiChoices: kanjis.length > 0 });
-      setLayoutOptions({ ...layoutOptions, kanjiChoices: false });
+      setLayoutOptions({ ...layoutOptions, kanjiChoices: kanjis.length > 0 });
+      // setLayoutOptions({ ...layoutOptions, kanjiChoices: false });
     }
   }, [kanjis.length > 0]);
 
@@ -226,10 +223,10 @@ export default function Keyboard({
   }, [kanjiIndex, selectedKanjiRef.current]);
 
   useEffect(() => {
-    if (kanjiIndex === null && target) {
-      setComposition(target.value.substring(compStart, compEnd));
+    if (kanjiIndex === null) {
+      setComposition((keyboardValue || "").substring(compStart, compEnd));
     }
-  }, [compStart, compEnd, kanjiIndex, target && target.value]);
+  }, [compStart, compEnd, kanjiIndex, keyboardValue]);
 
   useEffect(() => {
     if (disabled) return;
@@ -285,7 +282,7 @@ export default function Keyboard({
     return () => {
       controller.abort();
     };
-  }, [compStart, compEnd, composition, target, target && target.value]);
+  }, [compStart, compEnd, composition, target, keyboardValue]);
 
   useEffect(() => {
     if (disabled) return;
@@ -302,32 +299,28 @@ export default function Keyboard({
         setLayoutOptions((old) => {
           const options = { ...old };
 
-          options.size = target.value[target.selectionStart - 1]?.match(
-            new RegExp(`[${Object.entries(SIZES).flat().join()}]`)
-          );
+          options.size = keyboardValue
+            ? keyboardValue[target.selectionStart - 1]?.match(
+                new RegExp(`[${Object.entries(SIZES).flat().join()}]`)
+              )
+            : false;
 
-          options.contraction = target.value[target.selectionStart - 1]?.match(
-            new RegExp(
-              `[${
-                Object.entries(DAKUTENS).flat().join() +
-                Object.entries(TENTENS).flat().join()
-              }]`
-            )
-          );
+          options.contraction = keyboardValue
+            ? keyboardValue[target.selectionStart - 1]?.match(
+                new RegExp(
+                  `[${
+                    Object.entries(DAKUTENS).flat().join() +
+                    Object.entries(TENTENS).flat().join()
+                  }]`
+                )
+              )
+            : false;
 
           return options;
         });
       }
     }
-  }, [
-    language,
-    target,
-    target && target.value,
-    setLayout,
-    jp,
-    compStart,
-    compEnd,
-  ]);
+  }, [language, target, keyboardValue, setLayout, jp, compStart, compEnd]);
 
   useEffect(() => {
     if (disabled) return;
@@ -357,15 +350,15 @@ export default function Keyboard({
       keyboardRef.current.getCaretPosition(),
       keyboardRef.current.getCaretPositionEnd()
     );
-  }, [target && target.value]);
+  }, [keyboardValue]);
 
   const selectKanji = useCallback(
     (kanji) => {
       const newValue =
-        target.value.substring(0, compStart) +
+        keyboardValue.substring(0, compStart) +
         kanji +
-        target.value.substring(compEnd);
-      const caretPos = (target.value.substring(0, compStart) + kanji).length;
+        keyboardValue.substring(compEnd);
+      const caretPos = (keyboardValue.substring(0, compStart) + kanji).length;
 
       // WARNING: HACK
       target.value = newValue;
@@ -376,14 +369,7 @@ export default function Keyboard({
 
       onChange(newValue, target);
     },
-    [
-      onChange,
-      target,
-      target && target.value,
-      target && target.name,
-      compStart,
-      compEnd,
-    ]
+    [onChange, target, keyboardValue, target && target.name, compStart, compEnd]
   );
 
   if (disabled) {
@@ -399,11 +385,11 @@ export default function Keyboard({
           e.preventDefault();
           setTarget(e.target);
 
-          if (keyboardRef.current.getInput(e.target.name) != e.target.value) {
-            resetComposition();
-          }
+          // if (keyboardRef.current.getInput(e.target.name) != e.target.value) {
+          //   resetComposition();
+          // }
 
-          keyboardRef.current.setInput(e.target.value, e.target.name);
+          // keyboardRef.current.setInput(e.target.value, e.target.name);
 
           // if (e.target.inputMode == "tel") {
           //   keyboardRef.current.setOptions({
@@ -447,15 +433,17 @@ export default function Keyboard({
         }}
       >
         {kanjis.length > 0 && (
-          <div className="kanjis">
+          <div
+            className="kanjis"
+            onTouchStart={(e) => {
+              e.stopPropagation();
+            }}
+          >
             {kanjis.map((kanji, i) => (
               <button
                 key={"kanji-" + i}
                 {...(kanjiIndex === i ? { ref: selectedKanjiRef } : {})}
                 className={i === kanjiIndex ? "selected" : ""}
-                onTouchStart={(e) => {
-                  e.stopPropagation();
-                }}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -546,14 +534,14 @@ export default function Keyboard({
                 return;
               }
 
-              // if (button === "{select}") {
-              //   setKanjiIndex((old) => {
-              //     const kanjiIndex =
-              //       old === null ? 0 : (old + 1) % kanjis.length;
-              //     return kanjiIndex;
-              //   });
-              //   return;
-              // }
+              if (button === "{select}") {
+                setKanjiIndex((old) => {
+                  const kanjiIndex =
+                    old === null ? 0 : (old + 1) % kanjis.length;
+                  return kanjiIndex;
+                });
+                return;
+              }
 
               const offset = button === "{backspace}" ? -1 : 1;
 
